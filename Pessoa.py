@@ -3,35 +3,39 @@ import sqlite3
 
 class Pessoa(object):
 
-    def __init__(self, ra="", nome="", tel="", email="", foto=""):
+    def __init__(self, ID="", nome="", tel="", hora_entrada="", hora_saida="", faltas=0, foto=""):
         self.info = {}
-        self.ra = ra
+        self.ID = ID
         self.nome = nome
         self.tel = tel
-        self.email = email
+        self.hora_entrada = hora_entrada
+        self.hora_saida = hora_saida
+        self.faltas = faltas
         self.foto = foto
         self.banco = Banco()
         self.conexao = sqlite3.connect("banco.db")
         self.cursor = self.conexao.cursor()
 
-    def load_pessoa(self, ra):
+    def load_pessoa(self, ID):
         self.cursor.execute(f"""
         SELECT * FROM pessoas
-        WHERE ra like "{ra}"
+        WHERE ID like "{ID}"
         """)
 
         results = self.cursor.fetchone()
 
-        self.ra = ra
+        self.ID = ID
         self.nome = results[1]
         self.tel = results[2]
-        self.email = results[3]
-        self.foto = results[4]
+        self.hora_entrada = results[3]
+        self.hora_saida = results[4]
+        self.faltas = results[5]
+        self.foto = results[6]
 
     def insert_pessoa(self):
         self.cursor.execute(f"""
         INSERT INTO pessoas VALUES
-        ("{self.ra}", "{self.nome}", "{self.tel}", "{self.email}", "{self.foto}")
+        ("{self.ID}", "{self.nome}", "{self.tel}", "{self.hora_entrada}", "{self.hora_saida}" "{self.faltas}", "{self.foto}")
         """)
 
         self.conexao.commit()
@@ -55,7 +59,7 @@ def conta_pessoa():
     cursor = conexao.cursor()
 
     cursor.execute("""
-    SELECT COUNT(ra) FROM pessoas
+    SELECT COUNT(ID) FROM pessoas
     """)
 
     results = cursor.fetchone()
@@ -63,13 +67,13 @@ def conta_pessoa():
 
     return results[0]
 
-def delete_pessoa(ra):
+def delete_pessoa(ID):
     conexao = sqlite3.connect("banco.db")
     cursor = conexao.cursor()
 
     cursor.execute(f"""
     DELETE FROM pessoas
-    WHERE ra like "{ra}"
+    WHERE ID like "{ID}"
     """)
 
     conexao.commit()

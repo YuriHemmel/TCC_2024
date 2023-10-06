@@ -3,6 +3,7 @@ from PIL import Image
 import base64
 import io
 import cv2 as cv
+import sqlite3
 
 
 def tira_foto():
@@ -48,3 +49,22 @@ def convertToImage(bytes):
     binary_data = base64.b64decode(bytes)
     image = Image.open(io.BytesIO(binary_data))
     image.save('imagem_binario.jpg')
+
+
+def listar_cursos():
+    lista_materias = ["Selecione um curso"]
+
+    conexao = sqlite3.connect("banco.db")
+    cursor = conexao.cursor()
+
+    cursor.execute("""
+    SELECT nome FROM cursos
+    """)
+
+    results = cursor.fetchall()
+    conexao.close()
+
+    for m in results:
+        lista_materias.append(m)
+
+    return lista_materias

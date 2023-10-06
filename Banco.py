@@ -11,10 +11,12 @@ class Banco():
 
         # Tabela pessoas
         cursor.execute("""create table if not exists pessoas (
-                     ra text primary key unique not null,
+                     ID text primary key unique not null,
                      nome text not null,
                      tel text unique not null,
-                     email text unique not null,
+                     hora_entrada text not null,
+                     hora_saida text not null,
+                     faltas int not null,
                      foto text not null)""")
         
         # Tabela Câmeras
@@ -24,37 +26,6 @@ class Banco():
                      ip text unique not null,
                      senha text not null,
                      usuario text not null)""")
-        
-        # Tabela Cursos
-        cursor.execute("""create table if not exists cursos (
-                       idcurso integer primary key autoincrement unique not null,
-                       nome text not null,
-                       lista_materias text not null)""")
-
-#        cursor.execute("""INSERT INTO cursos (nome, lista_materias)
-#                       VALUES ("Ciência da computação", "QS, DSD")""")
-
-        # Tabela Matérias
-        cursor.execute("""create table if not exists materias (
-                       idmateria text primary key unique not null,
-                       nome text not null,
-                       dia_semana text not null,
-                       horario text not null)""")
-        
-#        cursor.execute("""INSERT INTO materias (idmateria, nome, dia_semana, horario)
-#                          VALUES ("QS", "Qualidade de software", "quinta", "19:10")
-#                       """)
-    
-#        cursor.execute("""INSERT INTO materias (idmateria, nome, dia_semana, horario)
-#                          VALUES ("DSD", "Desenvolvimento de Sistemas Distribuídos", "sexta", "19:10")
-#                       """)
-
-        # Tabela Faltas
-        cursor.execute("""create table if not exists faltas (
-                       id_falta integer primary key autoincrement unique not null,
-                       id_aluno text not null,
-                       id_materia text not null,
-                       num_faltas integer)""")
         
         self.conexao.commit()
         cursor.close()

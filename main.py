@@ -4,7 +4,7 @@ import Camera as Cam
 import Pessoa as Pes
 from tkinter import *  # Interface gráfica
 from tkinter import messagebox # Caixa de mensagem para confirmações
-#from tkinter import ttk # Combobox
+from datetime import datetime
 import cv2
 
 # Janela
@@ -93,7 +93,7 @@ def cadastra_camera():
 # Cadastra pessoas no banco de dados
 def cadastra_pessoa():
 
-    dados = [pagina_pessoa_ra.get(), pagina_pessoa_nome.get(), pagina_pessoa_tel.get(), pagina_pessoa_email.get()]
+    dados = [pagina_pessoa_id.get(), pagina_pessoa_nome.get(), pagina_pessoa_tel.get(), pagina_pessoa_curso.get()]
 
     # Verifica se os campos estão vazios
     for d in dados:
@@ -142,9 +142,12 @@ def volta_pag_cadastro():
 def volta_pag_pessoa():
 
     pagina_pessoa_nome.delete(0, END)
-    pagina_pessoa_ra.delete(0, END)
+    pagina_pessoa_id.delete(0, END)
     pagina_pessoa_tel.delete(0, END)
-    pagina_pessoa_email.delete(0, END)
+    pagina_pessoa_entH
+    pagina_pessoa_entM
+    pagina_pessoa_saidaH
+    pagina_pessoa_saidaM
     pagina_pessoa_label.config(text="")
 
     show_frame(pagina_inicial)
@@ -393,14 +396,14 @@ pagina_pessoa_nome["width"] = 20
 pagina_pessoa_nome["font"] = fonte
 pagina_pessoa_nome.place(x=300 - 70, y=90)
 
-pagina_pessoa_raLabel = Label(pagina_pessoa, text="RA:", font=fonte)
-pagina_pessoa_raLabel.configure(bg="#1fff93")
-pagina_pessoa_raLabel.place(x=220 - 23, y=137)
+pagina_pessoa_idLabel = Label(pagina_pessoa, text="ID:", font=fonte)
+pagina_pessoa_idLabel.configure(bg="#1fff93")
+pagina_pessoa_idLabel.place(x=220 - 20, y=137)
 
-pagina_pessoa_ra = Entry(pagina_pessoa)
-pagina_pessoa_ra["width"] = 20
-pagina_pessoa_ra["font"] = fonte
-pagina_pessoa_ra.place(x=300 - 70, y=140)
+pagina_pessoa_id = Entry(pagina_pessoa)
+pagina_pessoa_id["width"] = 20
+pagina_pessoa_id["font"] = fonte
+pagina_pessoa_id.place(x=300 - 70, y=140)
 
 pagina_pessoa_telLabel = Label(pagina_pessoa, text="Telefone:", font=fonte)
 pagina_pessoa_telLabel.configure(bg="#1fff93")
@@ -411,14 +414,53 @@ pagina_pessoa_tel["width"] = 20
 pagina_pessoa_tel["font"] = fonte
 pagina_pessoa_tel.place(x=300 - 70, y=190)
 
-pagina_pessoa_emailLabel = Label(pagina_pessoa, text="Email:", font=fonte)
-pagina_pessoa_emailLabel.configure(bg="#1fff93")
-pagina_pessoa_emailLabel.place(x=220 - 40, y=237)
+pagina_pessoa_horLabel = Label(pagina_pessoa, text="Horários:", font=fonte)
+pagina_pessoa_horLabel.configure(bg="#1fff93")
+pagina_pessoa_horLabel.place(x=300 - 30, y=217)
 
-pagina_pessoa_email = Entry(pagina_pessoa)
-pagina_pessoa_email["width"] = 20
-pagina_pessoa_email["font"] = fonte
-pagina_pessoa_email.place(x=300 - 70, y=240)
+pagina_pessoa_entLabel = Label(pagina_pessoa, text="Entrada:", font=fonte)
+pagina_pessoa_entLabel.configure(bg="#1fff93")
+pagina_pessoa_entLabel.place(x=220 - 55, y=247)
+
+pagina_pessoa_entH = Spinbox(pagina_pessoa, from_=0, to=23)
+pagina_pessoa_entH["width"] = 4
+pagina_pessoa_entH["font"] = fonte
+pagina_pessoa_entH.place(x=230, y=250)
+
+pagina_pessoa_entHLabel = Label(pagina_pessoa, text="H", font=fonte)
+pagina_pessoa_entHLabel.configure(bg="#1fff93")
+pagina_pessoa_entHLabel.place(x=270, y=249)
+
+pagina_pessoa_entM = Spinbox(pagina_pessoa, from_=0, to=59)
+pagina_pessoa_entM["width"] = 4
+pagina_pessoa_entM["font"] = fonte
+pagina_pessoa_entM.place(x=300, y=250)
+
+pagina_pessoa_entMLabel = Label(pagina_pessoa, text="M", font=fonte)
+pagina_pessoa_entMLabel.configure(bg="#1fff93")
+pagina_pessoa_entMLabel.place(x=340, y=249)
+
+pagina_pessoa_saidaLabel = Label(pagina_pessoa, text="Saída:", font=fonte)
+pagina_pessoa_saidaLabel.configure(bg="#1fff93")
+pagina_pessoa_saidaLabel.place(x=220 - 45, y=297)
+
+pagina_pessoa_saidaH = Spinbox(pagina_pessoa, from_=0, to=23)
+pagina_pessoa_saidaH["width"] = 4
+pagina_pessoa_saidaH["font"] = fonte
+pagina_pessoa_saidaH.place(x=230, y=300)
+
+pagina_pessoa_saidaHLabel = Label(pagina_pessoa, text="H", font=fonte)
+pagina_pessoa_saidaHLabel.configure(bg="#1fff93")
+pagina_pessoa_saidaHLabel.place(x=270, y=299)
+
+pagina_pessoa_saidaM = Spinbox(pagina_pessoa, from_=0, to=59)
+pagina_pessoa_saidaM["width"] = 4
+pagina_pessoa_saidaM["font"] = fonte
+pagina_pessoa_saidaM.place(x=300, y=300)
+
+pagina_pessoa_saidaMLabel = Label(pagina_pessoa, text="M", font=fonte)
+pagina_pessoa_saidaMLabel.configure(bg="#1fff93")
+pagina_pessoa_saidaMLabel.place(x=340, y=299)
 
 pagina_pessoa_cadastrar = Button(pagina_pessoa, text="Cadastrar",
                                    font=fonte, command=lambda: cadastra_pessoa())
