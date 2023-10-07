@@ -14,8 +14,8 @@ class Banco():
                      ID text primary key unique not null,
                      nome text not null,
                      tel text unique not null,
-                     hora_entrada text not null,
-                     hora_saida text not null,
+                     entrada text not null,
+                     saida text not null,
                      faltas int not null,
                      foto text not null)""")
         

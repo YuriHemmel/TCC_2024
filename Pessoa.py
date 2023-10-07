@@ -3,13 +3,13 @@ import sqlite3
 
 class Pessoa(object):
 
-    def __init__(self, ID="", nome="", tel="", hora_entrada="", hora_saida="", faltas=0, foto=""):
+    def __init__(self, ID="", nome="", tel="", entrada="", saida="", faltas=0, foto=""):
         self.info = {}
         self.ID = ID
         self.nome = nome
         self.tel = tel
-        self.hora_entrada = hora_entrada
-        self.hora_saida = hora_saida
+        self.entrada = entrada
+        self.saida = saida
         self.faltas = faltas
         self.foto = foto
         self.banco = Banco()
@@ -27,15 +27,16 @@ class Pessoa(object):
         self.ID = ID
         self.nome = results[1]
         self.tel = results[2]
-        self.hora_entrada = results[3]
-        self.hora_saida = results[4]
+        self.entrada = results[3]
+        self.saida = results[4]
         self.faltas = results[5]
         self.foto = results[6]
 
     def insert_pessoa(self):
+
         self.cursor.execute(f"""
         INSERT INTO pessoas VALUES
-        ("{self.ID}", "{self.nome}", "{self.tel}", "{self.hora_entrada}", "{self.hora_saida}" "{self.faltas}", "{self.foto}")
+        ("{self.ID}", "{self.nome}", "{self.tel}", "{self.entrada}", "{self.saida}", "{self.faltas}", "{self.foto}")
         """)
 
         self.conexao.commit()
@@ -78,3 +79,17 @@ def delete_pessoa(ID):
 
     conexao.commit()
     conexao.close()
+
+def seleciona_pessoa(ID):
+    conexao = sqlite3.connect("banco.db")
+    cursor = conexao.cursor()
+
+    cursor.execute(f"""
+    SELECT * FROM pessoas
+    WHERE ID like "{ID}"
+    """)
+
+    results = cursor.fetchone()
+    conexao.close()
+
+    return results

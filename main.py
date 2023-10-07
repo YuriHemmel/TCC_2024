@@ -21,13 +21,14 @@ pagina_cameras = Frame(janela)
 pagina_cadastro = Frame(janela)
 pagina_pessoa = Frame(janela)
 pagina_list_pessoa = Frame(janela)
+pagina_edit_pessoa = Frame(janela)
 
 # Fontes
 fonte = ("Arial", 10, 'bold')
 fonteTit = ("Arial", 13, 'bold')
 
 # Adicionando as páginas
-paginas = (pagina_inicial, pagina_cameras, pagina_cadastro, pagina_pessoa, pagina_list_pessoa)
+paginas = (pagina_inicial, pagina_cameras, pagina_cadastro, pagina_pessoa, pagina_list_pessoa, pagina_edit_pessoa)
 
 # Adiciona os frames nas páginas
 for frame in paginas:
@@ -54,7 +55,7 @@ def listar_pessoas():
     pessoas = Pes.list_pessoa()
     
     for p in pessoas:
-        lista_pessoa.insert(0, f"RA: {p[0]} Nome: {p[1]}")
+        lista_pessoa.insert(0, f"ID: {p[0]} Nome: {p[1]}")
 
 # Cadastra câmeras no banco de dados
 def cadastra_camera():
@@ -93,7 +94,7 @@ def cadastra_camera():
 # Cadastra pessoas no banco de dados
 def cadastra_pessoa():
 
-    dados = [pagina_pessoa_id.get(), pagina_pessoa_nome.get(), pagina_pessoa_tel.get(), pagina_pessoa_curso.get()]
+    dados = [pagina_pessoa_id.get(), pagina_pessoa_nome.get(), pagina_pessoa_tel.get()]
 
     # Verifica se os campos estão vazios
     for d in dados:
@@ -102,22 +103,43 @@ def cadastra_pessoa():
                 text="Por favor, preencha os\ncampos corretamente.")
             return
 
+    ent = f"{pagina_pessoa_entH.get()}:{pagina_pessoa_entM.get()}"
+    sai = f"{pagina_pessoa_saidaH.get()}:{pagina_pessoa_saidaM.get()}"
+
+    entrada = datetime.strptime(ent, "%H:%M")
+    saida = datetime.strptime(sai, "%H:%M")
+
     fotoBin = utils.recebe_foto_binario()
 
     # Verifica se os dados inseridos pertencem à uma pessoa já registrada
     try:
-        pessoa = Pes.Pessoa(dados[0], dados[1], dados[2], dados[3], fotoBin)
+        pessoa = Pes.Pessoa(dados[0], dados[1], dados[2], entrada, saida, 0, fotoBin)
         pessoa.insert_pessoa()
-    except Exception as e:
-        print(e)
+    except: #Exception as e:
+        #print(e)
         pagina_pessoa_label.config(text="Dados duplicados.")
         return
 
     # Cadastro bem sucedido
     pagina_pessoa_label.config(text="Pessoa registrada com sucesso.")
-    lista_pessoa.insert(0, f"RA: {dados[0]} Nome: {dados[1]}")
+    lista_pessoa.insert(0, f"ID: {dados[0]} Nome: {dados[1]}")
 
     return
+
+def direciona_editar_pessoa():
+
+    selecionada = lista_pessoa.get(ACTIVE)
+
+    #Se não tiver pessoa registrada, dá erro
+    if selecionada == "":
+        messagebox.showinfo('Erro', 'Nenhuma pessoa selecionada')
+        return
+    
+    selecionada = selecionada.split()[1]
+
+    pessoa = Pes.seleciona_pessoa(selecionada)
+
+    show_frame(pagina_edit_pessoa)
 
 # Indo para a página de cadastro (atualiza o campo de nome automáticamente)
 
@@ -474,7 +496,7 @@ pagina_pessoa_voltar = Button(pagina_pessoa, text="Voltar",
                                 font=fonte, command=lambda: volta_pag_pessoa())
 pagina_pessoa_voltar.place(x=310, y=340)
 
-# ================ Pagina das Pessoas =======================
+# ================ Pagina Lista das Pessoas =======================
 
 pagina_list_pessoa.configure(bg="#1FFF93")
 
@@ -488,7 +510,7 @@ lista_pessoa.place(x=150, y=80)
 lista_pessoa.yview_scroll(number=2, what='units')
 
 pagina_list_pessoa_acessar = Button(
-    pagina_list_pessoa, text="Conectar", font=fonte, command=lambda: conecta_camera())
+    pagina_list_pessoa, text="Editar", font=fonte, command=lambda: direciona_editar_pessoa())
 pagina_list_pessoa_acessar.place(x=300 - 80, y=270)
 
 pagina_list_pessoa_apagar = Button(
@@ -498,6 +520,15 @@ pagina_list_pessoa_apagar.place(x=300 + 20, y=270)
 pagina_list_pessoa_voltar = Button(
     pagina_list_pessoa, text="Voltar", font=fonte, command=lambda: show_frame(pagina_inicial))
 pagina_list_pessoa_voltar.place(x=300 - 25, y=320)
+
+# ================ Pagina Edição de Pessoas =======================
+
+pagina_edit_pessoa.configure(bg="#1FFF93")
+
+pagina_edit_pessoa_titulo = Label(
+    pagina_edit_pessoa, text="Selecione uma Pessoa", font=fonteTit)
+pagina_edit_pessoa_titulo.configure(bg="#1FFF93")
+pagina_edit_pessoa_titulo.place(x=300 - 90, y=40)
 
 # ================ Método de inicialização =======================
 
