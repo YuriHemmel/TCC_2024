@@ -93,3 +93,20 @@ def seleciona_pessoa(ID):
     conexao.close()
 
     return results
+
+def altera_dados(ID, nome, tel, entrada, saida):
+    conexao = sqlite3.connect("banco.db")
+    cursor = conexao.cursor()
+
+    cursor.execute(f"""
+    UPDATE pessoas
+    SET ID = "{ID}",
+    nome = "{nome}",
+    tel = "{tel}",
+    entrada = "{entrada}",
+    saida = "{saida}"
+    WHERE ID like "{ID}"
+    """)
+
+    conexao.commit()
+    conexao.close()

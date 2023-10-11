@@ -6,6 +6,7 @@ from tkinter import *  # Interface gráfica
 from tkinter import messagebox  # Caixa de mensagem para confirmações
 from datetime import datetime
 import cv2
+import os
 
 WIDTH = 600
 HEIGHT = 400
@@ -31,7 +32,7 @@ fonte = ("Arial", 10, 'bold')
 fonteTit = ("Arial", 13, 'bold')
 
 # Tamanho de botão
-tamanho_botão = 30
+tamanho_botao = 30
 
 # Adicionando as páginas
 paginas = (pagina_inicial, pagina_cameras, pagina_cadastro,
@@ -125,8 +126,8 @@ def cadastra_pessoa():
     entrada = datetime.strptime(ent, "%H:%M")
     saida = datetime.strptime(sai, "%H:%M")
 
-    ent = str(entrada)[10:]
-    sai = str(saida)[10:]
+    ent = str(entrada)[10:16]
+    sai = str(saida)[10:16]
 
     fotoBin = utils.recebe_foto_binario()
 
@@ -167,11 +168,34 @@ def direciona_editar_pessoa():
     # pessoa[5] = faltas
     # pessoa[6] = foto
 
-    pagina_edit_pessoa_id.insert(index=1, string=f"{pessoa[0]}")
     pagina_edit_pessoa_nome.insert(index=1, string=f"{pessoa[1]}")
     pagina_edit_pessoa_tel.insert(index=1, string=f"{pessoa[2]}")
+    pagina_edit_pessoa_ent.insert(index=1, string=f"{pessoa[3]}")
+    pagina_edit_pessoa_saida.insert(index=1, string=f"{pessoa[4]}")
 
     show_frame(pagina_edit_pessoa)
+
+# Salva novas informações no banco
+
+
+def alterar_info():
+
+    dados = [pagina_edit_pessoa_nome.get(), pagina_edit_pessoa_tel.get(
+    ), pagina_edit_pessoa_ent.get(), pagina_edit_pessoa_saida.get()]
+
+    # Verifica se os campos estão vazios
+    for d in dados:
+        if d == "":
+            messagebox.showinfo('Erro', 'Preencha os campos corretamente')
+            return
+
+    res = messagebox.askquestion('Confirmação', 'Deseja alterar os dados de ?')
+
+    if res == 'yes':
+        Pes.altera_dados(dados[0], dados[1], dados[2], dados[3], dados[4])
+    else:
+        messagebox.showinfo('Cancelado', 'Ação cancelada')
+
 
 # Indo para a página de cadastro (atualiza o campo de nome automáticamente)
 
@@ -282,7 +306,7 @@ def conecta_camera():
         ip = cam[2]
         port = '554'
 
-        # os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;udp"
+        os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;0"
 
         url = f"rtsp://{user}:{password}@{ip}:{port}/onvif1"
 
@@ -547,15 +571,15 @@ lista_pessoa.yview_scroll(number=2, what='units')
 
 pagina_list_pessoa_acessar = Button(
     pagina_list_pessoa, text="Editar", font=fonte, command=lambda: direciona_editar_pessoa())
-pagina_list_pessoa_acessar.pack(padx=45, ipadx=tamanho_botão, side=LEFT)
+pagina_list_pessoa_acessar.pack(padx=45, ipadx=tamanho_botao, side=LEFT)
 
 pagina_list_pessoa_apagar = Button(
     pagina_list_pessoa, text="Apagar", font=fonte, command=lambda: confirma_apagar_pessoa())
-pagina_list_pessoa_apagar.pack(padx=45, ipadx=tamanho_botão, side=RIGHT)
+pagina_list_pessoa_apagar.pack(padx=45, ipadx=tamanho_botao, side=RIGHT)
 
 pagina_list_pessoa_voltar = Button(
     pagina_list_pessoa, text="Voltar", font=fonte, command=lambda: show_frame(pagina_inicial))
-pagina_list_pessoa_voltar.pack(padx=45, ipadx=tamanho_botão, side=RIGHT)
+pagina_list_pessoa_voltar.pack(padx=45, ipadx=tamanho_botao, side=RIGHT)
 
 # ================ Pagina Edição de Pessoas =======================
 
@@ -564,36 +588,60 @@ pagina_edit_pessoa.configure(bg="#71BAFF")
 pagina_edit_pessoa_titulo = Label(
     pagina_edit_pessoa, text="Selecione uma Pessoa", font=fonteTit)
 pagina_edit_pessoa_titulo.configure(bg="#71BAFF")
-pagina_edit_pessoa_titulo.place(x=300 - 90, y=40)
+pagina_edit_pessoa_titulo.place(x=300 - 90, y=20)
 
 pagina_edit_pessoa_nomeLabel = Label(
     pagina_edit_pessoa, text="Nome:", font=fonte)
 pagina_edit_pessoa_nomeLabel.configure(bg="#71BAFF")
-pagina_edit_pessoa_nomeLabel.place(x=220 - 43, y=87)
+pagina_edit_pessoa_nomeLabel.place(x=220 - 43, y=67)
 
 pagina_edit_pessoa_nome = Entry(pagina_edit_pessoa)
 pagina_edit_pessoa_nome["width"] = 20
 pagina_edit_pessoa_nome["font"] = fonte
-pagina_edit_pessoa_nome.place(x=300 - 70, y=90)
-
-pagina_edit_pessoa_idLabel = Label(pagina_edit_pessoa, text="ID:", font=fonte)
-pagina_edit_pessoa_idLabel.configure(bg="#71BAFF")
-pagina_edit_pessoa_idLabel.place(x=220 - 20, y=137)
-
-pagina_edit_pessoa_id = Entry(pagina_edit_pessoa)
-pagina_edit_pessoa_id["width"] = 20
-pagina_edit_pessoa_id["font"] = fonte
-pagina_edit_pessoa_id.place(x=300 - 70, y=140)
+pagina_edit_pessoa_nome.place(x=300 - 70, y=70)
 
 pagina_edit_pessoa_telLabel = Label(
     pagina_edit_pessoa, text="Telefone:", font=fonte)
 pagina_edit_pessoa_telLabel.configure(bg="#71BAFF")
-pagina_edit_pessoa_telLabel.place(x=220 - 60, y=187)
+pagina_edit_pessoa_telLabel.place(x=220 - 60, y=117)
 
 pagina_edit_pessoa_tel = Entry(pagina_edit_pessoa)
 pagina_edit_pessoa_tel["width"] = 20
 pagina_edit_pessoa_tel["font"] = fonte
-pagina_edit_pessoa_tel.place(x=300 - 70, y=190)
+pagina_edit_pessoa_tel.place(x=300 - 70, y=117)
+
+pagina_edit_pessoa_horLabel = Label(
+    pagina_edit_pessoa, text="Horários:", font=fonte)
+pagina_edit_pessoa_horLabel.configure(bg="#71BAFF")
+pagina_edit_pessoa_horLabel.place(x=300 - 30, y=157)
+
+pagina_edit_pessoa_entLabel = Label(
+    pagina_edit_pessoa, text="Entrada:", font=fonte)
+pagina_edit_pessoa_entLabel.configure(bg="#71BAFF")
+pagina_edit_pessoa_entLabel.place(x=220 - 55, y=197)
+
+pagina_edit_pessoa_ent = Entry(pagina_edit_pessoa)
+pagina_edit_pessoa_ent["width"] = 15
+pagina_edit_pessoa_ent["font"] = fonte
+pagina_edit_pessoa_ent.place(x=227, y=200)
+
+pagina_edit_pessoa_saidaLabel = Label(
+    pagina_edit_pessoa, text="Saída:", font=fonte)
+pagina_edit_pessoa_saidaLabel.configure(bg="#71BAFF")
+pagina_edit_pessoa_saidaLabel.place(x=220 - 45, y=247)
+
+pagina_edit_pessoa_saida = Entry(pagina_edit_pessoa)
+pagina_edit_pessoa_saida["width"] = 15
+pagina_edit_pessoa_saida["font"] = fonte
+pagina_edit_pessoa_saida.place(x=227, y=250)
+
+pagina_edit_pessoa_voltar = Button(
+    pagina_edit_pessoa, text="Voltar", font=fonte, command=lambda: show_frame(pagina_list_pessoa))
+pagina_edit_pessoa_voltar.pack(pady=20, ipadx=tamanho_botao, side=BOTTOM)
+
+pagina_edit_pessoa_salvar = Button(
+    pagina_edit_pessoa, text="Salvar alterações", font=fonte, command=lambda: alterar_info())
+pagina_edit_pessoa_salvar.pack(pady=5, ipadx=tamanho_botao - 10,ipady=2,side=BOTTOM)
 
 # ================ Método de inicialização =======================
 
