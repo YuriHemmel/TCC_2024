@@ -3,16 +3,19 @@ import Banco
 import Camera as Cam
 import Pessoa as Pes
 from tkinter import *  # Interface gráfica
-from tkinter import messagebox # Caixa de mensagem para confirmações
+from tkinter import messagebox  # Caixa de mensagem para confirmações
 from datetime import datetime
 import cv2
+
+WIDTH = 600
+HEIGHT = 400
 
 # Janela
 janela = Tk()
 janela.title("Sistema de chamada")
 janela.rowconfigure(0, weight=1)
 janela.columnconfigure(0, weight=1)
-janela.geometry("600x400")
+janela.geometry(f"{WIDTH}x{HEIGHT}")
 janela.resizable(False, False)
 
 # Páginas
@@ -27,14 +30,20 @@ pagina_edit_pessoa = Frame(janela)
 fonte = ("Arial", 10, 'bold')
 fonteTit = ("Arial", 13, 'bold')
 
+# Tamanho de botão
+tamanho_botão = 30
+
 # Adicionando as páginas
-paginas = (pagina_inicial, pagina_cameras, pagina_cadastro, pagina_pessoa, pagina_list_pessoa, pagina_edit_pessoa)
+paginas = (pagina_inicial, pagina_cameras, pagina_cadastro,
+           pagina_pessoa, pagina_list_pessoa, pagina_edit_pessoa)
 
 # Adiciona os frames nas páginas
 for frame in paginas:
     frame.grid(row=0, column=0, sticky='nsew')
 
 # Mostra o Frame que queremos
+
+
 def show_frame(frame):
     frame.tkraise()
 
@@ -45,19 +54,23 @@ show_frame(pagina_inicial)
 # Cria o banco de dados se não existir ainda
 db = Banco.Banco()
 
+
 def listar_cameras():
     cams = Cam.list_camera()
 
     for c in cams:
         lista_cameras.insert(c[0], f"Nome: {c[1]}       IP: {c[2]}")
 
+
 def listar_pessoas():
     pessoas = Pes.list_pessoa()
-    
+
     for p in pessoas:
         lista_pessoa.insert(0, f"ID: {p[0]} Nome: {p[1]}")
 
 # Cadastra câmeras no banco de dados
+
+
 def cadastra_camera():
 
     dados = [pagina_cadastro_nome.get(), pagina_cadastro_ip.get(),
@@ -74,8 +87,8 @@ def cadastra_camera():
     try:
         camera = Cam.Camera(dados[0], dados[1], dados[2], dados[3])
         camera.insert_camera()
-    except: #Exception as e:
-        #print(e)
+    except:  # Exception as e:
+        # print(e)
         pagina_cadastro_label.config(text="Dados duplicados.")
         return
 
@@ -92,9 +105,12 @@ def cadastra_camera():
     return
 
 # Cadastra pessoas no banco de dados
+
+
 def cadastra_pessoa():
 
-    dados = [pagina_pessoa_id.get(), pagina_pessoa_nome.get(), pagina_pessoa_tel.get()]
+    dados = [pagina_pessoa_id.get(), pagina_pessoa_nome.get(),
+             pagina_pessoa_tel.get()]
 
     # Verifica se os campos estão vazios
     for d in dados:
@@ -109,14 +125,17 @@ def cadastra_pessoa():
     entrada = datetime.strptime(ent, "%H:%M")
     saida = datetime.strptime(sai, "%H:%M")
 
+    ent = str(entrada)[10:]
+    sai = str(saida)[10:]
+
     fotoBin = utils.recebe_foto_binario()
 
     # Verifica se os dados inseridos pertencem à uma pessoa já registrada
     try:
-        pessoa = Pes.Pessoa(dados[0], dados[1], dados[2], entrada, saida, 0, fotoBin)
+        pessoa = Pes.Pessoa(dados[0], dados[1], dados[2], ent, sai, 0, fotoBin)
         pessoa.insert_pessoa()
-    except: #Exception as e:
-        #print(e)
+    except:  # Exception as e:
+        # print(e)
         pagina_pessoa_label.config(text="Dados duplicados.")
         return
 
@@ -126,18 +145,31 @@ def cadastra_pessoa():
 
     return
 
+
 def direciona_editar_pessoa():
 
     selecionada = lista_pessoa.get(ACTIVE)
 
-    #Se não tiver pessoa registrada, dá erro
+    # Se não tiver pessoa registrada, dá erro
     if selecionada == "":
         messagebox.showinfo('Erro', 'Nenhuma pessoa selecionada')
         return
-    
+
     selecionada = selecionada.split()[1]
 
     pessoa = Pes.seleciona_pessoa(selecionada)
+
+    # pessoa[0] = ID
+    # pessoa[1] = Nome
+    # pessoa[2] = Telefone
+    # pessoa[3] = Hora de entrada
+    # pessoa[4] = Hora de saída
+    # pessoa[5] = faltas
+    # pessoa[6] = foto
+
+    pagina_edit_pessoa_id.insert(index=1, string=f"{pessoa[0]}")
+    pagina_edit_pessoa_nome.insert(index=1, string=f"{pessoa[1]}")
+    pagina_edit_pessoa_tel.insert(index=1, string=f"{pessoa[2]}")
 
     show_frame(pagina_edit_pessoa)
 
@@ -161,48 +193,50 @@ def volta_pag_cadastro():
 
     show_frame(pagina_inicial)
 
+
 def volta_pag_pessoa():
 
     pagina_pessoa_nome.delete(0, END)
     pagina_pessoa_id.delete(0, END)
     pagina_pessoa_tel.delete(0, END)
-    pagina_pessoa_entH
-    pagina_pessoa_entM
-    pagina_pessoa_saidaH
-    pagina_pessoa_saidaM
     pagina_pessoa_label.config(text="")
 
     show_frame(pagina_inicial)
 
 # Apaga camera do banco de dados
+
+
 def confirma_apagar_camera():
 
     camSelecionada = lista_cameras.get(ACTIVE)
 
-    #Se não tiver câmera registrada, dá erro
+    # Se não tiver câmera registrada, dá erro
     if camSelecionada == "":
         messagebox.showinfo('Erro', 'Nenhuma câmera selecionada')
         return
 
     camSelecionada = camSelecionada.split()[1]
-    
-    #Cria caixa de mensagem para confirmação
-    res = messagebox.askquestion("Apagar câmera", f"Deseja apagar informações da câmera {camSelecionada}?")
+
+    # Cria caixa de mensagem para confirmação
+    res = messagebox.askquestion(
+        "Apagar câmera", f"Deseja apagar informações da câmera {camSelecionada}?")
 
     if res == 'yes':
-        lista_cameras.delete(lista_cameras.curselection())    
+        lista_cameras.delete(lista_cameras.curselection())
         Cam.delete_camera(camSelecionada)
         messagebox.showinfo('Sucesso', 'Câmera apagada com sucesso')
-        
+
     else:
         messagebox.showinfo('Cancelado', 'Ação cancelada')
 
 # Apaga pessoa do banco de dados
+
+
 def confirma_apagar_pessoa():
 
     selecionada = lista_pessoa.get(ACTIVE)
 
-    #Se não tiver pessoa registrada, dá erro
+    # Se não tiver pessoa registrada, dá erro
     if selecionada == "":
         messagebox.showinfo('Erro', 'Nenhuma pessoa selecionada')
         return
@@ -214,17 +248,19 @@ def confirma_apagar_pessoa():
         nome = nome + " " + n
 
     selecionada = selecionada.split()[1]
-    
-    #Cria caixa de mensagem para confirmação
-    res = messagebox.askquestion("Apagar pessoa", f"Deseja apagar informações de{nome}?")
+
+    # Cria caixa de mensagem para confirmação
+    res = messagebox.askquestion(
+        "Apagar pessoa", f"Deseja apagar informações de{nome}?")
 
     if res == 'yes':
-        lista_pessoa.delete(lista_pessoa.curselection())    
+        lista_pessoa.delete(lista_pessoa.curselection())
         Pes.delete_pessoa(selecionada)
         messagebox.showinfo('Sucesso', 'Pessoa apagada com sucesso')
-        
+
     else:
         messagebox.showinfo('Cancelado', 'Ação cancelada')
+
 
 def conecta_camera():
     camSelecionada = lista_cameras.get(ACTIVE)
@@ -234,19 +270,19 @@ def conecta_camera():
         return
 
     camSelecionada = camSelecionada.split()[3]
-    
+
     cam = Cam.load_camera(camSelecionada)
 
     if cam[1] == "CameraTeste":
         cap = cv2.VideoCapture(0)
-        
+
     else:
         user = cam[4]
         password = cam[3]
         ip = cam[2]
         port = '554'
 
-        #os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;udp"
+        # os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;udp"
 
         url = f"rtsp://{user}:{password}@{ip}:{port}/onvif1"
 
@@ -272,16 +308,16 @@ def conecta_camera():
 # ================ Pagina inicial =======================
 
 
-pagina_inicial.configure(bg="#1FFF93")
+pagina_inicial.configure(bg="#71BAFF")
 
 pagina_inicial_titulo = Label(pagina_inicial, text="Bem Vindo", font=fonteTit)
-pagina_inicial_titulo.configure(bg="#1FFF93")
-pagina_inicial_titulo.place(x=300 - 47, y=20)
+pagina_inicial_titulo.configure(bg="#71BAFF")
+pagina_inicial_titulo.place(x=WIDTH/2 - 40, y=20)
 
 
 pagina_inicial_camsLabel = Label(
     pagina_inicial, text="Abrir câmera", font=fonte)
-pagina_inicial_camsLabel.configure(bg="#1FFF93")
+pagina_inicial_camsLabel.configure(bg="#71BAFF")
 pagina_inicial_camsLabel.place(x=165, y=105)
 
 pagina_inicial_cams = Button(pagina_inicial, text="Cameras",
@@ -290,16 +326,16 @@ pagina_inicial_cams.place(x=175, y=135)
 
 pagina_inicial_listPesLabel = Label(
     pagina_inicial, text="Listar Pessoas", font=fonte)
-pagina_inicial_listPesLabel.configure(bg="#1FFF93")
+pagina_inicial_listPesLabel.configure(bg="#71BAFF")
 pagina_inicial_listPesLabel.place(x=350, y=105)
 
 pagina_inicial_listPes = Button(pagina_inicial, text="Pessoas",
-                             font=fonte, command=lambda: show_frame(pagina_list_pessoa))
+                                font=fonte, command=lambda: show_frame(pagina_list_pessoa))
 pagina_inicial_listPes.place(x=365, y=135)
 
 pagina_inicial_cadLabel = Label(
     pagina_inicial, text="Cadastrar câmera", font=fonte)
-pagina_inicial_cadLabel.configure(bg="#1FFF93")
+pagina_inicial_cadLabel.configure(bg="#71BAFF")
 pagina_inicial_cadLabel.place(x=152, y=200)
 
 pagina_inicial_cadastro = Button(
@@ -308,7 +344,7 @@ pagina_inicial_cadastro.place(x=148, y=230)
 
 pagina_inicial_pessoaLabel = Label(
     pagina_inicial, text="Cadastrar pessoas", font=fonte)
-pagina_inicial_pessoaLabel.configure(bg="#1FFF93")
+pagina_inicial_pessoaLabel.configure(bg="#71BAFF")
 pagina_inicial_pessoaLabel.place(x=335, y=200)
 
 pagina_inicial_pessoa = Button(
@@ -317,11 +353,11 @@ pagina_inicial_pessoa.place(x=335, y=230)
 
 # ================ Pagina das Câmeras =======================
 
-pagina_cameras.configure(bg="#1FFF93")
+pagina_cameras.configure(bg="#71BAFF")
 
 pagina_cameras_titulo = Label(
     pagina_cameras, text="Selecione uma câmera", font=fonteTit)
-pagina_cameras_titulo.configure(bg="#1FFF93")
+pagina_cameras_titulo.configure(bg="#71BAFF")
 pagina_cameras_titulo.place(x=300 - 90, y=40)
 
 lista_cameras = Listbox(pagina_cameras, width=35)
@@ -342,16 +378,16 @@ pagina_cameras_voltar.place(x=300 - 25, y=320)
 
 # ================ Pagina de Cadastro de Câmeras =======================
 
-pagina_cadastro.configure(bg="#1FFF93")
+pagina_cadastro.configure(bg="#71BAFF")
 
 pagina_cadastro_titulo = Label(
     pagina_cadastro, text="Cadastre sua câmera", font=fonteTit)
-pagina_cadastro_titulo.configure(bg="#1FFF93")
+pagina_cadastro_titulo.configure(bg="#71BAFF")
 pagina_cadastro_titulo.place(x=300 - 90, y=30)
 pagina_cadastro_titulo.pack()
 
 pagina_cadastro_nomeLabel = Label(pagina_cadastro, text="Nome:", font=fonte)
-pagina_cadastro_nomeLabel.configure(bg="#1fff93")
+pagina_cadastro_nomeLabel.configure(bg="#71BAFF")
 pagina_cadastro_nomeLabel.place(x=220 - 45, y=87)
 
 pagina_cadastro_nome = Entry(pagina_cadastro)
@@ -360,7 +396,7 @@ pagina_cadastro_nome["font"] = fonte
 pagina_cadastro_nome.place(x=300 - 70, y=90)
 
 pagina_cadastro_ipLabel = Label(pagina_cadastro, text="IP:", font=fonte)
-pagina_cadastro_ipLabel.configure(bg="#1fff93")
+pagina_cadastro_ipLabel.configure(bg="#71BAFF")
 pagina_cadastro_ipLabel.place(x=220 - 20, y=137)
 
 pagina_cadastro_ip = Entry(pagina_cadastro)
@@ -369,7 +405,7 @@ pagina_cadastro_ip["font"] = fonte
 pagina_cadastro_ip.place(x=300 - 70, y=140)
 
 pagina_cadastro_usuLabel = Label(pagina_cadastro, text="Usuário:", font=fonte)
-pagina_cadastro_usuLabel.configure(bg="#1fff93")
+pagina_cadastro_usuLabel.configure(bg="#71BAFF")
 pagina_cadastro_usuLabel.place(x=220 - 55, y=187)
 
 pagina_cadastro_usuario = Entry(pagina_cadastro)
@@ -379,7 +415,7 @@ pagina_cadastro_usuario.insert(index=1, string="admin")
 pagina_cadastro_usuario.place(x=300 - 70, y=190)
 
 pagina_cadastro_senhaLabel = Label(pagina_cadastro, text="Senha:", font=fonte)
-pagina_cadastro_senhaLabel.configure(bg="#1fff93")
+pagina_cadastro_senhaLabel.configure(bg="#71BAFF")
 pagina_cadastro_senhaLabel.place(x=220 - 47, y=237)
 
 pagina_cadastro_senha = Entry(pagina_cadastro)
@@ -393,7 +429,7 @@ pagina_cadastro_cadastrar = Button(pagina_cadastro, text="Cadastrar",
 pagina_cadastro_cadastrar.place(x=300 - 37, y=290)
 
 pagina_cadastro_label = Label(pagina_cadastro, text="", font=fonte)
-pagina_cadastro_label.configure(bg="#1fff93")
+pagina_cadastro_label.configure(bg="#71BAFF")
 pagina_cadastro_label.place(x=355, y=287)
 
 pagina_cadastro_voltar = Button(pagina_cadastro, text="Voltar",
@@ -402,15 +438,15 @@ pagina_cadastro_voltar.place(x=300 - 25, y=340)
 
 # ================ Pagina de Cadastro de Pessoas =======================
 
-pagina_pessoa.configure(bg="#1FFF93")
+pagina_pessoa.configure(bg="#71BAFF")
 
 pagina_pessoa_titulo = Label(
     pagina_pessoa, text="Cadastre a Pessoa", font=fonteTit)
-pagina_pessoa_titulo.configure(bg="#1FFF93")
+pagina_pessoa_titulo.configure(bg="#71BAFF")
 pagina_pessoa_titulo.place(x=300 - 75, y=30)
 
 pagina_pessoa_nomeLabel = Label(pagina_pessoa, text="Nome:", font=fonte)
-pagina_pessoa_nomeLabel.configure(bg="#1fff93")
+pagina_pessoa_nomeLabel.configure(bg="#71BAFF")
 pagina_pessoa_nomeLabel.place(x=220 - 43, y=87)
 
 pagina_pessoa_nome = Entry(pagina_pessoa)
@@ -419,7 +455,7 @@ pagina_pessoa_nome["font"] = fonte
 pagina_pessoa_nome.place(x=300 - 70, y=90)
 
 pagina_pessoa_idLabel = Label(pagina_pessoa, text="ID:", font=fonte)
-pagina_pessoa_idLabel.configure(bg="#1fff93")
+pagina_pessoa_idLabel.configure(bg="#71BAFF")
 pagina_pessoa_idLabel.place(x=220 - 20, y=137)
 
 pagina_pessoa_id = Entry(pagina_pessoa)
@@ -428,7 +464,7 @@ pagina_pessoa_id["font"] = fonte
 pagina_pessoa_id.place(x=300 - 70, y=140)
 
 pagina_pessoa_telLabel = Label(pagina_pessoa, text="Telefone:", font=fonte)
-pagina_pessoa_telLabel.configure(bg="#1fff93")
+pagina_pessoa_telLabel.configure(bg="#71BAFF")
 pagina_pessoa_telLabel.place(x=220 - 60, y=187)
 
 pagina_pessoa_tel = Entry(pagina_pessoa)
@@ -437,11 +473,11 @@ pagina_pessoa_tel["font"] = fonte
 pagina_pessoa_tel.place(x=300 - 70, y=190)
 
 pagina_pessoa_horLabel = Label(pagina_pessoa, text="Horários:", font=fonte)
-pagina_pessoa_horLabel.configure(bg="#1fff93")
+pagina_pessoa_horLabel.configure(bg="#71BAFF")
 pagina_pessoa_horLabel.place(x=300 - 30, y=217)
 
 pagina_pessoa_entLabel = Label(pagina_pessoa, text="Entrada:", font=fonte)
-pagina_pessoa_entLabel.configure(bg="#1fff93")
+pagina_pessoa_entLabel.configure(bg="#71BAFF")
 pagina_pessoa_entLabel.place(x=220 - 55, y=247)
 
 pagina_pessoa_entH = Spinbox(pagina_pessoa, from_=0, to=23)
@@ -450,7 +486,7 @@ pagina_pessoa_entH["font"] = fonte
 pagina_pessoa_entH.place(x=230, y=250)
 
 pagina_pessoa_entHLabel = Label(pagina_pessoa, text="H", font=fonte)
-pagina_pessoa_entHLabel.configure(bg="#1fff93")
+pagina_pessoa_entHLabel.configure(bg="#71BAFF")
 pagina_pessoa_entHLabel.place(x=270, y=249)
 
 pagina_pessoa_entM = Spinbox(pagina_pessoa, from_=0, to=59)
@@ -459,11 +495,11 @@ pagina_pessoa_entM["font"] = fonte
 pagina_pessoa_entM.place(x=300, y=250)
 
 pagina_pessoa_entMLabel = Label(pagina_pessoa, text="M", font=fonte)
-pagina_pessoa_entMLabel.configure(bg="#1fff93")
+pagina_pessoa_entMLabel.configure(bg="#71BAFF")
 pagina_pessoa_entMLabel.place(x=340, y=249)
 
 pagina_pessoa_saidaLabel = Label(pagina_pessoa, text="Saída:", font=fonte)
-pagina_pessoa_saidaLabel.configure(bg="#1fff93")
+pagina_pessoa_saidaLabel.configure(bg="#71BAFF")
 pagina_pessoa_saidaLabel.place(x=220 - 45, y=297)
 
 pagina_pessoa_saidaH = Spinbox(pagina_pessoa, from_=0, to=23)
@@ -472,7 +508,7 @@ pagina_pessoa_saidaH["font"] = fonte
 pagina_pessoa_saidaH.place(x=230, y=300)
 
 pagina_pessoa_saidaHLabel = Label(pagina_pessoa, text="H", font=fonte)
-pagina_pessoa_saidaHLabel.configure(bg="#1fff93")
+pagina_pessoa_saidaHLabel.configure(bg="#71BAFF")
 pagina_pessoa_saidaHLabel.place(x=270, y=299)
 
 pagina_pessoa_saidaM = Spinbox(pagina_pessoa, from_=0, to=59)
@@ -481,54 +517,83 @@ pagina_pessoa_saidaM["font"] = fonte
 pagina_pessoa_saidaM.place(x=300, y=300)
 
 pagina_pessoa_saidaMLabel = Label(pagina_pessoa, text="M", font=fonte)
-pagina_pessoa_saidaMLabel.configure(bg="#1fff93")
+pagina_pessoa_saidaMLabel.configure(bg="#71BAFF")
 pagina_pessoa_saidaMLabel.place(x=340, y=299)
 
 pagina_pessoa_cadastrar = Button(pagina_pessoa, text="Cadastrar",
-                                   font=fonte, command=lambda: cadastra_pessoa())
+                                 font=fonte, command=lambda: cadastra_pessoa())
 pagina_pessoa_cadastrar.place(x=215, y=340)
 
 pagina_pessoa_label = Label(pagina_pessoa, text="", font=fonte)
-pagina_pessoa_label.configure(bg="#1fff93")
+pagina_pessoa_label.configure(bg="#71BAFF")
 pagina_pessoa_label.place(x=375, y=340)
 
 pagina_pessoa_voltar = Button(pagina_pessoa, text="Voltar",
-                                font=fonte, command=lambda: volta_pag_pessoa())
+                              font=fonte, command=lambda: volta_pag_pessoa())
 pagina_pessoa_voltar.place(x=310, y=340)
 
 # ================ Pagina Lista das Pessoas =======================
 
-pagina_list_pessoa.configure(bg="#1FFF93")
+pagina_list_pessoa.configure(bg="#71BAFF")
 
 pagina_list_pessoa_titulo = Label(
     pagina_list_pessoa, text="Selecione uma Pessoa", font=fonteTit)
-pagina_list_pessoa_titulo.configure(bg="#1FFF93")
-pagina_list_pessoa_titulo.place(x=300 - 90, y=40)
+pagina_list_pessoa_titulo.configure(bg="#71BAFF")
+pagina_list_pessoa_titulo.pack(side=TOP, fill=X, pady=30)
 
 lista_pessoa = Listbox(pagina_list_pessoa, width=50)
-lista_pessoa.place(x=150, y=80)
+lista_pessoa.pack(padx=150, fill=BOTH)
 lista_pessoa.yview_scroll(number=2, what='units')
 
 pagina_list_pessoa_acessar = Button(
     pagina_list_pessoa, text="Editar", font=fonte, command=lambda: direciona_editar_pessoa())
-pagina_list_pessoa_acessar.place(x=300 - 80, y=270)
+pagina_list_pessoa_acessar.pack(padx=45, ipadx=tamanho_botão, side=LEFT)
 
 pagina_list_pessoa_apagar = Button(
     pagina_list_pessoa, text="Apagar", font=fonte, command=lambda: confirma_apagar_pessoa())
-pagina_list_pessoa_apagar.place(x=300 + 20, y=270)
+pagina_list_pessoa_apagar.pack(padx=45, ipadx=tamanho_botão, side=RIGHT)
 
 pagina_list_pessoa_voltar = Button(
     pagina_list_pessoa, text="Voltar", font=fonte, command=lambda: show_frame(pagina_inicial))
-pagina_list_pessoa_voltar.place(x=300 - 25, y=320)
+pagina_list_pessoa_voltar.pack(padx=45, ipadx=tamanho_botão, side=RIGHT)
 
 # ================ Pagina Edição de Pessoas =======================
 
-pagina_edit_pessoa.configure(bg="#1FFF93")
+pagina_edit_pessoa.configure(bg="#71BAFF")
 
 pagina_edit_pessoa_titulo = Label(
     pagina_edit_pessoa, text="Selecione uma Pessoa", font=fonteTit)
-pagina_edit_pessoa_titulo.configure(bg="#1FFF93")
+pagina_edit_pessoa_titulo.configure(bg="#71BAFF")
 pagina_edit_pessoa_titulo.place(x=300 - 90, y=40)
+
+pagina_edit_pessoa_nomeLabel = Label(
+    pagina_edit_pessoa, text="Nome:", font=fonte)
+pagina_edit_pessoa_nomeLabel.configure(bg="#71BAFF")
+pagina_edit_pessoa_nomeLabel.place(x=220 - 43, y=87)
+
+pagina_edit_pessoa_nome = Entry(pagina_edit_pessoa)
+pagina_edit_pessoa_nome["width"] = 20
+pagina_edit_pessoa_nome["font"] = fonte
+pagina_edit_pessoa_nome.place(x=300 - 70, y=90)
+
+pagina_edit_pessoa_idLabel = Label(pagina_edit_pessoa, text="ID:", font=fonte)
+pagina_edit_pessoa_idLabel.configure(bg="#71BAFF")
+pagina_edit_pessoa_idLabel.place(x=220 - 20, y=137)
+
+pagina_edit_pessoa_id = Entry(pagina_edit_pessoa)
+pagina_edit_pessoa_id["width"] = 20
+pagina_edit_pessoa_id["font"] = fonte
+pagina_edit_pessoa_id.place(x=300 - 70, y=140)
+
+pagina_edit_pessoa_telLabel = Label(
+    pagina_edit_pessoa, text="Telefone:", font=fonte)
+pagina_edit_pessoa_telLabel.configure(bg="#71BAFF")
+pagina_edit_pessoa_telLabel.place(x=220 - 60, y=187)
+
+pagina_edit_pessoa_tel = Entry(pagina_edit_pessoa)
+pagina_edit_pessoa_tel["width"] = 20
+pagina_edit_pessoa_tel["font"] = fonte
+pagina_edit_pessoa_tel.place(x=300 - 70, y=190)
 
 # ================ Método de inicialização =======================
 
