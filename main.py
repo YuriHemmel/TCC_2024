@@ -79,7 +79,7 @@ def cadastra_camera():
         camera.insert_camera()
     except: #Exception as e:
         #print(e)
-        pagina_cadastro_label.config(text="Dados duplicados.")
+        pagina_cadastro_label.config(text="Câmera já cadastrada\nanteriormente.")
         return
 
     # Cadastro bem sucedido
@@ -114,7 +114,7 @@ def cadastra_pessoa():
         pessoa.insert_pessoa()
     except Exception as e:
         print(e)
-        pagina_pessoa_label.config(text="Dados duplicados.")
+        pagina_pessoa_label.config(text="Pessoa já cadastrada\nanteriomente.")
         return
 
     # Cadastro bem sucedido
@@ -166,7 +166,7 @@ def confirma_apagar_camera():
     camSelecionada = camSelecionada.split()[1]
     
     #Cria caixa de mensagem para confirmação
-    res = messagebox.askquestion("Apagar câmera", f"Deseja apagar informações da câmera {camSelecionada}?")
+    res = messagebox.askquestion("Apagar câmera", f"Deseja apagar informações da câmera: {camSelecionada}?")
 
     if res == 'yes':
         lista_cameras.delete(lista_cameras.curselection())    
