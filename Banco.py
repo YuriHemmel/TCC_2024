@@ -1,60 +1,41 @@
 import sqlite3
 
 class Banco():
-
+    
     def __init__(self):
+
         self.conexao = sqlite3.connect('banco.db')
         self.createTable()
 
     def createTable(self):
+
         cursor = self.conexao.cursor()
+
+        # Tabela Cursos
+        cursor.execute("""create table if not exists cursos (
+                     CursoID INTEGER PRIMARY KEY AUTOINCREMENT,
+                     nome text not null,
+                     diaAula text not null,
+                     horaEntrada text not null
+                     )""")  
 
         # Tabela pessoas
         cursor.execute("""create table if not exists pessoas (
-                     ra text primary key unique not null,
+                     ID text unique not null PRIMARY KEY,
                      nome text not null,
                      tel text unique not null,
-                     email text unique not null,
-                     foto text not null)""")
+                     faltas int not null,
+                     foto text not null,
+                     CursoID int not null,
+                     FOREIGN KEY(CursoID) REFERENCES cursos(CursoID))""")
         
         # Tabela Câmeras
         cursor.execute("""create table if not exists cameras (
-                     idcamera integer primary key autoincrement unique not null,
+                     idcamera INTEGER PRIMARY KEY AUTOINCREMENT,
                      nome text not null,
                      ip text unique not null,
                      senha text not null,
                      usuario text not null)""")
-        
-        # Tabela Cursos
-        cursor.execute("""create table if not exists cursos (
-                       idcurso integer primary key autoincrement unique not null,
-                       nome text not null,
-                       lista_materias text not null)""")
-
-#        cursor.execute("""INSERT INTO cursos (nome, lista_materias)
-#                       VALUES ("Ciência da computação", "QS, DSD")""")
-
-        # Tabela Matérias
-        cursor.execute("""create table if not exists materias (
-                       idmateria text primary key unique not null,
-                       nome text not null,
-                       dia_semana text not null,
-                       horario text not null)""")
-        
-#        cursor.execute("""INSERT INTO materias (idmateria, nome, dia_semana, horario)
-#                          VALUES ("QS", "Qualidade de software", "quinta", "19:10")
-#                       """)
-    
-#        cursor.execute("""INSERT INTO materias (idmateria, nome, dia_semana, horario)
-#                          VALUES ("DSD", "Desenvolvimento de Sistemas Distribuídos", "sexta", "19:10")
-#                       """)
-
-        # Tabela Faltas
-        cursor.execute("""create table if not exists faltas (
-                       id_falta integer primary key autoincrement unique not null,
-                       id_aluno text not null,
-                       id_materia text not null,
-                       num_faltas integer)""")
         
         self.conexao.commit()
         cursor.close()
