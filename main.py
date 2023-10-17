@@ -1,4 +1,5 @@
 import utils
+import os
 import Banco
 import Camera as Cam
 import Pessoa as Pes
@@ -13,6 +14,9 @@ import os
 WIDTH = 600
 HEIGHT = 400
 TOKEN = ""
+
+# Configuração básica para protocolo rtsp
+os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;0"
 
 # Janela
 janela = Tk()
@@ -82,7 +86,7 @@ def cadastra_camera():
 
     # Verifica se os campos estão vazios
     for d in dados:
-        if d == "":
+        if d.strip() == "":
             pagina_cadastro_label.config(
                 text="Por favor, preencha os\ncampos corretamente.")
             return
@@ -91,9 +95,10 @@ def cadastra_camera():
     try:
         camera = Cam.Camera(dados[0], dados[1], dados[2], dados[3])
         camera.insert_camera()
-    except:  # Exception as e:
-        # print(e)
-        pagina_cadastro_label.config(text="Dados duplicados.")
+
+    except: #Exception as e:
+        #print(e)
+        pagina_cadastro_label.config(text="Câmera já cadastrada\nanteriormente.")
         return
 
     # Cadastro bem sucedido
@@ -118,7 +123,7 @@ def cadastra_pessoa():
 
     # Verifica se os campos estão vazios
     for d in dados:
-        if d == "":
+        if d.strip() == "":
             pagina_pessoa_label.config(
                 text="Por favor, preencha os\ncampos corretamente.")
             return
@@ -136,7 +141,7 @@ def cadastra_pessoa():
         pessoa.insert_pessoa()
     except Exception as e:
         print(e)
-        pagina_pessoa_label.config(text="Dados duplicados.")
+        pagina_pessoa_label.config(text="Pessoa já cadastrada\nanteriomente.")
         return
 
     # Cadastro bem sucedido
@@ -253,10 +258,9 @@ def confirma_apagar_camera():
         return
 
     camSelecionada = camSelecionada.split()[1]
-
-    # Cria caixa de mensagem para confirmação
-    res = messagebox.askquestion(
-        "Apagar câmera", f"Deseja apagar informações da câmera {camSelecionada}?")
+    
+    #Cria caixa de mensagem para confirmação
+    res = messagebox.askquestion("Apagar câmera", f"Deseja apagar informações da câmera: {camSelecionada}?")
 
     if res == 'yes':
         lista_cameras.delete(lista_cameras.curselection())
@@ -286,9 +290,8 @@ def confirma_apagar_pessoa():
 
     selecionada = selecionada.split()[1]
 
-    # Cria caixa de mensagem para confirmação
-    res = messagebox.askquestion(
-        "Apagar pessoa", f"Deseja apagar informações de{nome}?")
+    #Cria caixa de mensagem para confirmação
+    res = messagebox.askquestion("Apagar pessoa", f"Deseja apagar informações de {nome}?")
 
     if res == 'yes':
         lista_pessoa.delete(lista_pessoa.curselection())
@@ -319,23 +322,23 @@ def conecta_camera():
         ip = cam[2]
         port = '554'
 
-        os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;0"
-
         url = f"rtsp://{user}:{password}@{ip}:{port}/onvif1"
 
-        print('Conectado com ' + url)
+        print('Tentando conectar com ' + url)
 
         cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
 
     while True:
         ret, frame = cap.read()
-        if ret == False:
-            print("Sem frame")
-            break
-        else:
-            cv2.imshow('VIDEO', frame)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if not ret:
+            print("Sem frame ou erro na captura de video")
+            break
+
+        cv2.imshow("VIDEO", frame)
+
+        if cv2.waitKey(1) == ord('q'):
+            print("Desconectando camera IP")
             break
 
     cap.release()
