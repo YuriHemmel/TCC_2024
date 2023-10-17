@@ -3,40 +3,23 @@ import sqlite3
 
 class Pessoa(object):
 
-    def __init__(self, ID="", nome="", tel="", entrada="", saida="", faltas=0, foto=""):
+    def __init__(self, ID="", nome="", tel="", faltas=0, foto="", CursoID = 0):
         self.info = {}
         self.ID = ID
         self.nome = nome
         self.tel = tel
-        self.entrada = entrada
-        self.saida = saida
         self.faltas = faltas
         self.foto = foto
+        self.CursoID = CursoID
         self.banco = Banco()
         self.conexao = sqlite3.connect("banco.db")
         self.cursor = self.conexao.cursor()
-
-    def load_pessoa(self, ID):
-        self.cursor.execute(f"""
-        SELECT * FROM pessoas
-        WHERE ID like "{ID}"
-        """)
-
-        results = self.cursor.fetchone()
-
-        self.ID = ID
-        self.nome = results[1]
-        self.tel = results[2]
-        self.entrada = results[3]
-        self.saida = results[4]
-        self.faltas = results[5]
-        self.foto = results[6]
 
     def insert_pessoa(self):
 
         self.cursor.execute(f"""
         INSERT INTO pessoas VALUES
-        ("{self.ID}", "{self.nome}", "{self.tel}", "{self.entrada}", "{self.saida}", "{self.faltas}", "{self.foto}")
+        ("{self.ID}", "{self.nome}", "{self.tel}","{self.faltas}", "{self.foto}", "{self.CursoID}")
         """)
 
         self.conexao.commit()
@@ -80,7 +63,7 @@ def delete_pessoa(ID):
     conexao.commit()
     conexao.close()
 
-def seleciona_pessoa(ID):
+def load_pessoa(ID):
     conexao = sqlite3.connect("banco.db")
     cursor = conexao.cursor()
 
@@ -94,17 +77,14 @@ def seleciona_pessoa(ID):
 
     return results
 
-def altera_dados(ID, nome, tel, entrada, saida):
+def altera_dados(ID, nome, tel):
     conexao = sqlite3.connect("banco.db")
     cursor = conexao.cursor()
 
     cursor.execute(f"""
     UPDATE pessoas
-    SET ID = "{ID}",
     nome = "{nome}",
     tel = "{tel}",
-    entrada = "{entrada}",
-    saida = "{saida}"
     WHERE ID like "{ID}"
     """)
 

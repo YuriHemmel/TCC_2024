@@ -52,19 +52,20 @@ def convertToImage(bytes):
 
 
 def listar_cursos():
-    lista_materias = ["Selecione um curso"]
+    lista_cursos = []
 
     conexao = sqlite3.connect("banco.db")
     cursor = conexao.cursor()
 
-    cursor.execute("""
-    SELECT nome FROM cursos
-    """)
+    cursor.execute("""SELECT nome FROM cursos""")
 
     results = cursor.fetchall()
     conexao.close()
 
-    for m in results:
-        lista_materias.append(m)
+    for c in results:
+        curso = ""
+        for l in c:
+            curso = curso + l
+        lista_cursos.append(curso)
 
-    return lista_materias
+    return lista_cursos
