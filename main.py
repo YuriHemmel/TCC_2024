@@ -225,8 +225,6 @@ def conecta_camera():
         ip = cam[2]
         port = '554'
 
-        #os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;udp"
-
         url = f"rtsp://{user}:{password}@{ip}:{port}/onvif1"
 
         print('Tentando conectar com ' + url)
@@ -235,13 +233,15 @@ def conecta_camera():
 
     while True:
         ret, frame = cap.read()
-        if ret == False:
-            print("Sem frame")
-            break
-        else:
-            cv2.imshow('VIDEO', frame)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if not ret:
+            print("Sem frame ou erro na captura de video")
+            break
+
+        cv2.imshow("VIDEO", frame)
+
+        if cv2.waitKey(1) == ord('q'):
+            print("Desconectando camera IP")
             break
 
     cap.release()
