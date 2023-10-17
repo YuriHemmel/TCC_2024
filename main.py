@@ -123,6 +123,11 @@ def cadastra_pessoa():
                 text="Por favor, preencha os\ncampos corretamente.")
             return
 
+    if pagina_pessoa_curso.get() == "Selecione um curso":
+        pagina_pessoa_label.config(
+                text="O curso não é válido")
+        return
+
     fotoBin = utils.recebe_foto_binario()
 
     # Verifica se os dados inseridos pertencem à uma pessoa já registrada
