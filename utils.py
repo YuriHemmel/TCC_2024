@@ -62,10 +62,10 @@ def listar_cursos():
     results = cursor.fetchall()
     conexao.close()
 
-    for c in results:
-        curso = ""
-        for l in c:
-            curso = curso + l
-        lista_cursos.append(curso)
+    for curso in results:
+        nome_curso = ""
+        for letra in curso:
+            nome_curso = nome_curso + letra
+        lista_cursos.append(nome_curso)
 
     return lista_cursos

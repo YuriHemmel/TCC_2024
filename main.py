@@ -12,7 +12,7 @@ import os
 
 WIDTH = 600
 HEIGHT = 400
-TOKEN = ""
+TEMP_ID = ""
 
 # Janela
 janela = Tk()
@@ -146,10 +146,10 @@ def cadastra_pessoa():
     return
 
 
-def set_token(valor):
-    global TOKEN
+def guarda_id(valor):
+    global TEMP_ID
 
-    TOKEN = valor
+    TEMP_ID = valor
 
 def direciona_editar_pessoa():
 
@@ -174,7 +174,7 @@ def direciona_editar_pessoa():
     pagina_edit_pessoa_nome.insert(index=1, string=f"{pessoa[1]}")
     pagina_edit_pessoa_tel.insert(index=1, string=f"{pessoa[2]}")
 
-    set_token(pessoa[0])
+    guarda_id(pessoa[0])
 
     show_frame(pagina_edit_pessoa)
 # Salva novas informações no banco
@@ -226,7 +226,7 @@ def volta_pag_edit_pessoa():
     pagina_edit_pessoa_nome.delete(0, END)
     pagina_edit_pessoa_tel.delete(0, END)
 
-    set_token("")
+    guarda_id("")
 
     show_frame(pagina_list_pessoa)
 
@@ -278,17 +278,17 @@ def confirma_apagar_pessoa():
         messagebox.showinfo('Erro', 'Nenhuma pessoa selecionada')
         return
 
+    # Pega o nome da pessoa
     nomeSelecionado = selecionada.split()[3::]
-    nome = ""
 
-    for n in nomeSelecionado:
-        nome = nome + " " + n
+    nome = f"{nomeSelecionado[0]} {nomeSelecionado[len(nomeSelecionado) - 1]}"
 
+    # Pega o ID
     selecionada = selecionada.split()[1]
 
     # Cria caixa de mensagem para confirmação
     res = messagebox.askquestion(
-        "Apagar pessoa", f"Deseja apagar informações de{nome}?")
+        "Apagar pessoa", f"Deseja apagar informações de {nome} {selecionada}?")
 
     if res == 'yes':
         lista_pessoa.delete(lista_pessoa.curselection())
@@ -590,7 +590,7 @@ pagina_edit_pessoa_voltar = Button(
 pagina_edit_pessoa_voltar.pack(pady=20, ipadx=30, side=BOTTOM)
 
 pagina_edit_pessoa_salvar = Button(
-    pagina_edit_pessoa, text="Salvar alterações", font=fonte, command=lambda: alterar_info(TOKEN))
+    pagina_edit_pessoa, text="Salvar alterações", font=fonte, command=lambda: alterar_info(TEMP_ID))
 pagina_edit_pessoa_salvar.pack(pady=5, ipadx=30 - 10,ipady=2,side=BOTTOM)
 
 # ================ Método de inicialização =======================
