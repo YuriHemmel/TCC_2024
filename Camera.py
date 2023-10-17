@@ -111,5 +111,3 @@ def delete_camera(nome):
 
     conexao.commit()
     conexao.close()
-
-#delete_camera("Camera1")

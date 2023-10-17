@@ -1,4 +1,5 @@
 import utils
+import os
 import Banco
 import Camera as Cam
 import Pessoa as Pes
@@ -6,6 +7,9 @@ from tkinter import *  # Interface gráfica
 from tkinter import messagebox # Caixa de mensagem para confirmações
 #from tkinter import ttk # Combobox
 import cv2
+
+# Configuração básica para protocolo rtsp
+os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;0"
 
 # Janela
 janela = Tk()
@@ -64,7 +68,7 @@ def cadastra_camera():
 
     # Verifica se os campos estão vazios
     for d in dados:
-        if d == "":
+        if d.strip() == "":
             pagina_cadastro_label.config(
                 text="Por favor, preencha os\ncampos corretamente.")
             return
@@ -97,7 +101,7 @@ def cadastra_pessoa():
 
     # Verifica se os campos estão vazios
     for d in dados:
-        if d == "":
+        if d.strip() == "":
             pagina_pessoa_label.config(
                 text="Por favor, preencha os\ncampos corretamente.")
             return
@@ -191,7 +195,7 @@ def confirma_apagar_pessoa():
     selecionada = selecionada.split()[1]
     
     #Cria caixa de mensagem para confirmação
-    res = messagebox.askquestion("Apagar pessoa", f"Deseja apagar informações de{nome}?")
+    res = messagebox.askquestion("Apagar pessoa", f"Deseja apagar informações de {nome}?")
 
     if res == 'yes':
         lista_pessoa.delete(lista_pessoa.curselection())    
@@ -225,7 +229,7 @@ def conecta_camera():
 
         url = f"rtsp://{user}:{password}@{ip}:{port}/onvif1"
 
-        print('Conectado com ' + url)
+        print('Tentando conectar com ' + url)
 
         cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
 
