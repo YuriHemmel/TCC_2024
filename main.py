@@ -1,5 +1,6 @@
 import utils
 import os
+import re
 import Banco
 import Camera as Cam
 import Pessoa as Pes
@@ -117,9 +118,21 @@ def cadastra_camera():
 
 
 def cadastra_pessoa():
+    PATTERN_RA = "^[A-z0-9]{7}$"
+    PATTERN_NOME = "^(?=^.{2,60}$)^[A-ZÀÁÂĖÈÉÊÌÍÒÓÔÕÙÚÛÇ][a-zàáâãèéêìíóôõùúç]+(?:[ ](?:das?|dos?|de|e|[A-ZÀÁÂĖÈÉÊÌÍÒÓÔÕÙÚÛÇ][a-zàáâãèéêìíóôõùúç]+))*$"
 
     dados = [pagina_pessoa_id.get(), pagina_pessoa_nome.get(),
              pagina_pessoa_tel.get()]
+
+    # Valida os campos com regex
+    ra_valido = re.match(PATTERN_RA, dados[0])
+    if ra_valido is None:
+        pagina_pessoa_label.config(text="ID inválido!\nPor favor, preencha o\ncampo de ID corretamente.")
+        return
+    nome_valido = re.match(PATTERN_NOME, dados[1])
+    if nome_valido is None:
+        pagina_pessoa_label.config(text="Nome inválido!\nPor favor, preencha o\ncampo de nome corretamente.")
+        return
 
     # Verifica se os campos estão vazios
     for d in dados:
@@ -133,6 +146,7 @@ def cadastra_pessoa():
                 text="O curso não é válido")
         return
 
+    # Tira foto em analise, vai falhar
     fotoBin = utils.recebe_foto_binario()
 
     # Verifica se os dados inseridos pertencem à uma pessoa já registrada
