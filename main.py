@@ -254,6 +254,7 @@ def volta_pag_edit_pessoa():
 
     pagina_edit_pessoa_nome.delete(0, END)
     pagina_edit_pessoa_tel.delete(0, END)
+    pagina_edit_pessoa_falta.delete(0, END)
 
     guarda_id("")
 
@@ -309,7 +310,10 @@ def confirma_apagar_pessoa():
     # Pega o nome da pessoa
     nomeSelecionado = selecionada.split()[3::]
 
-    nome = f"{nomeSelecionado[0]} {nomeSelecionado[len(nomeSelecionado) - 1]}"
+    if nomeSelecionado[0] == nomeSelecionado[len(nomeSelecionado) - 1]:
+        nome = f"{nomeSelecionado[0]}"
+    else:
+        nome = f"{nomeSelecionado[0]} {nomeSelecionado[len(nomeSelecionado) - 1]}"
 
     # Pega o ID
     selecionada = selecionada.split()[1]
