@@ -3,35 +3,23 @@ import sqlite3
 
 class Pessoa(object):
 
-    def __init__(self, ra="", nome="", tel="", email="", foto=""):
+    def __init__(self, ID="", nome="", tel="", faltas=0, foto="", CursoID = 0):
         self.info = {}
-        self.ra = ra
+        self.ID = ID
         self.nome = nome
         self.tel = tel
-        self.email = email
+        self.faltas = faltas
         self.foto = foto
+        self.CursoID = CursoID
         self.banco = Banco()
         self.conexao = sqlite3.connect("banco.db")
         self.cursor = self.conexao.cursor()
 
-    def load_pessoa(self, ra):
-        self.cursor.execute(f"""
-        SELECT * FROM pessoas
-        WHERE ra like "{ra}"
-        """)
-
-        results = self.cursor.fetchone()
-
-        self.ra = ra
-        self.nome = results[1]
-        self.tel = results[2]
-        self.email = results[3]
-        self.foto = results[4]
-
     def insert_pessoa(self):
+
         self.cursor.execute(f"""
         INSERT INTO pessoas VALUES
-        ("{self.ra}", "{self.nome}", "{self.tel}", "{self.email}", "{self.foto}")
+        ("{self.ID}", "{self.nome}", "{self.tel}","{self.faltas}", "{self.foto}", "{self.CursoID}")
         """)
 
         self.conexao.commit()
@@ -55,7 +43,7 @@ def conta_pessoa():
     cursor = conexao.cursor()
 
     cursor.execute("""
-    SELECT COUNT(ra) FROM pessoas
+    SELECT COUNT(ID) FROM pessoas
     """)
 
     results = cursor.fetchone()
@@ -63,13 +51,41 @@ def conta_pessoa():
 
     return results[0]
 
-def delete_pessoa(ra):
+def delete_pessoa(ID):
     conexao = sqlite3.connect("banco.db")
     cursor = conexao.cursor()
 
     cursor.execute(f"""
     DELETE FROM pessoas
-    WHERE ra like "{ra}"
+    WHERE ID like "{ID}"
+    """)
+
+    conexao.commit()
+    conexao.close()
+
+def load_pessoa(ID):
+    conexao = sqlite3.connect("banco.db")
+    cursor = conexao.cursor()
+
+    cursor.execute(f"""
+    SELECT * FROM pessoas
+    WHERE ID like "{ID}"
+    """)
+
+    results = cursor.fetchone()
+    conexao.close()
+
+    return results
+
+def altera_dados(ID, nome, tel):
+    conexao = sqlite3.connect("banco.db")
+    cursor = conexao.cursor()
+
+    cursor.execute(f"""
+    UPDATE pessoas
+    nome = "{nome}",
+    tel = "{tel}",
+    WHERE ID like "{ID}"
     """)
 
     conexao.commit()
