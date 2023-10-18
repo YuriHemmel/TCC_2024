@@ -1,5 +1,6 @@
 import utils
 import os
+import re
 import Banco
 import Camera as Cam
 import Pessoa as Pes
@@ -117,10 +118,13 @@ def cadastra_camera():
 
 
 def cadastra_pessoa():
+    PATTERN_RA = "^[A-z0-9]{7}$"
+    PATTERN_NOME = "^(?=^.{2,60}$)^[A-ZÀÁÂĖÈÉÊÌÍÒÓÔÕÙÚÛÇ][a-zàáâãèéêìíóôõùúç]+(?:[ ](?:das?|dos?|de|e|[A-ZÀÁÂĖÈÉÊÌÍÒÓÔÕÙÚÛÇ][a-zàáâãèéêìíóôõùúç]+))*$"
+    PATTERN_TELEFONE = "^\(?(?:[14689][1-9]|2[12478]|3[1234578]|5[1345]|7[134579])\)? ?(?:[2-8]|9[0-9])[0-9]{3}\-?[0-9]{4}$"
 
     dados = [pagina_pessoa_id.get(), pagina_pessoa_nome.get(),
              pagina_pessoa_tel.get()]
-
+    
     # Verifica se os campos estão vazios
     for d in dados:
         if d.strip() == "":
@@ -128,13 +132,30 @@ def cadastra_pessoa():
                 text="Por favor, preencha os\ncampos corretamente.")
             return
 
+    # Valida os campos com regex -> RA/ID, nome e telefone
+    ra_valido = re.match(PATTERN_RA, dados[0])
+    if ra_valido is None:
+        pagina_pessoa_label.config(text="ID inválido!\nPor favor, preencha o\ncampo de ID corretamente.")
+        return
+    
+    nome_valido = re.match(PATTERN_NOME, dados[1])
+    if nome_valido is None:
+        pagina_pessoa_label.config(text="Nome inválido!\nPor favor, preencha o\ncampo de nome corretamente.")
+        return
+
+    telefone_valido = re.match(PATTERN_TELEFONE, dados[2])
+    if telefone_valido is None:
+        pagina_pessoa_label.config(text="Telefone inválido!\nPor favor, preencha o\ncampo de telefone corretamente.")
+        return
+
     if pagina_pessoa_curso.get() == "Selecione um curso":
         pagina_pessoa_label.config(
-                text="O curso não é válido")
+                text="Por favor, selecione um curso válido!")
         return
 
     curso_id = utils.retorna_curso_id(pagina_pessoa_curso.get())
 
+    # Tira foto em analise, vai falhar
     fotoBin = utils.recebe_foto_binario()
 
     # Verifica se os dados inseridos pertencem à uma pessoa já registrada
