@@ -109,7 +109,7 @@ def cadastra_camera():
     pagina_cadastro_ip.delete(0, END)
     pagina_cadastro_senha.delete(0, END)
 
-    pagina_cadastro_nome.insert(index=1, string=f"Camera{Cam.conta_camera()}")
+    # pagina_cadastro_nome.insert(index=1, string=f"Camera{Cam.conta_camera()}")
 
     return
 
@@ -208,7 +208,7 @@ def alterar_info(varId):
 
 def show_pag_cadastro():
 
-    pagina_cadastro_nome.insert(index=1, string=f"Camera{Cam.conta_camera()}")
+    # pagina_cadastro_nome.insert(index=1, string=f"Camera{Cam.conta_camera()}")
     show_frame(pagina_cadastro)
 
 # Limpa os campos da página de cadastro de câmera
@@ -452,7 +452,7 @@ pagina_cadastro_usuLabel.place(x=220 - 55, y=187)
 pagina_cadastro_usuario = Entry(pagina_cadastro)
 pagina_cadastro_usuario["width"] = 20
 pagina_cadastro_usuario["font"] = fonte
-pagina_cadastro_usuario.insert(index=1, string="admin")
+# pagina_cadastro_usuario.insert(index=1, string="admin")
 pagina_cadastro_usuario.place(x=300 - 70, y=190)
 
 pagina_cadastro_senhaLabel = Label(pagina_cadastro, text="Senha:", font=fonte)

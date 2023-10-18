@@ -14,8 +14,7 @@ from tkinter import filedialog
 def browseFiles():
 	filename = filedialog.askopenfilename(initialdir = "/home/pi/Downloads/", title = "Select a File", filetypes = (("PNG images", "*.png*"), ("JPEG image", "*.jpg"), ("all files", "*.*")))
 	image = cv2.imread(filename)
-	cv2.imshow("test", image)
-	cv2.waitKey(0)
+	
     # cv2.imshow("test", image)
 	# Change label contents
 	label_file_explorer.configure(text="File Opened: "+filename)
