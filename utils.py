@@ -83,3 +83,16 @@ def retorna_curso_id(nome_curso):
     conexao.close()
 
     return results[0]
+
+def retorna_curso_nome(curso_id):
+    
+    conexao = sqlite3.connect("banco.db")
+    cursor = conexao.cursor()
+
+    cursor.execute(f"""SELECT nome FROM cursos
+                    WHERE CursoID like "{curso_id}" """)
+
+    results = cursor.fetchone()
+    conexao.close()
+
+    return results[0]

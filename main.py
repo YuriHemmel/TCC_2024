@@ -97,9 +97,10 @@ def cadastra_camera():
         camera = Cam.Camera(dados[0], dados[1], dados[2], dados[3])
         camera.insert_camera()
 
-    except: #Exception as e:
-        #print(e)
-        pagina_cadastro_label.config(text="Câmera já cadastrada\nanteriormente.")
+    except:  # Exception as e:
+        # print(e)
+        pagina_cadastro_label.config(
+            text="Câmera já cadastrada\nanteriormente.")
         return
 
     # Cadastro bem sucedido
@@ -124,7 +125,7 @@ def cadastra_pessoa():
 
     dados = [pagina_pessoa_id.get(), pagina_pessoa_nome.get(),
              pagina_pessoa_tel.get()]
-    
+
     # Verifica se os campos estão vazios
     for d in dados:
         if d.strip() == "":
@@ -135,35 +136,36 @@ def cadastra_pessoa():
     # Valida os campos com regex -> RA/ID, nome e telefone
     ra_valido = re.match(PATTERN_RA, dados[0])
     if ra_valido is None:
-        pagina_pessoa_label.config(text="ID inválido!\nPor favor, preencha o\ncampo de ID corretamente.")
+        pagina_pessoa_label.config(
+            text="ID inválido!\nPor favor, preencha o\ncampo de ID corretamente.")
         return
-    
+
     nome_valido = re.match(PATTERN_NOME, dados[1])
     if nome_valido is None:
-        pagina_pessoa_label.config(text="Nome inválido!\nPor favor, preencha o\ncampo de nome corretamente.")
+        pagina_pessoa_label.config(
+            text="Nome inválido!\nPor favor, preencha o\ncampo de nome corretamente.")
         return
 
     telefone_valido = re.match(PATTERN_TELEFONE, dados[2])
     if telefone_valido is None:
-        pagina_pessoa_label.config(text="Telefone inválido!\nPor favor, preencha o\ncampo de telefone corretamente.")
+        pagina_pessoa_label.config(
+            text="Telefone inválido!\nPor favor, preencha o\ncampo de telefone corretamente.")
         return
 
     if pagina_pessoa_curso.get() == "Selecione um curso":
         pagina_pessoa_label.config(
-                text="Por favor, selecione um curso válido!")
+            text="Por favor, selecione um curso válido!")
         return
-
-    curso_id = utils.retorna_curso_id(pagina_pessoa_curso.get())
 
     # Tira foto em analise, vai falhar
     fotoBin = utils.recebe_foto_binario()
 
     # Verifica se os dados inseridos pertencem à uma pessoa já registrada
     try:
-        pessoa = Pes.Pessoa(dados[0], dados[1], dados[2], 0, fotoBin, curso_id)
+        pessoa = Pes.Pessoa(dados[0], dados[1], dados[2], 0, fotoBin, utils.retorna_curso_id(pagina_pessoa_curso.get()))
         pessoa.insert_pessoa()
-    except: # Exception as e:
-        #print(e)
+    except:  # Exception as e:
+        # print(e)
         pagina_pessoa_label.config(text="Pessoa já cadastrada\nanteriomente.")
         return
 
@@ -178,6 +180,7 @@ def guarda_id(valor):
     global TEMP_ID
 
     TEMP_ID = valor
+
 
 def direciona_editar_pessoa():
 
@@ -202,6 +205,7 @@ def direciona_editar_pessoa():
     pagina_edit_pessoa_nome.insert(index=0, string=f"{pessoa[1]}")
     pagina_edit_pessoa_tel.insert(index=0, string=f"{pessoa[2]}")
     pagina_edit_pessoa_falta.insert(index=0, string=f"{pessoa[3]}")
+    pagina_edit_pessoa_curso.set(f"{utils.retorna_curso_nome(pessoa[5])}")
 
     guarda_id(pessoa[0])
 
@@ -211,7 +215,7 @@ def direciona_editar_pessoa():
 
 def alterar_info(varId):
 
-    dados = [pagina_edit_pessoa_nome.get(), pagina_edit_pessoa_tel.get()]
+    dados = [pagina_edit_pessoa_nome.get(), pagina_edit_pessoa_tel.get(), pagina_edit_pessoa_falta.get()]
 
     # Verifica se os campos estão vazios
     for d in dados:
@@ -219,10 +223,14 @@ def alterar_info(varId):
             messagebox.showinfo('Erro', 'Preencha os campos corretamente')
             return
 
-    res = messagebox.askquestion('Confirmação', f'Deseja alterar os dados de {varId}?')
+    res = messagebox.askquestion(
+        'Confirmação', f'Deseja alterar os dados de {varId}?')
 
     if res == 'yes':
-        Pes.altera_dados(varId, dados[0], dados[1])
+        for pessoa in lista_pessoa.curselection():
+            lista_pessoa.delete(pessoa)
+            lista_pessoa.insert(pessoa, f"ID: {varId} Nome: {dados[0]}")   
+        Pes.altera_dados(varId, dados[0], dados[1], dados[2], utils.retorna_curso_id(pagina_edit_pessoa_curso.get()))
     else:
         messagebox.showinfo('Cancelado', 'Ação cancelada')
 
@@ -261,6 +269,8 @@ def volta_pag_edit_pessoa():
     show_frame(pagina_list_pessoa)
 
 # Limpa os campos da página de cadastro de pessoa
+
+
 def volta_pag_pessoa():
 
     pagina_pessoa_nome.delete(0, END)
@@ -283,9 +293,10 @@ def confirma_apagar_camera():
         return
 
     camSelecionada = camSelecionada.split()[1]
-    
-    #Cria caixa de mensagem para confirmação
-    res = messagebox.askquestion("Apagar câmera", f"Deseja apagar informações da câmera: {camSelecionada}?")
+
+    # Cria caixa de mensagem para confirmação
+    res = messagebox.askquestion(
+        "Apagar câmera", f"Deseja apagar informações da câmera: {camSelecionada}?")
 
     if res == 'yes':
         lista_cameras.delete(lista_cameras.curselection())
@@ -308,16 +319,17 @@ def confirma_apagar_pessoa():
         return
 
     # Pega o nome da pessoa
-    nomeSelecionado = selecionada.split()[3::]
+    nome_selecionado = selecionada.split()[3::]
 
-    if nomeSelecionado[0] == nomeSelecionado[len(nomeSelecionado) - 1]:
-        nome = f"{nomeSelecionado[0]}"
+    # Se a pessoa só tiver o primeiro nome cadastrado, não aparecer "primeiroNome primeiroNome ra"
+    if nome_selecionado[0] == nome_selecionado[len(nome_selecionado) - 1]:
+        nome = f"{nome_selecionado[0]}"
     else:
-        nome = f"{nomeSelecionado[0]} {nomeSelecionado[len(nomeSelecionado) - 1]}"
+        nome = f"{nome_selecionado[0]} {nome_selecionado[len(nome_selecionado) - 1]}"
 
     # Pega o ID
     selecionada = selecionada.split()[1]
-    
+
     # Cria caixa de mensagem para confirmação
     res = messagebox.askquestion(
         "Apagar pessoa", f"Deseja apagar informações de {nome} {selecionada}?")
@@ -603,7 +615,7 @@ pagina_edit_pessoa_nomeLabel.configure(bg="#71BAFF")
 pagina_edit_pessoa_nomeLabel.place(x=220 - 41, y=67)
 
 pagina_edit_pessoa_nome = Entry(pagina_edit_pessoa)
-pagina_edit_pessoa_nome["width"] = 20
+pagina_edit_pessoa_nome["width"] = 25
 pagina_edit_pessoa_nome["font"] = fonte
 pagina_edit_pessoa_nome.place(x=300 - 70, y=70)
 
@@ -613,7 +625,7 @@ pagina_edit_pessoa_telLabel.configure(bg="#71BAFF")
 pagina_edit_pessoa_telLabel.place(x=220 - 60, y=117)
 
 pagina_edit_pessoa_tel = Entry(pagina_edit_pessoa)
-pagina_edit_pessoa_tel["width"] = 20
+pagina_edit_pessoa_tel["width"] = 25
 pagina_edit_pessoa_tel["font"] = fonte
 pagina_edit_pessoa_tel.place(x=300 - 70, y=120)
 
@@ -623,15 +635,18 @@ pagina_edit_pessoa_faltaLabel.configure(bg="#71BAFF")
 pagina_edit_pessoa_faltaLabel.place(x=220 - 43, y=167)
 
 pagina_edit_pessoa_falta = Entry(pagina_edit_pessoa)
-pagina_edit_pessoa_falta["width"] = 20
+pagina_edit_pessoa_falta["width"] = 25
 pagina_edit_pessoa_falta["font"] = fonte
 pagina_edit_pessoa_falta.place(x=300 - 70, y=170)
 
-pagina_edit_pessoa_cursoLabel = Label(pagina_edit_pessoa, text="Curso:", font=fonte)
+pagina_edit_pessoa_cursoLabel = Label(
+    pagina_edit_pessoa, text="Curso:", font=fonte)
 pagina_edit_pessoa_cursoLabel.configure(bg="#71BAFF")
 pagina_edit_pessoa_cursoLabel.place(x=220 - 40, y=220)
 
-pagina_edit_pessoa_curso = ttk.Combobox(pagina_edit_pessoa, textvariable=lista_cursos)
+pagina_edit_pessoa_curso = ttk.Combobox(
+    pagina_edit_pessoa, textvariable=lista_cursos)
+pagina_edit_pessoa_curso["width"] = 26
 pagina_edit_pessoa_curso['values'] = utils.listar_cursos()
 pagina_edit_pessoa_curso['state'] = 'readonly'
 pagina_edit_pessoa_curso.place(x=300 - 70, y=220)
@@ -642,7 +657,7 @@ pagina_edit_pessoa_voltar.pack(pady=20, ipadx=30, side=BOTTOM)
 
 pagina_edit_pessoa_salvar = Button(
     pagina_edit_pessoa, text="Salvar alterações", font=fonte, command=lambda: alterar_info(TEMP_ID))
-pagina_edit_pessoa_salvar.pack(pady=5, ipadx=30 - 10,ipady=2,side=BOTTOM)
+pagina_edit_pessoa_salvar.pack(pady=5, ipadx=30 - 10, ipady=2, side=BOTTOM)
 
 # ================ Método de inicialização =======================
 

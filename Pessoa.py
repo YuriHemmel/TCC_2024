@@ -77,14 +77,16 @@ def load_pessoa(ID):
 
     return results
 
-def altera_dados(ID, nome, tel):
+def altera_dados(ID, nome, tel, faltas, CursoID):
     conexao = sqlite3.connect("banco.db")
     cursor = conexao.cursor()
 
     cursor.execute(f"""
-    UPDATE pessoas
+    UPDATE pessoas SET
     nome = "{nome}",
     tel = "{tel}",
+    faltas = "{faltas}",
+    CursoID = "{CursoID}"
     WHERE ID like "{ID}"
     """)
 
