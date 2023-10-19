@@ -11,6 +11,7 @@ from tkinter import ttk
 from datetime import datetime
 import cv2
 import sys
+import pywhatkit
 
 WIDTH = 600
 HEIGHT = 400
@@ -388,7 +389,9 @@ def conecta_camera():
     cap.release()
     cv2.destroyAllWindows()
 
+# Manda mensagem por whatsapp
 def inicia_app():
+    pywhatkit.sendwhatmsg("+5511944880786", "Viado", 14, 37, 10, True, 10)
     return
 
 # ================ Pagina inicial =======================
@@ -413,21 +416,21 @@ pagina_inicial_cams.place(x=110, y=135)
 pagina_inicial_listPesLabel = Label(
     pagina_inicial, text="Listar Pessoas", font=fonte)
 pagina_inicial_listPesLabel.configure(bg="#71BAFF")
-pagina_inicial_listPesLabel.place(x=280, y=105)
+pagina_inicial_listPesLabel.place(x=280 + 153, y=105)
 
 pagina_inicial_listPes = Button(pagina_inicial, text="Pessoas",
                                 font=fonte, command=lambda: show_frame(pagina_list_pessoa))
-pagina_inicial_listPes.place(x=295, y=135)
+pagina_inicial_listPes.place(x=295 + 150, y=135)
 
 pagina_inicial_iniciaLabel = Label(
     pagina_inicial, text="Inicia câmeras", font=fonte)
 pagina_inicial_iniciaLabel.configure(bg="#71BAFF")
-pagina_inicial_iniciaLabel.place(x=280 + 153, y=105)
+pagina_inicial_iniciaLabel.place(x=280, y=105)
 
 pagina_inicial_inicia = Button(pagina_inicial, text="Iniciar",
                                 font=fonte, command=lambda: inicia_app())
 pagina_inicial_inicia['width'] = 8
-pagina_inicial_inicia.place(x=295 + 150, y=135)
+pagina_inicial_inicia.place(x=295, y=135)
 
 pagina_inicial_cadLabel = Label(
     pagina_inicial, text="Cadastrar câmera", font=fonte)
