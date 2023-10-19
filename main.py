@@ -10,7 +10,7 @@ import tkinter as tk
 from tkinter import ttk
 from datetime import datetime
 import cv2
-import os
+import sys
 
 WIDTH = 600
 HEIGHT = 400
@@ -162,7 +162,8 @@ def cadastra_pessoa():
 
     # Verifica se os dados inseridos pertencem à uma pessoa já registrada
     try:
-        pessoa = Pes.Pessoa(dados[0], dados[1], dados[2], 0, fotoBin, utils.retorna_curso_id(pagina_pessoa_curso.get()))
+        pessoa = Pes.Pessoa(dados[0], dados[1], dados[2], 0, fotoBin,
+                            utils.retorna_curso_id(pagina_pessoa_curso.get()))
         pessoa.insert_pessoa()
     except:  # Exception as e:
         # print(e)
@@ -215,7 +216,8 @@ def direciona_editar_pessoa():
 
 def alterar_info(varId):
 
-    dados = [pagina_edit_pessoa_nome.get(), pagina_edit_pessoa_tel.get(), pagina_edit_pessoa_falta.get()]
+    dados = [pagina_edit_pessoa_nome.get(), pagina_edit_pessoa_tel.get(),
+             pagina_edit_pessoa_falta.get()]
 
     # Verifica se os campos estão vazios
     for d in dados:
@@ -229,8 +231,9 @@ def alterar_info(varId):
     if res == 'yes':
         for pessoa in lista_pessoa.curselection():
             lista_pessoa.delete(pessoa)
-            lista_pessoa.insert(pessoa, f"ID: {varId} Nome: {dados[0]}")   
-        Pes.altera_dados(varId, dados[0], dados[1], dados[2], utils.retorna_curso_id(pagina_edit_pessoa_curso.get()))
+            lista_pessoa.insert(pessoa, f"ID: {varId} Nome: {dados[0]}")
+        Pes.altera_dados(varId, dados[0], dados[1], dados[2], utils.retorna_curso_id(
+            pagina_edit_pessoa_curso.get()))
     else:
         messagebox.showinfo('Cancelado', 'Ação cancelada')
 
@@ -385,6 +388,8 @@ def conecta_camera():
     cap.release()
     cv2.destroyAllWindows()
 
+def inicia_app():
+    return
 
 # ================ Pagina inicial =======================
 
@@ -399,38 +404,58 @@ pagina_inicial_titulo.place(x=WIDTH/2 - 40, y=20)
 pagina_inicial_camsLabel = Label(
     pagina_inicial, text="Abrir câmera", font=fonte)
 pagina_inicial_camsLabel.configure(bg="#71BAFF")
-pagina_inicial_camsLabel.place(x=165, y=105)
+pagina_inicial_camsLabel.place(x=100, y=105)
 
 pagina_inicial_cams = Button(pagina_inicial, text="Cameras",
                              font=fonte, command=lambda: show_frame(pagina_cameras))
-pagina_inicial_cams.place(x=175, y=135)
+pagina_inicial_cams.place(x=110, y=135)
 
 pagina_inicial_listPesLabel = Label(
     pagina_inicial, text="Listar Pessoas", font=fonte)
 pagina_inicial_listPesLabel.configure(bg="#71BAFF")
-pagina_inicial_listPesLabel.place(x=350, y=105)
+pagina_inicial_listPesLabel.place(x=280, y=105)
 
 pagina_inicial_listPes = Button(pagina_inicial, text="Pessoas",
                                 font=fonte, command=lambda: show_frame(pagina_list_pessoa))
-pagina_inicial_listPes.place(x=365, y=135)
+pagina_inicial_listPes.place(x=295, y=135)
+
+pagina_inicial_iniciaLabel = Label(
+    pagina_inicial, text="Inicia câmeras", font=fonte)
+pagina_inicial_iniciaLabel.configure(bg="#71BAFF")
+pagina_inicial_iniciaLabel.place(x=280 + 153, y=105)
+
+pagina_inicial_inicia = Button(pagina_inicial, text="Iniciar",
+                                font=fonte, command=lambda: inicia_app())
+pagina_inicial_inicia['width'] = 8
+pagina_inicial_inicia.place(x=295 + 150, y=135)
 
 pagina_inicial_cadLabel = Label(
     pagina_inicial, text="Cadastrar câmera", font=fonte)
 pagina_inicial_cadLabel.configure(bg="#71BAFF")
-pagina_inicial_cadLabel.place(x=152, y=200)
+pagina_inicial_cadLabel.place(x=152-68, y=200)
 
 pagina_inicial_cadastro = Button(
     pagina_inicial, text="Cadastrar Câmera", font=fonte, command=lambda: show_pag_cadastro())
-pagina_inicial_cadastro.place(x=148, y=230)
+pagina_inicial_cadastro.place(x=148-68, y=230)
 
 pagina_inicial_pessoaLabel = Label(
     pagina_inicial, text="Cadastrar pessoas", font=fonte)
 pagina_inicial_pessoaLabel.configure(bg="#71BAFF")
-pagina_inicial_pessoaLabel.place(x=335, y=200)
+pagina_inicial_pessoaLabel.place(x=335 - 68, y=200)
 
 pagina_inicial_pessoa = Button(
     pagina_inicial, text="Cadastrar Pessoa", font=fonte, command=lambda: show_frame(pagina_pessoa))
-pagina_inicial_pessoa.place(x=335, y=230)
+pagina_inicial_pessoa.place(x=335 - 68, y=230)
+
+pagina_inicial_sairLabel = Label(
+    pagina_inicial, text="Sair do app", font=fonte)
+pagina_inicial_sairLabel.configure(bg="#71BAFF")
+pagina_inicial_sairLabel.place(x=335 + 108, y=200)
+
+pagina_inicial_sair = Button(
+    pagina_inicial, text="Sair", font=fonte, command=lambda: sys.exit())
+pagina_inicial_sair['width'] = 8
+pagina_inicial_sair.place(x=335 + 110, y=230)
 
 # ================ Pagina das Câmeras =======================
 
