@@ -27,6 +27,7 @@ class Banco():
                      faltas int not null,
                      foto text not null,
                      CursoID int not null,
+                     presente bool not null,
                      FOREIGN KEY(CursoID) REFERENCES cursos(CursoID))""")
         
         # Tabela Câmeras

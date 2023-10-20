@@ -164,7 +164,7 @@ def cadastra_pessoa():
     # Verifica se os dados inseridos pertencem à uma pessoa já registrada
     try:
         pessoa = Pes.Pessoa(dados[0], dados[1], dados[2], 0, fotoBin,
-                            utils.retorna_curso_id(pagina_pessoa_curso.get()))
+                            utils.retorna_curso_id(pagina_pessoa_curso.get()), 0)
         pessoa.insert_pessoa()
     except:  # Exception as e:
         # print(e)
@@ -203,6 +203,7 @@ def direciona_editar_pessoa():
     # pessoa[3] = faltas
     # pessoa[4] = foto
     # pessoa[5] = id do curso
+    # pessoa[6] = presença no dia
 
     pagina_edit_pessoa_nome.insert(index=0, string=f"{pessoa[1]}")
     pagina_edit_pessoa_tel.insert(index=0, string=f"{pessoa[2]}")
@@ -390,8 +391,15 @@ def conecta_camera():
     cv2.destroyAllWindows()
 
 # Manda mensagem por whatsapp
+
+
 def inicia_app():
-    pywhatkit.sendwhatmsg("+5511944880786", "Viado", 14, 37, 10, True, 10)
+
+    nao_chegaram = Pes.verifica_chegada()
+    for pessoa in nao_chegaram:
+        for id in pessoa:
+            telefone = Pes.load_pessoa(id, "tel")
+            pywhatkit.sendwhatmsg(f"+55{telefone}", "Teste", 14, 37, 10, True, 10)
     return
 
 # ================ Pagina inicial =======================
@@ -428,7 +436,7 @@ pagina_inicial_iniciaLabel.configure(bg="#71BAFF")
 pagina_inicial_iniciaLabel.place(x=280, y=105)
 
 pagina_inicial_inicia = Button(pagina_inicial, text="Iniciar",
-                                font=fonte, command=lambda: inicia_app())
+                               font=fonte, command=lambda: inicia_app())
 pagina_inicial_inicia['width'] = 8
 pagina_inicial_inicia.place(x=295, y=135)
 
