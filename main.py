@@ -179,7 +179,7 @@ def cadastra_pessoa():
     
     pagina_pessoa_nome.delete(0, END)
     pagina_pessoa_id.delete(0, END)
-    pagina_pessoa_tel.delete(0, END)
+    pagina_pessoa_email.delete(0, END)
 
     return
 
