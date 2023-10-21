@@ -157,7 +157,7 @@ def cadastra_pessoa():
 
     if pagina_pessoa_curso.get() == "Selecione um curso":
         pagina_pessoa_label.config(
-            text="Por favor, selecione um curso válido!")
+            text="Por favor, selecione um curso\nválido!")
         return
 
     # Tira foto em analise, vai falhar
@@ -176,6 +176,10 @@ def cadastra_pessoa():
     # Cadastro bem sucedido
     pagina_pessoa_label.config(text="Pessoa registrada com sucesso.")
     lista_pessoa.insert(0, f"ID: {dados[0]} Nome: {dados[1]}")
+    
+    pagina_pessoa_nome.delete(0, END)
+    pagina_pessoa_id.delete(0, END)
+    pagina_pessoa_tel.delete(0, END)
 
     return
 
@@ -308,10 +312,6 @@ def confirma_apagar_camera():
     if res == 'yes':
         lista_cameras.delete(lista_cameras.curselection())
         Cam.delete_camera(camSelecionada)
-        messagebox.showinfo('Sucesso', 'Câmera apagada com sucesso')
-
-    else:
-        messagebox.showinfo('Cancelado', 'Ação cancelada')
 
 # Apaga pessoa do banco de dados
 
@@ -344,10 +344,6 @@ def confirma_apagar_pessoa():
     if res == 'yes':
         lista_pessoa.delete(lista_pessoa.curselection())
         Pes.delete_pessoa(selecionada)
-        messagebox.showinfo('Sucesso', 'Pessoa apagada com sucesso')
-
-    else:
-        messagebox.showinfo('Cancelado', 'Ação cancelada')
 
 
 def conecta_camera():
@@ -413,68 +409,68 @@ pagina_inicial.configure(bg="#71BAFF")
 pagina_inicial_titulo = Label(
     pagina_inicial, text="Menu Inicial", font=fonteTit)
 pagina_inicial_titulo.configure(bg="#71BAFF")
-pagina_inicial_titulo.place(x=WIDTH/2 - 40, y=20)
+pagina_inicial_titulo.place(x=WIDTH/2 - 45, y=20)
 
 
 pagina_inicial_camsLabel = Label(
     pagina_inicial, text="Lista de câmera", font=fonte)
 pagina_inicial_camsLabel.configure(bg="#71BAFF")
-pagina_inicial_camsLabel.place(x=60, y=105)
+pagina_inicial_camsLabel.place(x=60 - 10, y=105)
 
 pagina_inicial_cams = Button(pagina_inicial, text="Lista de cameras",
                              font=fonte, command=lambda: show_frame(pagina_cameras))
 pagina_inicial_cams['width'] = TAMANHO_BOTAO
-pagina_inicial_cams.place(x=50, y=135)
+pagina_inicial_cams.place(x=50 - 10, y=135)
 
 pagina_inicial_listPesLabel = Label(
     pagina_inicial, text="Listar Pessoas", font=fonte)
 pagina_inicial_listPesLabel.configure(bg="#71BAFF")
-pagina_inicial_listPesLabel.place(x=65, y=210)
+pagina_inicial_listPesLabel.place(x=65 - 10, y=210)
 
 pagina_inicial_listPes = Button(pagina_inicial, text="Lista de pessoas",
                                 font=fonte, command=lambda: show_frame(pagina_list_pessoa))
 pagina_inicial_listPes['width'] = TAMANHO_BOTAO
-pagina_inicial_listPes.place(x=50, y=240)
+pagina_inicial_listPes.place(x=50 - 10, y=240)
 
 pagina_inicial_iniciaLabel = Label(
-    pagina_inicial, text="Inicia app", font=fonte)
+    pagina_inicial, text="Iniciar app", font=fonte)
 pagina_inicial_iniciaLabel.configure(bg="#71BAFF")
-pagina_inicial_iniciaLabel.place(x=280, y=105)
+pagina_inicial_iniciaLabel.place(x=280 - 10, y=105)
 
 pagina_inicial_inicia = Button(pagina_inicial, text="Iniciar",
                                font=fonte, command=lambda: inicia_app())
 pagina_inicial_inicia['width'] = TAMANHO_BOTAO
-pagina_inicial_inicia.place(x=250, y=135)
-
-pagina_inicial_cadLabel = Label(
-    pagina_inicial, text="Cadastrar câmeras", font=fonte)
-pagina_inicial_cadLabel.configure(bg="#71BAFF")
-pagina_inicial_cadLabel.place(x=335 + 111, y=105)
-
-pagina_inicial_cadastro = Button(
-    pagina_inicial, text="Cadastrar Câmera", font=fonte, command=lambda: show_pag_cadastro())
-pagina_inicial_cadastro['width'] = TAMANHO_BOTAO
-pagina_inicial_cadastro.place(x=335 + 108, y=135)
-
-pagina_inicial_pessoaLabel = Label(
-    pagina_inicial, text="Cadastrar pessoas", font=fonte)
-pagina_inicial_pessoaLabel.configure(bg="#71BAFF")
-pagina_inicial_pessoaLabel.place(x=335 + 112, y=210)
-
-pagina_inicial_pessoa = Button(
-    pagina_inicial, text="Cadastrar Pessoa", font=fonte, command=lambda: show_frame(pagina_pessoa))
-pagina_inicial_pessoa['width'] = TAMANHO_BOTAO
-pagina_inicial_pessoa.place(x=335 + 108, y=240)
+pagina_inicial_inicia.place(x=250 - 10, y=135)
 
 pagina_inicial_sairLabel = Label(
     pagina_inicial, text="Sair do app", font=fonte)
 pagina_inicial_sairLabel.configure(bg="#71BAFF")
-pagina_inicial_sairLabel.place(x=275, y=210)
+pagina_inicial_sairLabel.place(x=265, y=210)
 
 pagina_inicial_sair = Button(
     pagina_inicial, text="Sair", font=fonte, command=lambda: sys.exit())
 pagina_inicial_sair['width'] = TAMANHO_BOTAO
-pagina_inicial_sair.place(x=250, y=240)
+pagina_inicial_sair.place(x=240, y=240)
+
+pagina_inicial_cadLabel = Label(
+    pagina_inicial, text="Cadastrar câmeras", font=fonte)
+pagina_inicial_cadLabel.configure(bg="#71BAFF")
+pagina_inicial_cadLabel.place(x=330 + 111, y=105)
+
+pagina_inicial_cadastro = Button(
+    pagina_inicial, text="Cadastrar Câmera", font=fonte, command=lambda: show_pag_cadastro())
+pagina_inicial_cadastro['width'] = TAMANHO_BOTAO
+pagina_inicial_cadastro.place(x=330 + 108, y=135)
+
+pagina_inicial_pessoaLabel = Label(
+    pagina_inicial, text="Cadastrar pessoas", font=fonte)
+pagina_inicial_pessoaLabel.configure(bg="#71BAFF")
+pagina_inicial_pessoaLabel.place(x=330 + 112, y=210)
+
+pagina_inicial_pessoa = Button(
+    pagina_inicial, text="Cadastrar Pessoa", font=fonte, command=lambda: show_frame(pagina_pessoa))
+pagina_inicial_pessoa['width'] = TAMANHO_BOTAO
+pagina_inicial_pessoa.place(x=330 + 108, y=240)
 
 # ================ Pagina das Câmeras =======================
 
@@ -509,7 +505,6 @@ pagina_cadastro_titulo = Label(
     pagina_cadastro, text="Cadastre sua câmera", font=fonteTit)
 pagina_cadastro_titulo.configure(bg="#71BAFF")
 pagina_cadastro_titulo.place(x=300 - 90, y=30)
-pagina_cadastro_titulo.pack()
 
 pagina_cadastro_nomeLabel = Label(pagina_cadastro, text="Nome:", font=fonte)
 pagina_cadastro_nomeLabel.configure(bg="#71BAFF")
@@ -551,15 +546,17 @@ pagina_cadastro_senha.place(x=300 - 70, y=240)
 
 pagina_cadastro_cadastrar = Button(pagina_cadastro, text="Cadastrar",
                                    font=fonte, command=lambda: cadastra_camera())
-pagina_cadastro_cadastrar.place(x=300 - 37, y=290)
+pagina_cadastro_cadastrar["width"] = TAMANHO_BOTAO
+pagina_cadastro_cadastrar.place(x=WIDTH/2 - 62, y=290)
 
 pagina_cadastro_label = Label(pagina_cadastro, text="", font=fonte)
 pagina_cadastro_label.configure(bg="#71BAFF")
-pagina_cadastro_label.place(x=355, y=287)
+pagina_cadastro_label.place(x=355 + 15, y=287)
 
 pagina_cadastro_voltar = Button(pagina_cadastro, text="Voltar",
                                 font=fonte, command=lambda: volta_pag_cadastro())
-pagina_cadastro_voltar.place(x=300 - 25, y=340)
+pagina_cadastro_voltar["width"] = TAMANHO_BOTAO
+pagina_cadastro_voltar.place(x=WIDTH/2 - 62, y=340)
 
 # ================ Pagina de Cadastro de Pessoas =======================
 
@@ -609,15 +606,17 @@ pagina_pessoa_curso.place(x=300 - 70, y=240)
 
 pagina_pessoa_cadastrar = Button(pagina_pessoa, text="Cadastrar",
                                  font=fonte, command=lambda: cadastra_pessoa())
-pagina_pessoa_cadastrar.place(x=215, y=340)
+pagina_pessoa_cadastrar["width"] = TAMANHO_BOTAO
+pagina_pessoa_cadastrar.place(x=WIDTH/2 - 62, y=290)
 
 pagina_pessoa_label = Label(pagina_pessoa, text="", font=fonte)
 pagina_pessoa_label.configure(bg="#71BAFF")
-pagina_pessoa_label.place(x=375, y=340)
+pagina_pessoa_label.place(x=375, y=300)
 
 pagina_pessoa_voltar = Button(pagina_pessoa, text="Voltar",
                               font=fonte, command=lambda: volta_pag_pessoa())
-pagina_pessoa_voltar.place(x=310, y=340)
+pagina_pessoa_voltar["width"] = TAMANHO_BOTAO
+pagina_pessoa_voltar.place(x=WIDTH/2 - 62, y=340)
 
 # ================ Pagina Lista das Pessoas =======================
 
