@@ -241,8 +241,6 @@ def alterar_info(varId):
             lista_pessoa.insert(pessoa, f"ID: {varId} Nome: {dados[0]}")
         Pes.altera_dados(varId, dados[0], dados[1], dados[2], utils.retorna_curso_id(
             pagina_edit_pessoa_curso.get()))
-    else:
-        messagebox.showinfo('Cancelado', 'Ação cancelada')
 
 
 # Indo para a página de cadastro (atualiza o campo de nome automáticamente)
