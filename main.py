@@ -419,32 +419,32 @@ pagina_inicial_titulo.place(x=WIDTH/2 - 40, y=20)
 pagina_inicial_camsLabel = Label(
     pagina_inicial, text="Lista de câmera", font=fonte)
 pagina_inicial_camsLabel.configure(bg="#71BAFF")
-pagina_inicial_camsLabel.place(x=60, y=105)
+pagina_inicial_camsLabel.place(x=60 - 10, y=105)
 
 pagina_inicial_cams = Button(pagina_inicial, text="Lista de cameras",
                              font=fonte, command=lambda: show_frame(pagina_cameras))
 pagina_inicial_cams['width'] = TAMANHO_BOTAO
-pagina_inicial_cams.place(x=50, y=135)
+pagina_inicial_cams.place(x=50 - 10, y=135)
 
 pagina_inicial_listPesLabel = Label(
     pagina_inicial, text="Listar Pessoas", font=fonte)
 pagina_inicial_listPesLabel.configure(bg="#71BAFF")
-pagina_inicial_listPesLabel.place(x=65, y=210)
+pagina_inicial_listPesLabel.place(x=65 - 10, y=210)
 
 pagina_inicial_listPes = Button(pagina_inicial, text="Lista de pessoas",
                                 font=fonte, command=lambda: show_frame(pagina_list_pessoa))
 pagina_inicial_listPes['width'] = TAMANHO_BOTAO
-pagina_inicial_listPes.place(x=50, y=240)
+pagina_inicial_listPes.place(x=50 - 10, y=240)
 
 pagina_inicial_iniciaLabel = Label(
     pagina_inicial, text="Inicia app", font=fonte)
 pagina_inicial_iniciaLabel.configure(bg="#71BAFF")
-pagina_inicial_iniciaLabel.place(x=280, y=105)
+pagina_inicial_iniciaLabel.place(x=280 - 10, y=105)
 
 pagina_inicial_inicia = Button(pagina_inicial, text="Iniciar",
                                font=fonte, command=lambda: inicia_app())
 pagina_inicial_inicia['width'] = TAMANHO_BOTAO
-pagina_inicial_inicia.place(x=250, y=135)
+pagina_inicial_inicia.place(x=250 - 10, y=135)
 
 pagina_inicial_cadLabel = Label(
     pagina_inicial, text="Cadastrar câmeras", font=fonte)
@@ -469,12 +469,12 @@ pagina_inicial_pessoa.place(x=335 + 108, y=240)
 pagina_inicial_sairLabel = Label(
     pagina_inicial, text="Sair do app", font=fonte)
 pagina_inicial_sairLabel.configure(bg="#71BAFF")
-pagina_inicial_sairLabel.place(x=275, y=210)
+pagina_inicial_sairLabel.place(x=265, y=210)
 
 pagina_inicial_sair = Button(
     pagina_inicial, text="Sair", font=fonte, command=lambda: sys.exit())
 pagina_inicial_sair['width'] = TAMANHO_BOTAO
-pagina_inicial_sair.place(x=250, y=240)
+pagina_inicial_sair.place(x=240, y=240)
 
 # ================ Pagina das Câmeras =======================
 
@@ -551,15 +551,17 @@ pagina_cadastro_senha.place(x=300 - 70, y=240)
 
 pagina_cadastro_cadastrar = Button(pagina_cadastro, text="Cadastrar",
                                    font=fonte, command=lambda: cadastra_camera())
-pagina_cadastro_cadastrar.place(x=300 - 37, y=290)
+pagina_cadastro_cadastrar["width"] = TAMANHO_BOTAO
+pagina_cadastro_cadastrar.place(x=WIDTH/2 - 62, y=290)
 
 pagina_cadastro_label = Label(pagina_cadastro, text="", font=fonte)
 pagina_cadastro_label.configure(bg="#71BAFF")
-pagina_cadastro_label.place(x=355, y=287)
+pagina_cadastro_label.place(x=355 + 15, y=287)
 
 pagina_cadastro_voltar = Button(pagina_cadastro, text="Voltar",
                                 font=fonte, command=lambda: volta_pag_cadastro())
-pagina_cadastro_voltar.place(x=300 - 25, y=340)
+pagina_cadastro_voltar["width"] = TAMANHO_BOTAO
+pagina_cadastro_voltar.place(x=WIDTH/2 - 62, y=340)
 
 # ================ Pagina de Cadastro de Pessoas =======================
 
