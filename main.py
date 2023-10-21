@@ -4,14 +4,15 @@ import re
 import Banco
 import Camera as Cam
 import Pessoa as Pes
-from tkinter import *  # Interface gráfica
-from tkinter import messagebox  # Caixa de mensagem para confirmações
 import tkinter as tk
-from tkinter import ttk
-from datetime import *
 import cv2
 import sys
-import pywhatkit
+from tkinter import *  # Interface gráfica
+from tkinter import messagebox  # Caixa de mensagem para confirmações
+from tkinter import ttk
+from datetime import *
+from email_utils import envia_email_alerta
+
 
 WIDTH = 600
 HEIGHT = 400
@@ -123,10 +124,10 @@ def cadastra_camera():
 def cadastra_pessoa():
     PATTERN_RA = "^[A-z0-9]{7}$"
     PATTERN_NOME = "^(?=^.{2,60}$)^[A-ZÀÁÂĖÈÉÊÌÍÒÓÔÕÙÚÛÇ][a-zàáâãèéêìíóôõùúç]+(?:[ ](?:das?|dos?|de|e|[A-ZÀÁÂĖÈÉÊÌÍÒÓÔÕÙÚÛÇ][a-zàáâãèéêìíóôõùúç]+))*$"
-    PATTERN_TELEFONE = "^\(?(?:[14689][1-9]|2[12478]|3[1234578]|5[1345]|7[134579])?\)? ?(?:[2-8]|9[0-9])[0-9]{3}\-?[0-9]{4}$"
+    PATTERN_EMAIL = "^[a-z0-9.]+@aluno\.unip\.br$"
 
     dados = [pagina_pessoa_id.get(), pagina_pessoa_nome.get(),
-             pagina_pessoa_tel.get()]
+             pagina_pessoa_email.get()]
 
     # Verifica se os campos estão vazios
     for d in dados:
@@ -135,7 +136,7 @@ def cadastra_pessoa():
                 text="Por favor, preencha os\ncampos corretamente.")
             return
 
-    # Valida os campos com regex -> RA/ID, nome e telefone
+    # Valida os campos com regex -> RA/ID, nome e email
     ra_valido = re.match(PATTERN_RA, dados[0])
     if ra_valido is None:
         pagina_pessoa_label.config(
@@ -148,10 +149,10 @@ def cadastra_pessoa():
             text="Nome inválido!\nPor favor, preencha o\ncampo de nome corretamente.")
         return
 
-    telefone_valido = re.match(PATTERN_TELEFONE, dados[2])
-    if telefone_valido is None:
+    email_valido = re.match(PATTERN_EMAIL, dados[2])
+    if email_valido is None:
         pagina_pessoa_label.config(
-            text="Telefone inválido!\nPor favor, preencha o\ncampo de telefone corretamente.")
+            text="Email inválido!\nPor favor, preencha o\ncampo de email corretamente.")
         return
 
     if pagina_pessoa_curso.get() == "Selecione um curso":
@@ -178,7 +179,7 @@ def cadastra_pessoa():
     
     pagina_pessoa_nome.delete(0, END)
     pagina_pessoa_id.delete(0, END)
-    pagina_pessoa_tel.delete(0, END)
+    pagina_pessoa_email.delete(0, END)
 
     return
 
@@ -204,14 +205,14 @@ def direciona_editar_pessoa():
 
     # pessoa[0] = ID
     # pessoa[1] = Nome
-    # pessoa[2] = Telefone
+    # pessoa[2] = Email
     # pessoa[3] = faltas
     # pessoa[4] = foto
     # pessoa[5] = id do curso
     # pessoa[6] = presença no dia
 
     pagina_edit_pessoa_nome.insert(index=0, string=f"{pessoa[1]}")
-    pagina_edit_pessoa_tel.insert(index=0, string=f"{pessoa[2]}")
+    pagina_edit_pessoa_email.insert(index=0, string=f"{pessoa[2]}")
     pagina_edit_pessoa_falta.insert(index=0, string=f"{pessoa[3]}")
     pagina_edit_pessoa_curso.set(f"{utils.retorna_curso_nome(pessoa[5])}")
 
@@ -223,7 +224,7 @@ def direciona_editar_pessoa():
 
 def alterar_info(varId):
 
-    dados = [pagina_edit_pessoa_nome.get(), pagina_edit_pessoa_tel.get(),
+    dados = [pagina_edit_pessoa_nome.get(), pagina_edit_pessoa_email.get(),
              pagina_edit_pessoa_falta.get()]
 
     # Verifica se os campos estão vazios
@@ -269,7 +270,7 @@ def volta_pag_cadastro():
 def volta_pag_edit_pessoa():
 
     pagina_edit_pessoa_nome.delete(0, END)
-    pagina_edit_pessoa_tel.delete(0, END)
+    pagina_edit_pessoa_email.delete(0, END)
     pagina_edit_pessoa_falta.delete(0, END)
 
     guarda_id("")
@@ -283,7 +284,7 @@ def volta_pag_pessoa():
 
     pagina_pessoa_nome.delete(0, END)
     pagina_pessoa_id.delete(0, END)
-    pagina_pessoa_tel.delete(0, END)
+    pagina_pessoa_email.delete(0, END)
     pagina_pessoa_label.config(text="")
 
     show_frame(pagina_inicial)
@@ -389,14 +390,13 @@ def conecta_camera():
 
 
 def inicia_app():
-
     nao_chegaram = Pes.verifica_chegada()
 
     for item in nao_chegaram:
-        telefone = Pes.load_pessoa_telefone(item[0])
-        pywhatkit.sendwhatmsg(
-            f"+55{telefone}", "Teste", datetime, 15, 7, True, 5)
-
+        ID = item[0]
+        email = Pes.recebe_email_por_ID(ID)
+        aluno = Pes.recebe_nome_por_ID(ID)
+        envia_email_alerta(aluno, ID, email)
     return
 
 # ================ Pagina inicial =======================
@@ -583,14 +583,14 @@ pagina_pessoa_id["width"] = 20
 pagina_pessoa_id["font"] = fonte
 pagina_pessoa_id.place(x=300 - 70, y=140)
 
-pagina_pessoa_telLabel = Label(pagina_pessoa, text="Telefone:", font=fonte)
-pagina_pessoa_telLabel.configure(bg="#71BAFF")
-pagina_pessoa_telLabel.place(x=220 - 60, y=187)
+pagina_pessoa_emailLabel = Label(pagina_pessoa, text="Email:", font=fonte)
+pagina_pessoa_emailLabel.configure(bg="#71BAFF")
+pagina_pessoa_emailLabel.place(x=220 - 40, y=187)
 
-pagina_pessoa_tel = Entry(pagina_pessoa)
-pagina_pessoa_tel["width"] = 20
-pagina_pessoa_tel["font"] = fonte
-pagina_pessoa_tel.place(x=300 - 70, y=190)
+pagina_pessoa_email = Entry(pagina_pessoa)
+pagina_pessoa_email["width"] = 20
+pagina_pessoa_email["font"] = fonte
+pagina_pessoa_email.place(x=300 - 70, y=190)
 
 pagina_pessoa_cursoLabel = Label(pagina_pessoa, text="Curso:", font=fonte)
 pagina_pessoa_cursoLabel.configure(bg="#71BAFF")
@@ -660,15 +660,15 @@ pagina_edit_pessoa_nome["width"] = 25
 pagina_edit_pessoa_nome["font"] = fonte
 pagina_edit_pessoa_nome.place(x=300 - 70, y=70)
 
-pagina_edit_pessoa_telLabel = Label(
-    pagina_edit_pessoa, text="Telefone:", font=fonte)
-pagina_edit_pessoa_telLabel.configure(bg="#71BAFF")
-pagina_edit_pessoa_telLabel.place(x=220 - 60, y=117)
+pagina_edit_pessoa_emailLabel = Label(
+    pagina_edit_pessoa, text="Email:", font=fonte)
+pagina_edit_pessoa_emailLabel.configure(bg="#71BAFF")
+pagina_edit_pessoa_emailLabel.place(x=220 - 40, y=117)
 
-pagina_edit_pessoa_tel = Entry(pagina_edit_pessoa)
-pagina_edit_pessoa_tel["width"] = 25
-pagina_edit_pessoa_tel["font"] = fonte
-pagina_edit_pessoa_tel.place(x=300 - 70, y=120)
+pagina_edit_pessoa_email = Entry(pagina_edit_pessoa)
+pagina_edit_pessoa_email["width"] = 25
+pagina_edit_pessoa_email["font"] = fonte
+pagina_edit_pessoa_email.place(x=300 - 70, y=120)
 
 pagina_edit_pessoa_faltaLabel = Label(
     pagina_edit_pessoa, text="Faltas:", font=fonte)

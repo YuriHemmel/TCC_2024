@@ -1,0 +1,35 @@
+import smtplib
+import os
+from dotenv import load_dotenv
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+# Carrega o arquivo .env que contém as variaveis de ambiente necessárias para o envio
+load_dotenv()
+
+USERNAME = os.environ['user'] # email do raspberry para login
+PASS = os.environ['pass'] # senha do email do raspberry para login
+REMETENTE = os.environ['email'] # email do remetente (quem vai enviar a mensagem)
+DESTINATARIO = "raspberrytest12345@gmail.com" # email do destinatario (quem vai receber a mensagem)
+assunto_email = "Test Subject" # assunto do email a ser enviado
+mensagem_email = "Teste de envio de email via raspberry pi" # mensagem do email a ser enviado
+
+# inicia a montagem do email usando MIMEMultipart
+mimemsg = MIMEMultipart() 
+mimemsg['From']=REMETENTE
+mimemsg['To']=DESTINATARIO
+mimemsg['Subject']=assunto_email
+mimemsg.attach(MIMEText(mensagem_email, 'plain'))
+
+# Abre conexão smtp para realizar o envio do email
+connection = smtplib.SMTP(host='smtp.gmail.com', port=587)
+connection.starttls()
+
+# login do email do remetente
+connection.login(USERNAME, PASS)
+
+# envio da mensagem
+connection.send_message(mimemsg)
+
+# fechando conexão
+connection.quit()
