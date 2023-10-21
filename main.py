@@ -175,6 +175,10 @@ def cadastra_pessoa():
     # Cadastro bem sucedido
     pagina_pessoa_label.config(text="Pessoa registrada com sucesso.")
     lista_pessoa.insert(0, f"ID: {dados[0]} Nome: {dados[1]}")
+    
+    pagina_pessoa_nome.delete(0, END)
+    pagina_pessoa_id.delete(0, END)
+    pagina_pessoa_tel.delete(0, END)
 
     return
 
@@ -307,10 +311,6 @@ def confirma_apagar_camera():
     if res == 'yes':
         lista_cameras.delete(lista_cameras.curselection())
         Cam.delete_camera(camSelecionada)
-        messagebox.showinfo('Sucesso', 'Câmera apagada com sucesso')
-
-    else:
-        messagebox.showinfo('Cancelado', 'Ação cancelada')
 
 # Apaga pessoa do banco de dados
 
@@ -343,10 +343,6 @@ def confirma_apagar_pessoa():
     if res == 'yes':
         lista_pessoa.delete(lista_pessoa.curselection())
         Pes.delete_pessoa(selecionada)
-        messagebox.showinfo('Sucesso', 'Pessoa apagada com sucesso')
-
-    else:
-        messagebox.showinfo('Cancelado', 'Ação cancelada')
 
 
 def conecta_camera():
@@ -437,7 +433,7 @@ pagina_inicial_listPes['width'] = TAMANHO_BOTAO
 pagina_inicial_listPes.place(x=50 - 10, y=240)
 
 pagina_inicial_iniciaLabel = Label(
-    pagina_inicial, text="Inicia app", font=fonte)
+    pagina_inicial, text="Iniciar app", font=fonte)
 pagina_inicial_iniciaLabel.configure(bg="#71BAFF")
 pagina_inicial_iniciaLabel.place(x=280 - 10, y=105)
 
@@ -611,7 +607,7 @@ pagina_pessoa_curso.place(x=300 - 70, y=240)
 pagina_pessoa_cadastrar = Button(pagina_pessoa, text="Cadastrar",
                                  font=fonte, command=lambda: cadastra_pessoa())
 pagina_pessoa_cadastrar["width"] = TAMANHO_BOTAO
-pagina_pessoa_cadastrar.place(x=WIDTH/2 - 62, y=300)
+pagina_pessoa_cadastrar.place(x=WIDTH/2 - 62, y=290)
 
 pagina_pessoa_label = Label(pagina_pessoa, text="", font=fonte)
 pagina_pessoa_label.configure(bg="#71BAFF")
