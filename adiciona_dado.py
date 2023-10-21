@@ -12,3 +12,4 @@ cursor.execute("""INSERT INTO cursos (nome, diaAula, horaEntrada) VALUES ('Engen
 
 conexao.commit()
 conexao.close()
+

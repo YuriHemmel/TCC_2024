@@ -106,12 +106,12 @@ def verifica_chegada():
     
     results = cursor.fetchall()
     conexao.close()
-
+    
     return results
 
-def load_pessoa(ID, dado):
-    num_elemento = 0
+def load_pessoa_telefone(ID):
 
+    
     conexao = sqlite3.connect("banco.db")
     cursor = conexao.cursor()
 
@@ -124,24 +124,11 @@ def load_pessoa(ID, dado):
     # pessoa[6] = presença no dia
 
     cursor.execute(f"""
-    SELECT * FROM pessoas
+    SELECT tel FROM pessoas
     WHERE ID like "{ID}"
     """)
 
     results = cursor.fetchone()
     conexao.close()
 
-    if dado == "nome":
-        num_elemento = 1
-    elif dado == "tel":
-        num_elemento = 2
-    elif dado == "faltas":
-        num_elemento = 3
-    elif dado == "foto":
-        num_elemento = 4
-    elif dado == "CursoID":
-        num_elemento = 5
-    else:
-        num_elemento = 6
-
-    return results[num_elemento]
+    return results
