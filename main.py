@@ -7,6 +7,7 @@ import Pessoa as Pes
 import tkinter as tk
 import cv2
 import sys
+from dotenv import load_dotenv
 from tkinter import *  # Interface gráfica
 from tkinter import messagebox  # Caixa de mensagem para confirmações
 from tkinter import ttk
@@ -19,8 +20,8 @@ HEIGHT = 400
 TEMP_ID = ""
 TAMANHO_BOTAO = 15
 
-# Configuração básica para protocolo rtsp
-os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;0"
+# Lê as variáveis de ambiente presentes no arquivo .env
+load_dotenv()
 
 # Janela
 janela = Tk()
@@ -54,8 +55,6 @@ for frame in paginas:
 lista_cursos = tk.StringVar()
 
 # Mostra o Frame que queremos
-
-
 def show_frame(frame):
     frame.tkraise()
 
@@ -67,6 +66,7 @@ show_frame(pagina_inicial)
 db = Banco.Banco()
 
 
+# Lista as cameras já cadastradas no sistema
 def listar_cameras():
     cams = Cam.list_camera()
 
@@ -74,17 +74,17 @@ def listar_cameras():
         lista_cameras.insert(c[0], f"Nome: {c[1]}       IP: {c[2]}")
 
 
+# Lista pessoas já cadastradas no sistema
 def listar_pessoas():
     pessoas = Pes.list_pessoa()
 
     for p in pessoas:
         lista_pessoa.insert(0, f"ID: {p[0]} Nome: {p[1]}")
 
+
 # Cadastra câmeras no banco de dados
-
-
 def cadastra_camera():
-
+    # Recebe as informações de cada campo do formulário
     dados = [pagina_cadastro_nome.get(), pagina_cadastro_ip.get(),
              pagina_cadastro_senha.get(), pagina_cadastro_usuario.get()]
 
@@ -101,7 +101,6 @@ def cadastra_camera():
         camera.insert_camera()
 
     except:  # Exception as e:
-        # print(e)
         pagina_cadastro_label.config(
             text="Câmera já cadastrada\nanteriormente.")
         return
@@ -112,16 +111,15 @@ def cadastra_camera():
 
     pagina_cadastro_nome.delete(0, END)
     pagina_cadastro_ip.delete(0, END)
+    pagina_cadastro_usuario.delete(0, END)
     pagina_cadastro_senha.delete(0, END)
-
-    # pagina_cadastro_nome.insert(index=1, string=f"Camera{Cam.conta_camera()}")
 
     return
 
+
 # Cadastra pessoas no banco de dados
-
-
 def cadastra_pessoa():
+    # Padrões de regex para cada campo ser validado
     PATTERN_RA = "^[A-z0-9]{7}$"
     PATTERN_NOME = "^(?=^.{2,60}$)^[A-ZÀÁÂĖÈÉÊÌÍÒÓÔÕÙÚÛÇ][a-zàáâãèéêìíóôõùúç]+(?:[ ](?:das?|dos?|de|e|[A-ZÀÁÂĖÈÉÊÌÍÒÓÔÕÙÚÛÇ][a-zàáâãèéêìíóôõùúç]+))*$"
     PATTERN_EMAIL = "^[a-z0-9.]+@aluno\.unip\.br$"
@@ -191,7 +189,6 @@ def guarda_id(valor):
 
 
 def direciona_editar_pessoa():
-
     selecionada = lista_pessoa.get(ACTIVE)
 
     # Se não tiver pessoa registrada, dá erro
@@ -219,11 +216,10 @@ def direciona_editar_pessoa():
     guarda_id(pessoa[0])
 
     show_frame(pagina_edit_pessoa)
+
+
 # Salva novas informações no banco
-
-
 def alterar_info(varId):
-
     dados = [pagina_edit_pessoa_nome.get(), pagina_edit_pessoa_email.get(),
              pagina_edit_pessoa_falta.get()]
 
@@ -245,18 +241,13 @@ def alterar_info(varId):
 
 
 # Indo para a página de cadastro (atualiza o campo de nome automáticamente)
-
-
 def show_pag_cadastro():
-
     # pagina_cadastro_nome.insert(index=1, string=f"Camera{Cam.conta_camera()}")
     show_frame(pagina_cadastro)
 
+
 # Limpa os campos da página de cadastro de câmera
-
-
 def volta_pag_cadastro():
-
     pagina_cadastro_nome.delete(0, END)
     pagina_cadastro_ip.delete(0, END)
     pagina_cadastro_senha.delete(0, END)
@@ -264,11 +255,9 @@ def volta_pag_cadastro():
 
     show_frame(pagina_inicial)
 
-# Limpa os campos da página de cadastro de c
 
-
+# Limpa os campos da página de editar pessoas
 def volta_pag_edit_pessoa():
-
     pagina_edit_pessoa_nome.delete(0, END)
     pagina_edit_pessoa_email.delete(0, END)
     pagina_edit_pessoa_falta.delete(0, END)
@@ -277,11 +266,9 @@ def volta_pag_edit_pessoa():
 
     show_frame(pagina_list_pessoa)
 
+
 # Limpa os campos da página de cadastro de pessoa
-
-
 def volta_pag_pessoa():
-
     pagina_pessoa_nome.delete(0, END)
     pagina_pessoa_id.delete(0, END)
     pagina_pessoa_email.delete(0, END)
@@ -289,11 +276,9 @@ def volta_pag_pessoa():
 
     show_frame(pagina_inicial)
 
+
 # Apaga camera do banco de dados
-
-
 def confirma_apagar_camera():
-
     camSelecionada = lista_cameras.get(ACTIVE)
 
     # Se não tiver câmera registrada, dá erro
@@ -311,11 +296,9 @@ def confirma_apagar_camera():
         lista_cameras.delete(lista_cameras.curselection())
         Cam.delete_camera(camSelecionada)
 
+
 # Apaga pessoa do banco de dados
-
-
 def confirma_apagar_pessoa():
-
     selecionada = lista_pessoa.get(ACTIVE)
 
     # Se não tiver pessoa registrada, dá erro
@@ -386,9 +369,7 @@ def conecta_camera():
     cap.release()
     cv2.destroyAllWindows()
 
-# Manda mensagem por whatsapp
-
-
+# Manda mensagem por email
 def inicia_app():
     nao_chegaram = Pes.verifica_chegada()
 
@@ -398,6 +379,7 @@ def inicia_app():
         aluno = Pes.recebe_nome_por_ID(ID)
         envia_email_alerta(aluno, ID, email)
     return
+
 
 # ================ Pagina inicial =======================
 
@@ -529,7 +511,6 @@ pagina_cadastro_usuLabel.place(x=220 - 55, y=187)
 pagina_cadastro_usuario = Entry(pagina_cadastro)
 pagina_cadastro_usuario["width"] = 20
 pagina_cadastro_usuario["font"] = fonte
-# pagina_cadastro_usuario.insert(index=1, string="admin")
 pagina_cadastro_usuario.place(x=300 - 70, y=190)
 
 pagina_cadastro_senhaLabel = Label(pagina_cadastro, text="Senha:", font=fonte)
