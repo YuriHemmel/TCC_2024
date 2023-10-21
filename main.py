@@ -156,7 +156,7 @@ def cadastra_pessoa():
 
     if pagina_pessoa_curso.get() == "Selecione um curso":
         pagina_pessoa_label.config(
-            text="Por favor, selecione um curso válido!")
+            text="Por favor, selecione um curso\nválido!")
         return
 
     # Tira foto em analise, vai falhar
@@ -413,7 +413,7 @@ pagina_inicial.configure(bg="#71BAFF")
 pagina_inicial_titulo = Label(
     pagina_inicial, text="Menu Inicial", font=fonteTit)
 pagina_inicial_titulo.configure(bg="#71BAFF")
-pagina_inicial_titulo.place(x=WIDTH/2 - 40, y=20)
+pagina_inicial_titulo.place(x=WIDTH/2 - 45, y=20)
 
 
 pagina_inicial_camsLabel = Label(
@@ -446,26 +446,6 @@ pagina_inicial_inicia = Button(pagina_inicial, text="Iniciar",
 pagina_inicial_inicia['width'] = TAMANHO_BOTAO
 pagina_inicial_inicia.place(x=250 - 10, y=135)
 
-pagina_inicial_cadLabel = Label(
-    pagina_inicial, text="Cadastrar câmeras", font=fonte)
-pagina_inicial_cadLabel.configure(bg="#71BAFF")
-pagina_inicial_cadLabel.place(x=335 + 111, y=105)
-
-pagina_inicial_cadastro = Button(
-    pagina_inicial, text="Cadastrar Câmera", font=fonte, command=lambda: show_pag_cadastro())
-pagina_inicial_cadastro['width'] = TAMANHO_BOTAO
-pagina_inicial_cadastro.place(x=335 + 108, y=135)
-
-pagina_inicial_pessoaLabel = Label(
-    pagina_inicial, text="Cadastrar pessoas", font=fonte)
-pagina_inicial_pessoaLabel.configure(bg="#71BAFF")
-pagina_inicial_pessoaLabel.place(x=335 + 112, y=210)
-
-pagina_inicial_pessoa = Button(
-    pagina_inicial, text="Cadastrar Pessoa", font=fonte, command=lambda: show_frame(pagina_pessoa))
-pagina_inicial_pessoa['width'] = TAMANHO_BOTAO
-pagina_inicial_pessoa.place(x=335 + 108, y=240)
-
 pagina_inicial_sairLabel = Label(
     pagina_inicial, text="Sair do app", font=fonte)
 pagina_inicial_sairLabel.configure(bg="#71BAFF")
@@ -475,6 +455,26 @@ pagina_inicial_sair = Button(
     pagina_inicial, text="Sair", font=fonte, command=lambda: sys.exit())
 pagina_inicial_sair['width'] = TAMANHO_BOTAO
 pagina_inicial_sair.place(x=240, y=240)
+
+pagina_inicial_cadLabel = Label(
+    pagina_inicial, text="Cadastrar câmeras", font=fonte)
+pagina_inicial_cadLabel.configure(bg="#71BAFF")
+pagina_inicial_cadLabel.place(x=330 + 111, y=105)
+
+pagina_inicial_cadastro = Button(
+    pagina_inicial, text="Cadastrar Câmera", font=fonte, command=lambda: show_pag_cadastro())
+pagina_inicial_cadastro['width'] = TAMANHO_BOTAO
+pagina_inicial_cadastro.place(x=330 + 108, y=135)
+
+pagina_inicial_pessoaLabel = Label(
+    pagina_inicial, text="Cadastrar pessoas", font=fonte)
+pagina_inicial_pessoaLabel.configure(bg="#71BAFF")
+pagina_inicial_pessoaLabel.place(x=330 + 112, y=210)
+
+pagina_inicial_pessoa = Button(
+    pagina_inicial, text="Cadastrar Pessoa", font=fonte, command=lambda: show_frame(pagina_pessoa))
+pagina_inicial_pessoa['width'] = TAMANHO_BOTAO
+pagina_inicial_pessoa.place(x=330 + 108, y=240)
 
 # ================ Pagina das Câmeras =======================
 
@@ -509,7 +509,6 @@ pagina_cadastro_titulo = Label(
     pagina_cadastro, text="Cadastre sua câmera", font=fonteTit)
 pagina_cadastro_titulo.configure(bg="#71BAFF")
 pagina_cadastro_titulo.place(x=300 - 90, y=30)
-pagina_cadastro_titulo.pack()
 
 pagina_cadastro_nomeLabel = Label(pagina_cadastro, text="Nome:", font=fonte)
 pagina_cadastro_nomeLabel.configure(bg="#71BAFF")
@@ -611,15 +610,17 @@ pagina_pessoa_curso.place(x=300 - 70, y=240)
 
 pagina_pessoa_cadastrar = Button(pagina_pessoa, text="Cadastrar",
                                  font=fonte, command=lambda: cadastra_pessoa())
-pagina_pessoa_cadastrar.place(x=215, y=340)
+pagina_pessoa_cadastrar["width"] = TAMANHO_BOTAO
+pagina_pessoa_cadastrar.place(x=WIDTH/2 - 62, y=300)
 
 pagina_pessoa_label = Label(pagina_pessoa, text="", font=fonte)
 pagina_pessoa_label.configure(bg="#71BAFF")
-pagina_pessoa_label.place(x=375, y=340)
+pagina_pessoa_label.place(x=375, y=300)
 
 pagina_pessoa_voltar = Button(pagina_pessoa, text="Voltar",
                               font=fonte, command=lambda: volta_pag_pessoa())
-pagina_pessoa_voltar.place(x=310, y=340)
+pagina_pessoa_voltar["width"] = TAMANHO_BOTAO
+pagina_pessoa_voltar.place(x=WIDTH/2 - 62, y=340)
 
 # ================ Pagina Lista das Pessoas =======================
 
