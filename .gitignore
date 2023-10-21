@@ -1,5 +1,6 @@
 __pycache__
 env
+.env
 *banco.db*
 .vscode
 PyWhatKit_DB.txt
