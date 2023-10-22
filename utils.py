@@ -1,4 +1,3 @@
-import os
 import base64
 import io
 import cv2 as cv
