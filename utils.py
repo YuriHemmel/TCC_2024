@@ -1,9 +1,9 @@
 import os
-from PIL import Image
 import base64
 import io
 import cv2 as cv
 import sqlite3
+from PIL import Image
 
 
 def tira_foto():

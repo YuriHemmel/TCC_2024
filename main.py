@@ -4,22 +4,24 @@ import re
 import Banco
 import Camera as Cam
 import Pessoa as Pes
-from tkinter import *  # Interface gráfica
-from tkinter import messagebox  # Caixa de mensagem para confirmações
 import tkinter as tk
-from tkinter import ttk
-from datetime import *
 import cv2
 import sys
-import pywhatkit
+from dotenv import load_dotenv
+from tkinter import *  # Interface gráfica
+from tkinter import messagebox  # Caixa de mensagem para confirmações
+from tkinter import ttk
+from datetime import *
+from email_utils import envia_email_alerta
+
 
 WIDTH = 600
 HEIGHT = 400
 TEMP_ID = ""
 TAMANHO_BOTAO = 15
 
-# Configuração básica para protocolo rtsp
-os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;0"
+# Lê as variáveis de ambiente presentes no arquivo .env
+load_dotenv()
 
 # Janela
 janela = Tk()
@@ -53,8 +55,6 @@ for frame in paginas:
 lista_cursos = tk.StringVar()
 
 # Mostra o Frame que queremos
-
-
 def show_frame(frame):
     frame.tkraise()
 
@@ -68,6 +68,7 @@ show_frame(pagina_cameras)
 db = Banco.Banco()
 
 
+# Lista as cameras já cadastradas no sistema
 def listar_cameras():
     cams = Cam.list_camera()
 
@@ -75,17 +76,17 @@ def listar_cameras():
         lista_cameras.insert(c[0], f"Nome: {c[1]}       IP: {c[2]}")
 
 
+# Lista pessoas já cadastradas no sistema
 def listar_pessoas():
     pessoas = Pes.list_pessoa()
 
     for p in pessoas:
         lista_pessoa.insert(0, f"RA: {p[0]}     Nome: {p[1]}")
 
+
 # Cadastra câmeras no banco de dados
-
-
 def cadastra_camera():
-
+    # Recebe as informações de cada campo do formulário
     dados = [pagina_cadastro_nome.get(), pagina_cadastro_ip.get(),
              pagina_cadastro_senha.get(), pagina_cadastro_usuario.get()]
 
@@ -102,7 +103,6 @@ def cadastra_camera():
         camera.insert_camera()
 
     except:  # Exception as e:
-        # print(e)
         pagina_cadastro_label.config(
             text="Câmera já cadastrada\nanteriormente.")
         return
@@ -113,22 +113,21 @@ def cadastra_camera():
 
     pagina_cadastro_nome.delete(0, END)
     pagina_cadastro_ip.delete(0, END)
+    pagina_cadastro_usuario.delete(0, END)
     pagina_cadastro_senha.delete(0, END)
-
-    # pagina_cadastro_nome.insert(index=1, string=f"Camera{Cam.conta_camera()}")
 
     return
 
+
 # Cadastra pessoas no banco de dados
-
-
 def cadastra_pessoa():
+    # Padrões de regex para cada campo ser validado
     PATTERN_RA = "^[A-z0-9]{7}$"
     PATTERN_NOME = "^(?=^.{2,60}$)^[A-ZÀÁÂĖÈÉÊÌÍÒÓÔÕÙÚÛÇ][a-zàáâãèéêìíóôõùúç]+(?:[ ](?:das?|dos?|de|e|[A-ZÀÁÂĖÈÉÊÌÍÒÓÔÕÙÚÛÇ][a-zàáâãèéêìíóôõùúç]+))*$"
-    PATTERN_TELEFONE = "^\(?(?:[14689][1-9]|2[12478]|3[1234578]|5[1345]|7[134579])?\)? ?(?:[2-8]|9[0-9])[0-9]{3}\-?[0-9]{4}$"
+    PATTERN_EMAIL = "^[a-z0-9.]+@aluno\.unip\.br$"
 
     dados = [pagina_pessoa_id.get(), pagina_pessoa_nome.get(),
-             pagina_pessoa_tel.get()]
+             pagina_pessoa_email.get()]
 
     # Verifica se os campos estão vazios
     for d in dados:
@@ -137,7 +136,7 @@ def cadastra_pessoa():
                 text="Por favor, preencha os\ncampos corretamente.")
             return
 
-    # Valida os campos com regex -> RA/ID, nome e telefone
+    # Valida os campos com regex -> RA/ID, nome e email
     ra_valido = re.match(PATTERN_RA, dados[0])
     if ra_valido is None:
         pagina_pessoa_label.config(
@@ -150,10 +149,10 @@ def cadastra_pessoa():
             text="Nome inválido!\nPor favor, preencha o\ncampo de nome corretamente.")
         return
 
-    telefone_valido = re.match(PATTERN_TELEFONE, dados[2])
-    if telefone_valido is None:
+    email_valido = re.match(PATTERN_EMAIL, dados[2])
+    if email_valido is None:
         pagina_pessoa_label.config(
-            text="Telefone inválido!\nPor favor, preencha o\ncampo de telefone corretamente.")
+            text="Email inválido!\nPor favor, preencha o\ncampo de email corretamente.")
         return
 
     if pagina_pessoa_curso.get() == "Selecione um curso":
@@ -180,7 +179,7 @@ def cadastra_pessoa():
 
     pagina_pessoa_nome.delete(0, END)
     pagina_pessoa_id.delete(0, END)
-    pagina_pessoa_tel.delete(0, END)
+    pagina_pessoa_email.delete(0, END)
 
     return
 
@@ -192,7 +191,6 @@ def guarda_id(valor):
 
 
 def direciona_editar_pessoa():
-
     selecionada = lista_pessoa.get(ACTIVE)
 
     # Se não tiver pessoa registrada, dá erro
@@ -206,26 +204,25 @@ def direciona_editar_pessoa():
 
     # pessoa[0] = ID
     # pessoa[1] = Nome
-    # pessoa[2] = Telefone
+    # pessoa[2] = Email
     # pessoa[3] = faltas
     # pessoa[4] = foto
     # pessoa[5] = id do curso
     # pessoa[6] = presença no dia
 
     pagina_edit_pessoa_nome.insert(index=0, string=f"{pessoa[1]}")
-    pagina_edit_pessoa_tel.insert(index=0, string=f"{pessoa[2]}")
+    pagina_edit_pessoa_email.insert(index=0, string=f"{pessoa[2]}")
     pagina_edit_pessoa_falta.insert(index=0, string=f"{pessoa[3]}")
     pagina_edit_pessoa_curso.set(f"{utils.retorna_curso_nome(pessoa[5])}")
 
     guarda_id(pessoa[0])
 
     show_frame(pagina_edit_pessoa)
+
+
 # Salva novas informações no banco
-
-
 def alterar_info(varId):
-
-    dados = [pagina_edit_pessoa_nome.get(), pagina_edit_pessoa_tel.get(),
+    dados = [pagina_edit_pessoa_nome.get(), pagina_edit_pessoa_email.get(),
              pagina_edit_pessoa_falta.get()]
 
     # Verifica se os campos estão vazios
@@ -246,18 +243,13 @@ def alterar_info(varId):
 
 
 # Indo para a página de cadastro (atualiza o campo de nome automáticamente)
-
-
 def show_pag_cadastro():
-
     # pagina_cadastro_nome.insert(index=1, string=f"Camera{Cam.conta_camera()}")
     show_frame(pagina_cadastro)
 
+
 # Limpa os campos da página de cadastro de câmera
-
-
 def volta_pag_cadastro():
-
     pagina_cadastro_nome.delete(0, END)
     pagina_cadastro_ip.delete(0, END)
     pagina_cadastro_senha.delete(0, END)
@@ -265,36 +257,30 @@ def volta_pag_cadastro():
 
     show_frame(pagina_inicial)
 
-# Limpa os campos da página de cadastro de c
 
-
+# Limpa os campos da página de editar pessoas
 def volta_pag_edit_pessoa():
-
     pagina_edit_pessoa_nome.delete(0, END)
-    pagina_edit_pessoa_tel.delete(0, END)
+    pagina_edit_pessoa_email.delete(0, END)
     pagina_edit_pessoa_falta.delete(0, END)
 
     guarda_id("")
 
     show_frame(pagina_list_pessoa)
 
+
 # Limpa os campos da página de cadastro de pessoa
-
-
 def volta_pag_pessoa():
-
     pagina_pessoa_nome.delete(0, END)
     pagina_pessoa_id.delete(0, END)
-    pagina_pessoa_tel.delete(0, END)
+    pagina_pessoa_email.delete(0, END)
     pagina_pessoa_label.config(text="")
 
     show_frame(pagina_inicial)
 
+
 # Apaga camera do banco de dados
-
-
 def confirma_apagar_camera():
-
     camSelecionada = lista_cameras.get(ACTIVE)
 
     # Se não tiver câmera registrada, dá erro
@@ -312,11 +298,9 @@ def confirma_apagar_camera():
         lista_cameras.delete(lista_cameras.curselection())
         Cam.delete_camera(camSelecionada)
 
+
 # Apaga pessoa do banco de dados
-
-
 def confirma_apagar_pessoa():
-
     selecionada = lista_pessoa.get(ACTIVE)
 
     # Se não tiver pessoa registrada, dá erro
@@ -387,19 +371,17 @@ def conecta_camera():
     cap.release()
     cv2.destroyAllWindows()
 
-# Manda mensagem por whatsapp
-
-
+# Manda mensagem por email
 def inicia_app():
-
     nao_chegaram = Pes.verifica_chegada()
 
     for item in nao_chegaram:
-        telefone = Pes.load_pessoa_telefone(item[0])
-        pywhatkit.sendwhatmsg(
-            f"+55{telefone}", "Teste", datetime, 15, 7, True, 5)
-
+        ID = item[0]
+        email = Pes.recebe_email_por_ID(ID)
+        aluno = Pes.recebe_nome_por_ID(ID)
+        envia_email_alerta(aluno, ID, email)
     return
+
 
 # ================ Pagina inicial =======================
 
@@ -548,7 +530,6 @@ pagina_cadastro_usuLabel.place(x=220 - 55, y=187)
 pagina_cadastro_usuario = Entry(pagina_cadastro)
 pagina_cadastro_usuario["width"] = 20
 pagina_cadastro_usuario["font"] = fonte
-# pagina_cadastro_usuario.insert(index=1, string="admin")
 pagina_cadastro_usuario.place(x=300 - 70, y=190)
 
 pagina_cadastro_senhaLabel = Label(pagina_cadastro, text="Senha:", font=fonte)
@@ -602,14 +583,14 @@ pagina_pessoa_id["width"] = 20
 pagina_pessoa_id["font"] = fonte
 pagina_pessoa_id.place(x=300 - 70, y=140)
 
-pagina_pessoa_telLabel = Label(pagina_pessoa, text="Telefone:", font=fonte)
-pagina_pessoa_telLabel.configure(bg="#71BAFF")
-pagina_pessoa_telLabel.place(x=220 - 60, y=187)
+pagina_pessoa_emailLabel = Label(pagina_pessoa, text="Email:", font=fonte)
+pagina_pessoa_emailLabel.configure(bg="#71BAFF")
+pagina_pessoa_emailLabel.place(x=220 - 40, y=187)
 
-pagina_pessoa_tel = Entry(pagina_pessoa)
-pagina_pessoa_tel["width"] = 20
-pagina_pessoa_tel["font"] = fonte
-pagina_pessoa_tel.place(x=300 - 70, y=190)
+pagina_pessoa_email = Entry(pagina_pessoa)
+pagina_pessoa_email["width"] = 20
+pagina_pessoa_email["font"] = fonte
+pagina_pessoa_email.place(x=300 - 70, y=190)
 
 pagina_pessoa_cursoLabel = Label(pagina_pessoa, text="Curso:", font=fonte)
 pagina_pessoa_cursoLabel.configure(bg="#71BAFF")
@@ -679,15 +660,15 @@ pagina_edit_pessoa_nome["width"] = 25
 pagina_edit_pessoa_nome["font"] = fonte
 pagina_edit_pessoa_nome.place(x=300 - 70, y=70)
 
-pagina_edit_pessoa_telLabel = Label(
-    pagina_edit_pessoa, text="Telefone:", font=fonte)
-pagina_edit_pessoa_telLabel.configure(bg="#71BAFF")
-pagina_edit_pessoa_telLabel.place(x=220 - 60, y=117)
+pagina_edit_pessoa_emailLabel = Label(
+    pagina_edit_pessoa, text="Email:", font=fonte)
+pagina_edit_pessoa_emailLabel.configure(bg="#71BAFF")
+pagina_edit_pessoa_emailLabel.place(x=220 - 40, y=117)
 
-pagina_edit_pessoa_tel = Entry(pagina_edit_pessoa)
-pagina_edit_pessoa_tel["width"] = 25
-pagina_edit_pessoa_tel["font"] = fonte
-pagina_edit_pessoa_tel.place(x=300 - 70, y=120)
+pagina_edit_pessoa_email = Entry(pagina_edit_pessoa)
+pagina_edit_pessoa_email["width"] = 25
+pagina_edit_pessoa_email["font"] = fonte
+pagina_edit_pessoa_email.place(x=300 - 70, y=120)
 
 pagina_edit_pessoa_faltaLabel = Label(
     pagina_edit_pessoa, text="Faltas:", font=fonte)

@@ -3,11 +3,11 @@ import sqlite3
 
 class Pessoa(object):
 
-    def __init__(self, ID="", nome="", tel="", faltas=0, foto="", CursoID = 0, presente = 0):
+    def __init__(self, ID="", nome="", email="", faltas=0, foto="", CursoID = 0, presente = 0):
         self.info = {}
         self.ID = ID
         self.nome = nome
-        self.tel = tel
+        self.email = email
         self.faltas = faltas
         self.foto = foto
         self.CursoID = CursoID
@@ -20,7 +20,7 @@ class Pessoa(object):
 
         self.cursor.execute(f"""
         INSERT INTO pessoas VALUES
-        ("{self.ID}", "{self.nome}", "{self.tel}","{self.faltas}", "{self.foto}", "{self.CursoID}", "{self.presente}")
+        ("{self.ID}", "{self.nome}", "{self.email}","{self.faltas}", "{self.foto}", "{self.CursoID}", "{self.presente}")
         """)
 
         self.conexao.commit()
@@ -78,14 +78,14 @@ def load_pessoa(ID):
 
     return results
 
-def altera_dados(ID, nome, tel, faltas, CursoID):
+def altera_dados(ID, nome, email, faltas, CursoID):
     conexao = sqlite3.connect("banco.db")
     cursor = conexao.cursor()
 
     cursor.execute(f"""
     UPDATE pessoas SET
     nome = "{nome}",
-    tel = "{tel}",
+    email = "{email}",
     faltas = "{faltas}",
     CursoID = "{CursoID}"
     WHERE ID like "{ID}"
@@ -101,7 +101,7 @@ def verifica_chegada():
 
     cursor.execute(f"""
     SELECT ID FROM pessoas
-    WHERE presente = 0
+    WHERE presente = false
                     """)
     
     results = cursor.fetchall()
@@ -109,26 +109,47 @@ def verifica_chegada():
     
     return results
 
-def load_pessoa_telefone(ID):
-
-    
+def recebe_email_por_ID(ID):    
     conexao = sqlite3.connect("banco.db")
     cursor = conexao.cursor()
 
     # pessoa[0] = ID
     # pessoa[1] = Nome
-    # pessoa[2] = Telefone
+    # pessoa[2] = Email
     # pessoa[3] = faltas
     # pessoa[4] = foto
     # pessoa[5] = id do curso
     # pessoa[6] = presença no dia
 
     cursor.execute(f"""
-    SELECT tel FROM pessoas
-    WHERE ID like "{ID}"
+    SELECT email FROM pessoas
+    WHERE ID = "{ID}"
     """)
 
-    results = cursor.fetchone()
+    result = cursor.fetchone()
     conexao.close()
 
-    return results
+    return result[0]
+
+
+def recebe_nome_por_ID(ID):    
+    conexao = sqlite3.connect("banco.db")
+    cursor = conexao.cursor()
+
+    # pessoa[0] = ID
+    # pessoa[1] = Nome
+    # pessoa[2] = Email
+    # pessoa[3] = faltas
+    # pessoa[4] = foto
+    # pessoa[5] = id do curso
+    # pessoa[6] = presença no dia
+
+    cursor.execute(f"""
+    SELECT nome FROM pessoas
+    WHERE ID = "{ID}"
+    """)
+
+    result = cursor.fetchone()
+    conexao.close()
+
+    return result[0]

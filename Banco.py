@@ -23,7 +23,7 @@ class Banco():
         cursor.execute("""create table if not exists pessoas (
                      ID text unique not null PRIMARY KEY,
                      nome text not null,
-                     tel text unique not null,
+                     email text unique not null,
                      faltas int not null,
                      foto text not null,
                      CursoID int not null,
