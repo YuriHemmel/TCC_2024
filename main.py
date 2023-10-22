@@ -18,6 +18,7 @@ from email_utils import envia_email_alerta
 WIDTH = 600
 HEIGHT = 400
 TEMP_ID = ""
+CACHE_FOTO = ""
 TAMANHO_BOTAO = 15
 
 # Lê as variáveis de ambiente presentes no arquivo .env
@@ -242,7 +243,6 @@ def alterar_info(varId):
 
 # Indo para a página de cadastro (atualiza o campo de nome automáticamente)
 def show_pag_cadastro():
-    # pagina_cadastro_nome.insert(index=1, string=f"Camera{Cam.conta_camera()}")
     show_frame(pagina_cadastro)
 
 
@@ -586,16 +586,17 @@ pagina_pessoa_curso.place(x=300 - 70, y=240)
 pagina_pessoa_cadastrar = Button(pagina_pessoa, text="Cadastrar",
                                  font=fonte, command=lambda: cadastra_pessoa())
 pagina_pessoa_cadastrar["width"] = TAMANHO_BOTAO
-pagina_pessoa_cadastrar.place(x=WIDTH/2 - 62, y=290)
+pagina_pessoa_cadastrar.place(x=40, y=290)
 
 pagina_pessoa_label = Label(pagina_pessoa, text="", font=fonte)
 pagina_pessoa_label.configure(bg="#71BAFF")
-pagina_pessoa_label.place(x=375, y=300)
+pagina_pessoa_label.place(x=60, y=330)
 
 pagina_pessoa_voltar = Button(pagina_pessoa, text="Voltar",
                               font=fonte, command=lambda: volta_pag_pessoa())
 pagina_pessoa_voltar["width"] = TAMANHO_BOTAO
-pagina_pessoa_voltar.place(x=WIDTH/2 - 62, y=340)
+pagina_pessoa_voltar.place(x=WIDTH/2 - 75, y=290)
+
 
 # ================ Pagina Lista das Pessoas =======================
 

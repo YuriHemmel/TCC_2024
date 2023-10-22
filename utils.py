@@ -3,6 +3,7 @@ import base64
 import io
 import cv2 as cv
 import sqlite3
+import Camera
 from PIL import Image
 
 
@@ -23,20 +24,33 @@ def tira_foto():
 
 def recebe_foto_binario():
     global bytes
-    webcam = cv.VideoCapture(0)
+    cam = Camera.load_camera("192.168.1.220")
 
-    if webcam.isOpened():
-        validacao, frame = webcam.read()
+    user = cam[4]
+    password = cam[3]
+    ip = cam[2]
+    port = '554'
+
+    url = f"rtsp://{user}:{password}@{ip}:{port}/onvif1"
+
+    print('Tentando conectar com ' + url)
+
+    cap = cv.VideoCapture(url, cv.CAP_FFMPEG)
+
+    if cap.isOpened():
+        validacao, frame = cap.read()
         while validacao:
-            validacao, frame = webcam.read()
-            cv.imshow("Video da Webcam", frame)
-            if cv.waitKey(1) & 0xFF == ord('q'):
+            validacao, frame = cap.read()
+            cv.imshow("VIDEO", frame)
+
+            if cv.waitKey(1) == ord('q'):
+                print("Desconectando da camera IP")
                 break
         cv.imwrite("imagem.jpg", frame)
         bytes = convertToBinaryData("imagem.jpg")
-    webcam.release()
+
+    cap.release()
     cv.destroyAllWindows()
-    os.remove("imagem.jpg")
     return bytes
 
 
@@ -77,7 +91,7 @@ def retorna_curso_id(nome_curso):
     cursor = conexao.cursor()
 
     cursor.execute(f"""SELECT CursoID FROM cursos
-                    WHERE nome like "{nome_curso}" """)
+                    WHERE nome = "{nome_curso}" """)
 
     results = cursor.fetchone()
     conexao.close()
@@ -90,7 +104,7 @@ def retorna_curso_nome(curso_id):
     cursor = conexao.cursor()
 
     cursor.execute(f"""SELECT nome FROM cursos
-                    WHERE CursoID like "{curso_id}" """)
+                    WHERE CursoID = "{curso_id}" """)
 
     results = cursor.fetchone()
     conexao.close()
