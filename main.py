@@ -60,7 +60,9 @@ def show_frame(frame):
 
 
 # Primeira página a aparecer
-show_frame(pagina_inicial)
+# show_frame(pagina_inicial)
+show_frame(pagina_cameras)
+
 
 # Cria o banco de dados se não existir ainda
 db = Banco.Banco()
@@ -77,7 +79,7 @@ def listar_pessoas():
     pessoas = Pes.list_pessoa()
 
     for p in pessoas:
-        lista_pessoa.insert(0, f"ID: {p[0]} Nome: {p[1]}")
+        lista_pessoa.insert(0, f"RA: {p[0]}     Nome: {p[1]}")
 
 # Cadastra câmeras no banco de dados
 
@@ -174,8 +176,8 @@ def cadastra_pessoa():
 
     # Cadastro bem sucedido
     pagina_pessoa_label.config(text="Pessoa registrada com sucesso.")
-    lista_pessoa.insert(0, f"ID: {dados[0]} Nome: {dados[1]}")
-    
+    lista_pessoa.insert(0, f"RA: {dados[0]}     Nome: {dados[1]}")
+
     pagina_pessoa_nome.delete(0, END)
     pagina_pessoa_id.delete(0, END)
     pagina_pessoa_tel.delete(0, END)
@@ -477,23 +479,40 @@ pagina_cameras.configure(bg="#71BAFF")
 pagina_cameras_titulo = Label(
     pagina_cameras, text="Selecione uma câmera", font=fonteTit)
 pagina_cameras_titulo.configure(bg="#71BAFF")
-pagina_cameras_titulo.pack(side=TOP, fill=X, pady=30)
+pagina_cameras_titulo.grid(row=2, column=2, rowspan=1, columnspan=2)
 
 lista_cameras = Listbox(pagina_cameras, width=35)
-lista_cameras.pack(padx=150, fill=BOTH)
-lista_cameras.yview_scroll(number=2, what='units')
+lista_cameras['height'] = 5
+lista_cameras.place(x=10, y=100)
+
+scrollbar_cameras = Scrollbar(
+    pagina_cameras, orient='vertical', command=lista_cameras.yview)
+scrollbar_cameras.place(x=30, y=100)
+
+pagina_cameras_pesquisaLabel = Label(
+    pagina_cameras, text="Pesquisa:", font=fonte)
+pagina_cameras_pesquisaLabel.configure(bg="#71BAFF")
+pagina_cameras_pesquisaLabel.place(x=10, y=170)
+
+pagina_cameras_pesquisa = Entry(pagina_cameras)
+pagina_cameras_pesquisa['width'] = 20
+pagina_cameras_pesquisa['font'] = fonte
+pagina_cameras_pesquisa.place(x=200, y=100)
 
 pagina_cameras_conectar = Button(
     pagina_cameras, text="Conectar", font=fonte, command=lambda: conecta_camera())
-pagina_cameras_conectar.pack(padx=35, ipadx=30, side=LEFT)
+pagina_cameras_conectar.place(x=90, y=200)
 
 pagina_cameras_apagar = Button(
     pagina_cameras, text="Apagar", font=fonte, command=lambda: confirma_apagar_camera())
-pagina_cameras_apagar.pack(padx=35, ipadx=30, side=RIGHT)
+pagina_cameras_apagar.place(x=90 + 150, y=200)
 
 pagina_cameras_voltar = Button(
     pagina_cameras, text="Voltar", font=fonte, command=lambda: show_frame(pagina_inicial))
-pagina_cameras_voltar.pack(padx=45, ipadx=30, side=RIGHT)
+pagina_cameras_voltar.place(x=90 + 100, y=200)
+
+for line in range(100):
+    lista_cameras.insert(END, f"Linha {line}")
 
 # ================ Pagina de Cadastro de Câmeras =======================
 
