@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from tkinter import *  # Interface gráfica
 from tkinter import messagebox  # Caixa de mensagem para confirmações
 from tkinter import ttk
+from tkcalendar import Calendar, DateEntry
 from datetime import *
 from email_utils import envia_email_alerta
 from PIL import Image, ImageTk
@@ -73,8 +74,8 @@ def show_frame(frame):
 
 
 # Primeira página a aparecer
-show_frame(pagina_inicial)
-#show_frame(pagina_alunos)
+# show_frame(pagina_inicial)
+show_frame(pagina_alunos)
 
 
 # Cria o banco de dados se não existir ainda
@@ -487,13 +488,13 @@ frame_aluno_botoes.place(x=0, y=53)
 
 # Frame do conteúdo / informações
 frame_aluno_info = Frame(pagina_alunos, width=WIDTH,
-                         height=250, bg=AZUL_CLARO, padx=10)
+                         height=230, bg=AZUL_CLARO, padx=10)
 frame_aluno_info.place(x=0, y=118)
 
 # Frame das tabelas
 frame_aluno_tabela = Frame(pagina_alunos, width=WIDTH,
-                           height=200, bg=AZUL_CLARO, padx=10)
-frame_aluno_tabela.place(x=0, y=118+260)
+                           height=250, bg=AZUL_CLARO, padx=10)
+frame_aluno_tabela.place(x=0, y=118+240)
 
 # ----------------------------- Título ----------------------------------
 
@@ -513,7 +514,32 @@ ttk.Separator(pagina_alunos, orient=HORIZONTAL).place(x=0, y=52, width=WIDTH)
 
 
 def alunos():
-    print("Alunos")
+    # Label e entry do Nome do aluno
+    label_nome = Label(frame_aluno_info, text="Nome *",
+                       height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+    label_nome.place(x=10, y=10)
+
+    entry_nome_curso = Entry(frame_aluno_info, width=45,
+                             justify='left', relief=SOLID)
+    entry_nome_curso.place(x=12, y=40)
+
+    # Label e entry do email
+    label_duracao = Label(frame_aluno_info, text="Email *",
+                          height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+    label_duracao.place(x=10, y=70)
+
+    entry_duracao = Entry(frame_aluno_info, width=45,
+                          justify='left', relief=SOLID)
+    entry_duracao.place(x=12, y=100)
+
+    # Label e entry do Telefone
+    label_preco = Label(frame_aluno_info, text="Telefone *",
+                        height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+    label_preco.place(x=10, y=130)
+
+    entry_preco = Entry(frame_aluno_info, width=10,
+                        justify='left', relief=SOLID)
+    entry_preco.place(x=12, y=160)
 
 # Função para cursos e turmas
 
@@ -521,18 +547,20 @@ def alunos():
 def cursos_turmas():
     # Tabela de cursos
     frame_tabela_cursos = Frame(
-        frame_aluno_tabela, width=300, height=200, bg=AZUL_ESCURO)
+        frame_aluno_tabela, width=300, height=200, bg=AZUL_CLARO)
     frame_tabela_cursos.place(x=30, y=0)
 
     # Divisão entre cursos e turmas
-    frame_divisao = Frame(
-        frame_aluno_tabela, width=15, height=200, bg=PRETO)
-    frame_divisao.place(x=300 + 85, y=0)
+    frame_linha = Frame(
+        frame_aluno_tabela, width=15, height=200, bg=AZUL_CLARO)
+    frame_linha.place(x=300 + 85, y=0)
 
     # Tabela de turmas
     frame_tabela_turma = Frame(
-        frame_aluno_tabela, width=300, height=200, bg=AZUL_ESCURO)
+        frame_aluno_tabela, width=300, height=200, bg=AZUL_CLARO)
     frame_tabela_turma.place(x=300 + 150, y=0)
+
+    # -------------------- Detalhes do Curso -----------------------------------
 
     # Label e entry do Nome do curso
     label_nome = Label(frame_aluno_info, text="Nome do Curso *",
@@ -545,25 +573,189 @@ def cursos_turmas():
 
     # Label e entry da Duração do curso
     label_duracao = Label(frame_aluno_info, text="Duração *",
-                       height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+                          height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
     label_duracao.place(x=10, y=70)
 
     entry_duracao = Entry(frame_aluno_info, width=20,
-                             justify='left', relief=SOLID)
+                          justify='left', relief=SOLID)
     entry_duracao.place(x=12, y=100)
 
     # Label e entry do Preço do curso
     label_preco = Label(frame_aluno_info, text="Preço *",
-                       height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+                        height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
     label_preco.place(x=10, y=130)
 
     entry_preco = Entry(frame_aluno_info, width=10,
-                             justify='left', relief=SOLID)
+                        justify='left', relief=SOLID)
     entry_preco.place(x=12, y=160)
 
-    # Botão Carregar
-    botao_carregar = Button(frame_aluno_info, anchor=CENTER, text='SALVAR', width=10, overrelief=RIDGE,font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_carregar.place
+    # Botão salvar curso
+    botao_curso_salvar = Button(frame_aluno_info, anchor=CENTER, text='SALVAR', width=10,
+                                overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
+    botao_curso_salvar.place(x=107, y=160)
+
+    # Botão atualizar curso
+    botao_curso_atualizar = Button(frame_aluno_info, anchor=CENTER, text='ATUALIZAR',
+                                   width=10, overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
+    botao_curso_atualizar.place(x=197, y=160)
+
+    # Botão deletar curso
+    botao_curso_deletar = Button(frame_aluno_info, anchor=CENTER, text='DELETAR', width=10,
+                                 overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
+    botao_curso_deletar.place(x=287, y=160)
+
+    # Mostra Tabela Cursos
+    def mostra_cursos():
+        tabela_cursos_label = Label(frame_aluno_info, text="Tabela de cursos",
+                                    height=1, relief="flat", anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+        tabela_cursos_label.place(x=0, y=210)
+
+        lista_cabecalho = ['ID', 'Curso', 'Duração', 'Preço']
+
+        lista_itens = []
+
+        global tree_cursos
+
+        tree_cursos = ttk.Treeview(
+            frame_aluno_tabela, selectmode="extended", columns=lista_cabecalho, show='headings')
+
+        # Scrollbars
+        scroll_vertical = ttk.Scrollbar(
+            frame_aluno_tabela, orient='vertical', command=tree_cursos.yview)
+        scroll_horizontal = ttk.Scrollbar(
+            frame_aluno_tabela, orient="horizontal", command=tree_cursos.xview)
+
+        tree_cursos.configure(yscrollcommand=scroll_vertical,
+                              xscrollcommand=scroll_horizontal)
+
+        tree_cursos.place(x=0, y=0, width=340, height=200)
+        scroll_vertical.place(x=340, y=0, height=200)
+        scroll_horizontal.place(x=0, y=200, width=340)
+
+        posicao_coluna = ["nw", "nw", "e", "e"]
+        largura_coluna = [30, 150, 80, 60]
+        cont = 0
+
+        for coluna in lista_cabecalho:
+            tree_cursos.heading(coluna, text=coluna.title(), anchor=NW)
+            tree_cursos.column(
+                coluna, width=largura_coluna[cont], anchor=posicao_coluna[cont])
+
+            cont += 1
+
+        for item in lista_itens:
+            tree_cursos.insert('', 'end', values=item)
+
+    mostra_cursos()
+
+    # ------------------------------- Linha Separatória ---------------------------------------
+
+    # Linha separatória info
+    label_linha = Label(frame_aluno_info, relief=GROOVE, text='h', width=1,
+                        height=200, anchor=NW, font=("Ivy, 1"), bg=PRETO, fg=PRETO)
+    label_linha.place(x=390, y=0)
+    label_linha = Label(frame_aluno_info, relief=GROOVE, text='h', width=1,
+                        height=200, anchor=NW, font=("Ivy, 1"), bg=BRANCO, fg=PRETO)
+    label_linha.place(x=388, y=0)
+
+    # Linha separatória tabela
+    label_linha = Label(frame_linha, relief=GROOVE, text='h', width=1,
+                        height=200, anchor=NW, font=("Ivy, 1"), bg=PRETO, fg=PRETO)
+    label_linha.place(x=5, y=0)
+    label_linha = Label(frame_linha, relief=GROOVE, text='h', width=1,
+                        height=200, anchor=NW, font=("Ivy, 1"), bg=BRANCO, fg=PRETO)
+    label_linha.place(x=3, y=0)
+
+    # ------------------------------ Detalhes das Turmas ------------------------------------
+
+    label_nome = Label(frame_aluno_info, text="Nome Turma *",
+                       height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+    label_nome.place(x=404, y=10)
+    entry_nome_turma = Entry(frame_aluno_info, width=35,
+                             justify=LEFT, relief="solid")
+    entry_nome_turma.place(x=407, y=40)
+
+    label_curso_turma = Label(frame_aluno_info, text="Curso *",
+                              height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+    label_curso_turma.place(x=404, y=70)
+
+    # Pegando os cursos
+    cursos = ['curso1', 'curso2']
+    curso = []
+
+    for item in cursos:
+        curso.append(item)
+
+    combobox_curso = ttk.Combobox(frame_aluno_info, width=20, font=fonte_botao)
+    combobox_curso['values'] = curso
+    combobox_curso['state'] = 'readonly'
+    combobox_curso.place(x=407, y=100)
+
+    label_data_inicio = Label(frame_aluno_info, text="Data de início *",
+                              height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+    label_data_inicio.place(x=406, y=130)
+
+    data_inicio = DateEntry(frame_aluno_info, width=10, background=AZUL_ESCURO,
+                            foreground=BRANCO, borderwidth=2, year=2023)
+    data_inicio.place(x=407, y=160)
+
+    # Botão salvar turma
+    botao_turma_salvar = Button(frame_aluno_info, anchor=CENTER, text='SALVAR', width=10,
+                                overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
+    botao_turma_salvar.place(x=507, y=160)
+
+    # Botão atualizar turma
+    botao_turma_atualizar = Button(frame_aluno_info, anchor=CENTER, text='ATUALIZAR',
+                                   width=10, overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
+    botao_turma_atualizar.place(x=597, y=160)
+
+    # Botão deletar turma
+    botao_turma_deletar = Button(frame_aluno_info, anchor=CENTER, text='DELETAR', width=10,
+                                 overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
+    botao_turma_deletar.place(x=687, y=160)
+
+    def mostra_turmas():
+        tabela_turma_label = Label(frame_aluno_info, text="Tabela de turmas",
+                                   height=1, relief="flat", anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+        tabela_turma_label.place(x=410, y=210)
+
+        lista_cabecalho = ['ID', 'Nome da Turma', 'Curso', 'Inicio']
+
+        lista_itens = []
+
+        global tree_turma
+
+        tree_turma = ttk.Treeview(
+            frame_aluno_tabela, selectmode="extended", columns=lista_cabecalho, show='headings')
+
+        # Scrollbars
+        scroll_vertical = ttk.Scrollbar(
+            frame_aluno_tabela, orient='vertical', command=tree_turma.yview)
+        scroll_horizontal = ttk.Scrollbar(
+            frame_aluno_tabela, orient="horizontal", command=tree_turma.xview)
+
+        tree_turma.configure(yscrollcommand=scroll_vertical,
+                             xscrollcommand=scroll_horizontal)
+
+        tree_turma.place(x=410, y=0, width=395, height=200)
+        scroll_vertical.place(x=410 + 395, y=0, height=200)
+        scroll_horizontal.place(x=410, y=200, width=395)
+
+        posicao_coluna = ["nw", "nw", "e", "e"]
+        largura_coluna = [30, 130, 150, 80]
+        cont = 0
+
+        for coluna in lista_cabecalho:
+            tree_turma.heading(coluna, text=coluna.title(), anchor=NW)
+            tree_turma.column(
+                coluna, width=largura_coluna[cont], anchor=posicao_coluna[cont])
+
+            cont += 1
+
+        for item in lista_itens:
+            tree_turma.insert('', 'end', values=item)
+
+    mostra_turmas()
 
 # Função para salvar
 
@@ -895,5 +1087,5 @@ listar_cameras()
 listar_pessoas()
 
 # ================ Main Loop =======================
-
+alunos()
 janela.mainloop()
