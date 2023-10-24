@@ -96,3 +96,130 @@ def retorna_curso_nome(curso_id):
     conexao.close()
 
     return results[0]
+
+#============================== Funções de Tabelas ========================================= 
+
+#--------------------------------- Tabela cursos -------------------------------------------
+
+# Função criar cursos
+def cria_curso(lista):
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute(f"""INSERT INTO cursos (nome, duracao, preco) VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}") """)
+
+# Mostra os cursos
+def mostra_curso():
+    lista = []
+
+    conexao = sqlite3.connect("banco.db")
+    cursor = conexao.cursor()
+    
+    cursor.execute("""SELECT * FROM cursos""")
+
+    results = cursor.fetchall()
+    conexao.close()
+
+    for row in results:
+        lista.append(row)
+    
+    return lista
+
+# Atualiza dados do cursos
+def atualiza_curso(lista):
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""UPDATE cursos SET nome="{lista[1]}", duracao="{lista[2]}", preco="{lista[3]}" WHERE id="{lista[0]}" """)
+
+# Deleta dados do cursos
+def apaga_curso(id):
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""DELETE FROM cursos WHERE id="{id}" """)
+
+#--------------------------------- Tabela turmas -------------------------------------------
+
+# Função criar turma
+def cria_turma(lista):
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute(f"""INSERT INTO turmas (nome, curso_id, data_inicio) VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}") """)
+
+# Mostra as turmas
+def mostra_turma():
+    lista = []
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute("""SELECT * FROM turmas""")
+        results = cursor.fetchall()
+
+        for linha in results:
+            lista.append(linha)
+    
+    return lista
+
+# Atualiza dados do cursos
+def atualiza_turma(lista):
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""UPDATE turmas SET nome="{lista[1]}", curso_id="{lista[2]}", data_inicio="{lista[3]}" WHERE id="{lista[0]}" """)
+
+# Deleta dados do cursos
+def apaga_turma(id):
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""DELETE FROM turmas WHERE id="{id}" """)
+
+#--------------------------------- Tabela alunos -------------------------------------------
+
+# Função criar aluno
+def cria_aluno(lista):
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute(f"""INSERT INTO alunos (ra, nome, email, telefone, sexo, foto, turma_id, faltas, presente)
+                                       VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}", "{lista[3]}", "{lista[4]}", "{lista[5]}", "{lista[6]}", 0, 0 ) """)
+
+# Mostra os alunos
+def mostra_aluno():
+    lista = []
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute("""SELECT * FROM alunos""")
+        results = cursor.fetchall()
+
+        for linha in results:
+            lista.append(linha)
+    
+    return lista
+
+# Atualiza dados do cursos
+def atualiza_aluno(lista):
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""UPDATE alunos SET nome="{lista[1]}", email="{lista[2]}", telefone="{lista[3]}", sexo="{lista[4]}",
+                       foto="{lista[5]}", turma_id="{lista[6]}", faltas="{lista[7]}" 
+                       WHERE ra="{lista[0]}" """)
+
+# Deleta dados do cursos
+def apaga_aluno(id):
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""DELETE FROM alunos WHERE id="{id}" """)
