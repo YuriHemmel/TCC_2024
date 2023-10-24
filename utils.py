@@ -213,13 +213,13 @@ def atualiza_aluno(lista):
     conexao = sqlite3.connect("banco.db")
     with conexao:
         cursor = conexao.cursor()
-        cursor.execute(f"""UPDATE alunos SET nome="{lista[1]}", email="{lista[2]}", telefone="{lista[3]}", sexo="{lista[4]}",
+        cursor.execute(f"""UPDATE alunos SET ra = "{lista[0]}", nome="{lista[1]}", email="{lista[2]}", telefone="{lista[3]}", sexo="{lista[4]}",
                        foto="{lista[5]}", turma_id="{lista[6]}", faltas="{lista[7]}" 
-                       WHERE ra="{lista[0]}" """)
+                       WHERE ra="{lista[8]}" """)
 
 # Deleta dados do cursos
-def apaga_aluno(id):
+def apaga_aluno(ra):
     conexao = sqlite3.connect("banco.db")
     with conexao:
         cursor = conexao.cursor()
-        cursor.execute(f"""DELETE FROM alunos WHERE id="{id}" """)
+        cursor.execute(f"""DELETE FROM alunos WHERE ra="{ra}" """)
