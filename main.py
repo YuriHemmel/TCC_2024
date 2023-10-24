@@ -54,8 +54,7 @@ pagina_edit_pessoa = Frame(janela)
 
 # Fontes
 fonte = ("Ivy", 11)
-fonte_titulo = ("Arial", 13, 'bold')
-fonte_icone = ("Ivy", 15, 'bold')
+fonte_titulo = ("Ivy", 15, 'bold')
 fonte_botao = ("Ivy", 8, 'bold')
 
 # Adicionando as páginas
@@ -66,24 +65,16 @@ paginas = (pagina_inicial, pagina_cameras, pagina_cadastro,
 for frame in paginas:
     frame.grid(row=0, column=0, sticky='nsew')
 
-# Lista de cursos
-lista_cursos = tk.StringVar()
-
 # Mostra o Frame que queremos
-
-
 def show_frame(frame):
     frame.tkraise()
-
 
 # Primeira página a aparecer
 # show_frame(pagina_inicial)
 show_frame(pagina_alunos)
 
-
 # Cria o banco de dados se não existir ainda
 db = Banco.Banco()
-
 
 # Lista as cameras já cadastradas no sistema
 def listar_cameras():
@@ -91,15 +82,6 @@ def listar_cameras():
 
     for c in cams:
         lista_cameras.insert(c[0], f"Nome: {c[1]}       IP: {c[2]}")
-
-
-# Lista pessoas já cadastradas no sistema
-def listar_pessoas():
-    pessoas = Pes.list_pessoa()
-
-    for p in pessoas:
-        lista_pessoa.insert(0, f"RA: {p[0]}     Nome: {p[1]}")
-
 
 # Cadastra câmeras no banco de dados
 def cadastra_camera():
@@ -202,70 +184,6 @@ def cadastra_pessoa():
     return
 
 
-def guarda_id(valor):
-    global TEMP_ID
-
-    TEMP_ID = valor
-
-
-def direciona_editar_pessoa():
-    selecionada = lista_pessoa.get(ACTIVE)
-
-    # Se não tiver pessoa registrada, dá erro
-    if selecionada == "":
-        messagebox.showinfo('Erro', 'Nenhuma pessoa selecionada')
-        return
-
-    selecionada = selecionada.split()[1]
-
-    pessoa = Pes.load_pessoa(selecionada)
-
-    # pessoa[0] = ID
-    # pessoa[1] = Nome
-    # pessoa[2] = Email
-    # pessoa[3] = faltas
-    # pessoa[4] = foto
-    # pessoa[5] = id do curso
-    # pessoa[6] = presença no dia
-
-    pagina_edit_pessoa_nome.insert(index=0, string=f"{pessoa[1]}")
-    pagina_edit_pessoa_email.insert(index=0, string=f"{pessoa[2]}")
-    pagina_edit_pessoa_falta.insert(index=0, string=f"{pessoa[3]}")
-    pagina_edit_pessoa_curso.set(f"{utils.retorna_curso_nome(pessoa[5])}")
-
-    guarda_id(pessoa[0])
-
-    show_frame(pagina_edit_pessoa)
-
-
-# Salva novas informações no banco
-def alterar_info(varId):
-    dados = [pagina_edit_pessoa_nome.get(), pagina_edit_pessoa_email.get(),
-             pagina_edit_pessoa_falta.get()]
-
-    # Verifica se os campos estão vazios
-    for d in dados:
-        if d == "":
-            messagebox.showinfo('Erro', 'Preencha os campos corretamente')
-            return
-
-    res = messagebox.askquestion(
-        'Confirmação', f'Deseja alterar os dados de {varId}?')
-
-    if res == 'yes':
-        for pessoa in lista_pessoa.curselection():
-            lista_pessoa.delete(pessoa)
-            lista_pessoa.insert(pessoa, f"ID: {varId} Nome: {dados[0]}")
-        Pes.altera_dados(varId, dados[0], dados[1], dados[2], utils.retorna_curso_id(
-            pagina_edit_pessoa_curso.get()))
-
-
-# Indo para a página de cadastro (atualiza o campo de nome automáticamente)
-def show_pag_cadastro():
-    # pagina_cadastro_nome.insert(index=1, string=f"Camera{Cam.conta_camera()}")
-    show_frame(pagina_cadastro)
-
-
 # Limpa os campos da página de cadastro de câmera
 def volta_pag_cadastro():
     pagina_cadastro_nome.delete(0, END)
@@ -275,26 +193,6 @@ def volta_pag_cadastro():
 
     show_frame(pagina_inicial)
 
-
-# Limpa os campos da página de editar pessoas
-def volta_pag_edit_pessoa():
-    pagina_edit_pessoa_nome.delete(0, END)
-    pagina_edit_pessoa_email.delete(0, END)
-    pagina_edit_pessoa_falta.delete(0, END)
-
-    guarda_id("")
-
-    show_frame(pagina_list_pessoa)
-
-
-# Limpa os campos da página de cadastro de pessoa
-def volta_pag_pessoa():
-    pagina_cadastro_pessoa_nome.delete(0, END)
-    pagina_cadastro_pessoa_id.delete(0, END)
-    pagina_cadastro_pessoa_email.delete(0, END)
-    pagina_cadastro_pessoa_label.config(text="")
-
-    show_frame(pagina_inicial)
 
 
 # Apaga camera do banco de dados
@@ -315,36 +213,6 @@ def confirma_apagar_camera():
     if res == 'yes':
         lista_cameras.delete(lista_cameras.curselection())
         Cam.delete_camera(camSelecionada)
-
-
-# Apaga pessoa do banco de dados
-def confirma_apagar_pessoa():
-    selecionada = lista_pessoa.get(ACTIVE)
-
-    # Se não tiver pessoa registrada, dá erro
-    if selecionada == "":
-        messagebox.showinfo('Erro', 'Nenhuma pessoa selecionada')
-        return
-
-    # Pega o nome da pessoa
-    nome_selecionado = selecionada.split()[3::]
-
-    # Se a pessoa só tiver o primeiro nome cadastrado, não aparecer "primeiroNome primeiroNome ra"
-    if nome_selecionado[0] == nome_selecionado[len(nome_selecionado) - 1]:
-        nome = f"{nome_selecionado[0]}"
-    else:
-        nome = f"{nome_selecionado[0]} {nome_selecionado[len(nome_selecionado) - 1]}"
-
-    # Pega o ID
-    selecionada = selecionada.split()[1]
-
-    # Cria caixa de mensagem para confirmação
-    res = messagebox.askquestion(
-        "Apagar pessoa", f"Deseja apagar informações de {nome} {selecionada}?")
-
-    if res == 'yes':
-        lista_pessoa.delete(lista_pessoa.curselection())
-        Pes.delete_pessoa(selecionada)
 
 
 def conecta_camera():
@@ -404,8 +272,6 @@ def inicia_app():
 
 
 # ================ Pagina inicial =======================
-
-
 pagina_inicial.configure(bg=AZUL_CLARO)
 
 pagina_inicial_titulo = Label(
@@ -460,7 +326,7 @@ pagina_inicial_cadLabel.configure(bg=AZUL_CLARO)
 pagina_inicial_cadLabel.place(x=330 + 111, y=105)
 
 pagina_inicial_cadastro = Button(
-    pagina_inicial, text="Cadastrar Câmera", font=fonte, command=lambda: show_pag_cadastro())
+    pagina_inicial, text="Cadastrar Câmera", font=fonte, command=lambda: show_frame(pagina_cadastro))
 pagina_inicial_cadastro['width'] = TAMANHO_BOTAO
 pagina_inicial_cadastro.place(x=330 + 108, y=135)
 
@@ -506,7 +372,7 @@ aluno_icone_titulo = aluno_icone_titulo.resize((50, 50))
 aluno_icone_titulo = ImageTk.PhotoImage(aluno_icone_titulo)
 
 aluno_icone_titulo_label = Label(frame_titulo, image=aluno_icone_titulo, text="Cadastro de alunos",
-                                 width=WIDTH, compound=LEFT, relief=RAISED, anchor=NW, font=fonte_icone, bg=AZUL_ESCURO, fg=BRANCO)
+                                 width=WIDTH, compound=LEFT, relief=RAISED, anchor=NW, font=fonte_titulo, bg=AZUL_ESCURO, fg=BRANCO)
 aluno_icone_titulo_label.place(x=0, y=0)
 
 ttk.Separator(pagina_alunos, orient=HORIZONTAL).place(x=0, y=52, width=WIDTH)
@@ -1365,7 +1231,6 @@ def controle(comando_botao):
 
 # ------------------------ Botões de navegação -----------------------------
 
-
 icone_cadastro = Image.open('images/icon_add.png')
 icone_cadastro = icone_cadastro.resize((20, 20))
 icone_cadastro = ImageTk.PhotoImage(icone_cadastro)
@@ -1392,98 +1257,6 @@ botao_voltar.place(x=280, y=30)
 
 ttk.Separator(pagina_alunos, orient=HORIZONTAL).place(x=0, y=118, width=WIDTH)
 
-
-# ================ Pagina de Cadastro de Pessoas =======================
-
-pagina_cadastro_pessoa.configure(bg=AZUL_CLARO)
-
-pagina_cadastro_pessoa_titulo = Label(
-    pagina_cadastro_pessoa, text="Cadastre a Pessoa", font=fonte_titulo)
-pagina_cadastro_pessoa_titulo.configure(bg=AZUL_CLARO)
-pagina_cadastro_pessoa_titulo.place(x=300 - 75, y=30)
-
-pagina_cadastro_pessoa_nomeLabel = Label(
-    pagina_cadastro_pessoa, text="Nome:", font=fonte)
-pagina_cadastro_pessoa_nomeLabel.configure(bg=AZUL_CLARO)
-pagina_cadastro_pessoa_nomeLabel.place(x=220 - 43, y=87)
-
-pagina_cadastro_pessoa_nome = Entry(pagina_cadastro_pessoa)
-pagina_cadastro_pessoa_nome["width"] = 20
-pagina_cadastro_pessoa_nome["font"] = fonte
-pagina_cadastro_pessoa_nome.place(x=300 - 70, y=90)
-
-pagina_cadastro_pessoa_idLabel = Label(
-    pagina_cadastro_pessoa, text="ID:", font=fonte)
-pagina_cadastro_pessoa_idLabel.configure(bg=AZUL_CLARO)
-pagina_cadastro_pessoa_idLabel.place(x=220 - 20, y=137)
-
-pagina_cadastro_pessoa_id = Entry(pagina_cadastro_pessoa)
-pagina_cadastro_pessoa_id["width"] = 20
-pagina_cadastro_pessoa_id["font"] = fonte
-pagina_cadastro_pessoa_id.place(x=300 - 70, y=140)
-
-pagina_cadastro_pessoa_emailLabel = Label(
-    pagina_cadastro_pessoa, text="Email:", font=fonte)
-pagina_cadastro_pessoa_emailLabel.configure(bg=AZUL_CLARO)
-pagina_cadastro_pessoa_emailLabel.place(x=220 - 40, y=187)
-
-pagina_cadastro_pessoa_email = Entry(pagina_cadastro_pessoa)
-pagina_cadastro_pessoa_email["width"] = 20
-pagina_cadastro_pessoa_email["font"] = fonte
-pagina_cadastro_pessoa_email.place(x=300 - 70, y=190)
-
-pagina_cadastro_pessoa_cursoLabel = Label(
-    pagina_cadastro_pessoa, text="Curso:", font=fonte)
-pagina_cadastro_pessoa_cursoLabel.configure(bg=AZUL_CLARO)
-pagina_cadastro_pessoa_cursoLabel.place(x=220 - 40, y=237)
-
-pagina_cadastro_pessoa_curso = ttk.Combobox(
-    pagina_cadastro_pessoa, textvariable=lista_cursos)
-pagina_cadastro_pessoa_curso['values'] = utils.listar_cursos()
-pagina_cadastro_pessoa_curso['state'] = 'readonly'
-pagina_cadastro_pessoa_curso.set(value="Selecione um curso")
-pagina_cadastro_pessoa_curso.place(x=300 - 70, y=240)
-
-pagina_cadastro_pessoa_cadastrar = Button(pagina_cadastro_pessoa, text="Cadastrar",
-                                          font=fonte, command=lambda: cadastra_pessoa())
-pagina_cadastro_pessoa_cadastrar["width"] = TAMANHO_BOTAO
-pagina_cadastro_pessoa_cadastrar.place(x=WIDTH/2 - 62, y=290)
-
-pagina_cadastro_pessoa_label = Label(
-    pagina_cadastro_pessoa, text="", font=fonte)
-pagina_cadastro_pessoa_label.configure(bg=AZUL_CLARO)
-pagina_cadastro_pessoa_label.place(x=375, y=300)
-
-pagina_cadastro_pessoa_voltar = Button(pagina_cadastro_pessoa, text="Voltar",
-                                       font=fonte, command=lambda: volta_pag_pessoa())
-pagina_cadastro_pessoa_voltar["width"] = TAMANHO_BOTAO
-pagina_cadastro_pessoa_voltar.place(x=WIDTH/2 - 62, y=340)
-
-# ================ Pagina Lista das Pessoas =======================
-
-pagina_list_pessoa.configure(bg=AZUL_CLARO)
-
-pagina_list_pessoa_titulo = Label(
-    pagina_list_pessoa, text="Selecione uma Pessoa", font=fonte_titulo)
-pagina_list_pessoa_titulo.configure(bg=AZUL_CLARO)
-pagina_list_pessoa_titulo.pack(side=TOP, fill=X, pady=30)
-
-lista_pessoa = Listbox(pagina_list_pessoa, width=50)
-lista_pessoa.pack(padx=150, fill=BOTH)
-lista_pessoa.yview_scroll(number=2, what='units')
-
-pagina_list_pessoa_acessar = Button(
-    pagina_list_pessoa, text="Editar", font=fonte, command=lambda: direciona_editar_pessoa())
-pagina_list_pessoa_acessar.pack(padx=45, ipadx=30, side=LEFT)
-
-pagina_list_pessoa_apagar = Button(
-    pagina_list_pessoa, text="Apagar", font=fonte, command=lambda: confirma_apagar_pessoa())
-pagina_list_pessoa_apagar.pack(padx=45, ipadx=30, side=RIGHT)
-
-pagina_list_pessoa_voltar = Button(
-    pagina_list_pessoa, text="Voltar", font=fonte, command=lambda: show_frame(pagina_inicial))
-pagina_list_pessoa_voltar.pack(padx=45, ipadx=30, side=RIGHT)
-
 # ================ Pagina das Câmeras =======================
 
 pagina_cameras.configure(bg=AZUL_CLARO)
@@ -1496,25 +1269,6 @@ pagina_cameras_titulo.pack(side=TOP, fill=X, pady=30)
 lista_cameras = Listbox(pagina_cameras, width=35)
 lista_cameras['height'] = 5
 lista_cameras.pack(padx=150, fill=BOTH)
-
-"""
-scrollbar_cameras = Scrollbar(
-    pagina_cameras, orient='vertical', command=lista_cameras.yview)
-scrollbar_cameras.pack(padx=45, ipadx=30, side=LEFT)
-
-pagina_cameras_pesquisaLabel = Label(
-    pagina_cameras, text="Pesquisa:", font=fonte)
-pagina_cameras_pesquisaLabel.configure(bg=AZUL_CLARO)
-pagina_cameras_pesquisaLabel.place(x=10, y=170)
-
-pagina_cameras_pesquisa = Entry(pagina_cameras)
-pagina_cameras_pesquisa['width'] = 20
-pagina_cameras_pesquisa['font'] = fonte
-pagina_cameras_pesquisa.place(x=200, y=100)
-
-for line in range(100):
-    lista_cameras.insert(END, f"Linha {line}")
-"""
 
 pagina_cameras_conectar = Button(
     pagina_cameras, text="Conectar", font=fonte, command=lambda: conecta_camera())
@@ -1589,71 +1343,16 @@ pagina_cadastro_voltar = Button(pagina_cadastro, text="Voltar",
 pagina_cadastro_voltar["width"] = TAMANHO_BOTAO
 pagina_cadastro_voltar.place(x=WIDTH/2 - 62, y=340)
 
-# ================ Pagina Edição de Pessoas =======================
-
-pagina_edit_pessoa.configure(bg=AZUL_CLARO)
-
-pagina_edit_pessoa_titulo = Label(
-    pagina_edit_pessoa, text="Selecione uma Pessoa", font=fonte_titulo)
-pagina_edit_pessoa_titulo.configure(bg=AZUL_CLARO)
-pagina_edit_pessoa_titulo.place(x=300 - 90, y=20)
-
-pagina_edit_pessoa_nomeLabel = Label(
-    pagina_edit_pessoa, text="Nome:", font=fonte)
-pagina_edit_pessoa_nomeLabel.configure(bg=AZUL_CLARO)
-pagina_edit_pessoa_nomeLabel.place(x=220 - 41, y=67)
-
-pagina_edit_pessoa_nome = Entry(pagina_edit_pessoa)
-pagina_edit_pessoa_nome["width"] = 25
-pagina_edit_pessoa_nome["font"] = fonte
-pagina_edit_pessoa_nome.place(x=300 - 70, y=70)
-
-pagina_edit_pessoa_emailLabel = Label(
-    pagina_edit_pessoa, text="Email:", font=fonte)
-pagina_edit_pessoa_emailLabel.configure(bg=AZUL_CLARO)
-pagina_edit_pessoa_emailLabel.place(x=220 - 40, y=117)
-
-pagina_edit_pessoa_email = Entry(pagina_edit_pessoa)
-pagina_edit_pessoa_email["width"] = 25
-pagina_edit_pessoa_email["font"] = fonte
-pagina_edit_pessoa_email.place(x=300 - 70, y=120)
-
-pagina_edit_pessoa_faltaLabel = Label(
-    pagina_edit_pessoa, text="Faltas:", font=fonte)
-pagina_edit_pessoa_faltaLabel.configure(bg=AZUL_CLARO)
-pagina_edit_pessoa_faltaLabel.place(x=220 - 43, y=167)
-
-pagina_edit_pessoa_falta = Entry(pagina_edit_pessoa)
-pagina_edit_pessoa_falta["width"] = 25
-pagina_edit_pessoa_falta["font"] = fonte
-pagina_edit_pessoa_falta.place(x=300 - 70, y=170)
-
-pagina_edit_pessoa_cursoLabel = Label(
-    pagina_edit_pessoa, text="Curso:", font=fonte)
-pagina_edit_pessoa_cursoLabel.configure(bg=AZUL_CLARO)
-pagina_edit_pessoa_cursoLabel.place(x=220 - 40, y=220)
-
-pagina_edit_pessoa_curso = ttk.Combobox(
-    pagina_edit_pessoa, textvariable=lista_cursos)
-pagina_edit_pessoa_curso["width"] = 26
-pagina_edit_pessoa_curso['values'] = utils.listar_cursos()
-pagina_edit_pessoa_curso['state'] = 'readonly'
-pagina_edit_pessoa_curso.place(x=300 - 70, y=220)
-
-pagina_edit_pessoa_voltar = Button(
-    pagina_edit_pessoa, text="Voltar", font=fonte, command=lambda: volta_pag_edit_pessoa())
-pagina_edit_pessoa_voltar.pack(pady=20, ipadx=30, side=BOTTOM)
-
-pagina_edit_pessoa_salvar = Button(
-    pagina_edit_pessoa, text="Salvar alterações", font=fonte, command=lambda: alterar_info(TEMP_ID))
-pagina_edit_pessoa_salvar.pack(pady=5, ipadx=30 - 10, ipady=2, side=BOTTOM)
-
 # ================ Método de inicialização =======================
 
 # Adiciona as câmeras à lista
 """listar_cameras()
+
+# Adiciona as pessoas à lista
 listar_pessoas()"""
 
-# ================ Main Loop =======================
 alunos()
+
+# ================ Main Loop =======================
+
 janela.mainloop()
