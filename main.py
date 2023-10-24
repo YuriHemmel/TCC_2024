@@ -517,23 +517,104 @@ ttk.Separator(pagina_alunos, orient=HORIZONTAL).place(x=0, y=52, width=WIDTH)
 
 
 def alunos():
+
+    # Função novo aluno
+    def novo_aluno():
+        # Dados da Imagem
+        global aluno_foto, label_foto, foto_string
+
+        # Dados do aluno
+        ra = entry_ra.get()
+        nome = entry_nome_aluno.get()
+        email = entry_email.get()
+        telefone = entry_telefone.get()
+        sexo = combobox_sexo.get()
+        foto = foto_string
+        turma = combobox_turma.get()
+
+        lista = [ra, nome, email, telefone, sexo, foto, turma]
+
+        # Verifica se os campos fora preenchidos
+        for item in lista:
+            if item == "":
+                messagebox.showerror("Erro", "Preencha os campos corretamente.")
+                return
+
+        # Criando aluno
+        utils.cria_aluno(lista)
+
+        # Mensagem de sucesso na criação do aluno
+        messagebox.showinfo("Sucesso", "Os dados fora inseridos com sucesso.")
+
+        entry_ra.delete(0,END)
+        entry_nome_aluno.delete(0,END)
+        entry_email.delete(0,END)
+        entry_telefone.delete(0,END)
+        combobox_sexo.delete(0,END)
+        combobox_turma.delete(0,END)
+
+        mostra_alunos()
+
+    # Carrega informações do aluno
+    def carrega_aluno():
+        global aluno_foto, label_foto, foto_string
+
+        try:
+            tree_itens = tree_alunos.focus()
+            tree_dicionario = tree_alunos.item(tree_itens)
+            tree_lista = tree_dicionario["values"]
+
+            # Guarda RA
+            valor_ra = tree_lista[0]
+
+            # Limpa os campos
+            entry_ra.delete(0,END)
+            entry_nome_aluno.delete(0,END)
+            entry_email.delete(0,END)
+            entry_telefone.delete(0,END)
+            combobox_sexo.delete(0,END)
+            combobox_turma.delete(0,END)
+
+            # Label e Entry das faltas
+            label_faltas = Label(frame_aluno_info, text="Faltas",
+                                height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+            label_faltas.place(x=451, y=10)
+
+            entry_faltas = Entry(frame_aluno_info, width=10, justify=LEFT, relief=SOLID)
+            entry_faltas.place(x=455, y=40)
+
+            # Insere dados nas entrys
+            entry_ra.insert(0, tree_lista[0])
+            entry_nome_aluno.insert(0, tree_lista[1])
+            entry_email.insert(0, tree_lista[2])
+            entry_telefone.insert(0, tree_lista[3])
+            combobox_sexo.insert(0, tree_lista[4])
+            combobox_turma.insert(0, tree_lista[6])
+            entry_faltas.insert(0, tree_lista[7])
+
+
+            
+
+        except IndexError:
+            messagebox.showerror("Erro", "Selecione um curso na tabela.")
+
     # Label e entry do Nome do aluno
     label_nome = Label(frame_aluno_info, text="Nome *",
                        height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
     label_nome.place(x=10, y=10)
 
-    entry_nome_curso = Entry(frame_aluno_info, width=45,
+    entry_nome_aluno = Entry(frame_aluno_info, width=45,
                              justify='left', relief=SOLID)
-    entry_nome_curso.place(x=12, y=40)
+    entry_nome_aluno.place(x=12, y=40)
 
     # Label e entry do email
-    label_duracao = Label(frame_aluno_info, text="Email *",
+    label_email = Label(frame_aluno_info, text="Email *",
                           height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_duracao.place(x=10, y=70)
+    label_email.place(x=10, y=70)
 
-    entry_duracao = Entry(frame_aluno_info, width=45,
+    entry_email = Entry(frame_aluno_info, width=45,
                           justify='left', relief=SOLID)
-    entry_duracao.place(x=12, y=100)
+    entry_email.place(x=12, y=100)
 
     # Label e entry do Telefone
     label_telefone = Label(frame_aluno_info, text="Telefone *",
@@ -554,14 +635,6 @@ def alunos():
     combobox_sexo['state'] = 'readonly'
     combobox_sexo.place(x=190, y=160)
 
-    # Label e Entry das faltas
-    label_faltas = Label(frame_aluno_info, text="Faltas",
-                         height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_faltas.place(x=451, y=10)
-
-    faltas = Entry(frame_aluno_info, width=10, justify=LEFT, relief=SOLID)
-    faltas.place(x=455, y=40)
-
     # Label e entry do RA
     label_ra = Label(frame_aluno_info, text="RA *",
                      height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
@@ -572,11 +645,11 @@ def alunos():
     entry_ra.place(x=455, y=100)
 
     # Pegando as Turmas
-    turmas = ['Turma A', 'Turma B']
+    turmas = utils.mostra_turma()
     turma = []
 
     for item in turmas:
-        turma.append(item)
+        turma.append(item[1])
 
     # Label e combobox do Curso
     label_turma = Label(frame_aluno_info, text="Turma *",
@@ -588,9 +661,10 @@ def alunos():
     combobox_turma['state'] = 'readonly'
     combobox_turma.place(x=455, y=160)
 
-    # Função para escolher imagem
+    # Dados da Imagem
     global aluno_foto, label_foto, foto_string
 
+    # Função para escolher imagem
     def escolhe_imagem():
         global aluno_foto, label_foto, foto_string
 
@@ -637,14 +711,14 @@ def alunos():
     # Botões
 
     # Botão salvar aluno
-    botao_salvar = Button(frame_aluno_info, anchor=CENTER, text='SALVAR', width=9,
+    botao_adicionar = Button(frame_aluno_info, command=novo_aluno, anchor=CENTER, text='ADICIONAR', width=9,
                           overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-    botao_salvar.place(x=627, y=110)
+    botao_adicionar.place(x=627, y=110)
 
-    # Botão atualizar aluno
-    botao_atualizar = Button(frame_aluno_info, anchor=CENTER, text='ATUALIZAR',
+    # Botão alterar aluno
+    botao_alterar = Button(frame_aluno_info, anchor=CENTER, text='ALTERAR',
                              width=9, overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_atualizar.place(x=627, y=145)
+    botao_alterar.place(x=627, y=145)
 
     # Botão deletar aluno
     botao_deletar = Button(frame_aluno_info, anchor=CENTER, text='DELETAR', width=9,
@@ -662,9 +736,9 @@ def alunos():
         tabela_alunos_label.place(x=0, y=210)
 
         lista_cabecalho = ['RA', 'Nome', 'Email',
-                           'Telefone', 'Sexo', 'imagem', 'Faltas', 'Curso']
+                           'Telefone', 'Sexo', 'Foto', 'Turma', 'Faltas']
 
-        lista_itens = []
+        lista_itens = utils.mostra_aluno()
 
         global tree_alunos
 
