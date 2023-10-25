@@ -2,7 +2,6 @@ import utils
 import os
 import re
 import Banco
-import Camera as Cam
 import tkinter as tk
 import cv2
 import sys
@@ -70,52 +69,6 @@ show_frame(pagina_inicial)
 # Cria o banco de dados se não existir ainda
 db = Banco.Banco()
 
-# Lista as cameras já cadastradas no sistema
-
-
-def listar_cameras():
-    cams = Cam.list_camera()
-
-    for c in cams:
-        lista_cameras.insert(c[0], f"Nome: {c[1]}       IP: {c[2]}")
-
-# Cadastra câmeras no banco de dados
-
-
-def cadastra_camera():
-    # Recebe as informações de cada campo do formulário
-    dados = [pagina_cadastro_nome.get(), pagina_cadastro_ip.get(),
-             pagina_cadastro_senha.get(), pagina_cadastro_usuario.get()]
-
-    # Verifica se os campos estão vazios
-    for d in dados:
-        if d.strip() == "":
-            pagina_cadastro_label.config(
-                text="Por favor, preencha os\ncampos corretamente.")
-            return
-
-    # Verifica se os dados inseridos pertencem à uma câmera já registrada
-    try:
-        camera = Cam.Camera(dados[0], dados[1], dados[2], dados[3])
-        camera.insert_camera()
-
-    except:  # Exception as e:
-        pagina_cadastro_label.config(
-            text="Câmera já cadastrada\nanteriormente.")
-        return
-
-    # Cadastro bem sucedido
-    pagina_cadastro_label.config(text="Camera registrada com sucesso.")
-    lista_cameras.insert(END, f"Nome: {dados[0]}  IP: {dados[1]}")
-
-    pagina_cadastro_nome.delete(0, END)
-    pagina_cadastro_ip.delete(0, END)
-    pagina_cadastro_usuario.delete(0, END)
-    pagina_cadastro_senha.delete(0, END)
-
-    return
-
-
 # Cadastra pessoas no banco de dados
 def cadastra_pessoa():
     # Padrões de regex para cada campo ser validado
@@ -182,36 +135,6 @@ def cadastra_pessoa():
     return
 
 
-# Limpa os campos da página de cadastro de câmera
-def volta_pag_cadastro():
-    pagina_cadastro_nome.delete(0, END)
-    pagina_cadastro_ip.delete(0, END)
-    pagina_cadastro_senha.delete(0, END)
-    pagina_cadastro_label.config(text="")
-
-    show_frame(pagina_inicial)
-
-
-# Apaga camera do banco de dados
-def confirma_apagar_camera():
-    camSelecionada = lista_cameras.get(ACTIVE)
-
-    # Se não tiver câmera registrada, dá erro
-    if camSelecionada == "":
-        messagebox.showinfo('Erro', 'Nenhuma câmera selecionada')
-        return
-
-    camSelecionada = camSelecionada.split()[1]
-
-    # Cria caixa de mensagem para confirmação
-    res = messagebox.askquestion(
-        "Apagar câmera", f"Deseja apagar informações da câmera: {camSelecionada}?")
-
-    if res == 'yes':
-        lista_cameras.delete(lista_cameras.curselection())
-        Cam.delete_camera(camSelecionada)
-
-
 def conecta_camera():
     camSelecionada = lista_cameras.get(ACTIVE)
 
@@ -254,9 +177,7 @@ def conecta_camera():
     cap.release()
     cv2.destroyAllWindows()
 
-# Manda mensagem por email
-
-
+# Inicia o programa
 def inicia_app():
     # Lista de pessoas que não chegaram
     nao_chegaram = utils.verifica_chegada_aluno()
@@ -359,10 +280,8 @@ icone_titulo_camera = icone_titulo_camera.resize((50, 50))
 icone_titulo_camera = ImageTk.PhotoImage(icone_titulo_camera)
 
 # ------------------------ Funções / Sub-paginas de alunos -----------------------------
-i = 0
+
 # Função de cadastro de alunos
-
-
 def alunos():
     # Titulo da página
     global titulo_cadastro_label
@@ -564,7 +483,7 @@ def alunos():
         valor_ra = entry_procura.get()
 
         try:
-            dados = utils.mostra_aluno_ra(valor_ra)
+            dados = utils.pesquisa_aluno(valor_ra)
 
             # Limpa os campos
             entry_procura.delete(0, END)
@@ -628,7 +547,7 @@ def alunos():
                             "Erro", "Preencha os campos corretamente.")
                         return
 
-                # Confirmação para apagar
+                # Confirmação para alterar
                 res = messagebox.askquestion(
                     'Confirmação', 'Deseja alterar os dados deste aluno?')
 
@@ -638,7 +557,7 @@ def alunos():
                 else:
                     return
 
-                # Mensagem de sucesso na criação do aluno
+                # Mensagem de sucesso na alteração do aluno
                 messagebox.showinfo(
                     "Sucesso", "Os dados fora alterados com sucesso.")
 
@@ -677,9 +596,6 @@ def alunos():
             tree_itens = tree_alunos.focus()
             tree_dicionario = tree_alunos.item(tree_itens)
             tree_lista = tree_dicionario["values"]
-
-            # Guarda RA antigo
-            valor_ra = tree_lista[0]
 
             # Limpa os campos
             entry_ra.delete(0, END)
@@ -899,9 +815,7 @@ def alunos():
 
     mostra_alunos()
 
-
 # Função de cadastro de cursos e turmas
-
 def cursos_turmas():
     # Titulo da página
     global titulo_cadastro_label
@@ -1357,8 +1271,6 @@ def cursos_turmas():
     mostra_turmas()
 
 # Função de cadastro de cameras
-
-
 def cameras():
     # ------------------------------------------------- Titulo da página ----------------------------------------------------
     global titulo_cadastro_label
@@ -1373,30 +1285,33 @@ def cameras():
 
     # Função nova camera
     def nova_camera():
-        nome = entry_nome_camera.get()
-        ip = entry_ip.get()
-        usuario = entry_usuario.get()
-        senha = entry_senha.get()
+        try:
+            nome = entry_nome_camera.get()
+            ip = entry_ip.get()
+            usuario = entry_usuario.get()
+            senha = entry_senha.get()
 
-        lista = [nome, ip, usuario, senha]
+            lista = [nome, ip, usuario, senha]
 
-        # Se os campos não forem preenchidos corretamente
-        for item in lista:
-            if item == "":
-                messagebox.showerror("Erro", "Preencha todos os campos")
-                return
+            # Se os campos não forem preenchidos corretamente
+            for item in lista:
+                if item == "":
+                    messagebox.showerror("Erro", "Preencha todos os campos")
+                    return
 
-        # Cria a camera
-        utils.cria_camera(lista)
+            # Cria a camera
+            utils.cria_camera(lista)
 
-        messagebox.showinfo("Sucesso", "Os dados foram inseridos com sucesso")
+            messagebox.showinfo("Sucesso", "Os dados foram inseridos com sucesso")
 
-        entry_nome_camera.delete(0, END)
-        entry_ip.delete(0, END)
-        entry_usuario.delete(0, END)
-        entry_senha.delete(0, END)
+            entry_nome_camera.delete(0, END)
+            entry_ip.delete(0, END)
+            entry_usuario.delete(0, END)
+            entry_senha.delete(0, END)
 
-        mostra_camera()
+            mostra_camera()
+        except:
+            messagebox.showerror("Erro", "IP já registrado")
 
     # Função carregar/atualizar curso
     def carregar_camera():
@@ -1463,7 +1378,7 @@ def cameras():
 
             botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text="Salvar alterações".upper(
             ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, fg=BRANCO)
-            botao_salvar.place(x=235, y=130)
+            botao_salvar.place(x=700, y=145)
         except IndexError:
             messagebox.showerror("Erro", "Selecione uma camera na tabela.")
 
@@ -1498,7 +1413,79 @@ def cameras():
 
     # Função pesquisa camera
     def pesquisa_camera():
-        print("Pesquisa")
+
+        ip = entry_procura.get()
+
+        try:
+            dados = utils.pesquisa_camera(ip)
+
+            valor_id = dados[0]
+
+            # Limpa os campos
+            entry_procura.delete(0, END)
+            entry_nome_camera.delete(0, END)
+            entry_ip.delete(0, END)
+            entry_usuario.delete(0, END)
+            entry_senha.delete(0, END)
+
+            # Inserindo dados nas entrys
+            entry_nome_camera.insert(0, dados[1])
+            entry_ip.insert(0, dados[2])
+            entry_usuario.insert(0, dados[3])
+            entry_senha.insert(0, dados[4])
+
+
+            def atualiza():
+
+                # Dados da camera
+                nome = entry_nome_camera.get()
+                ip = entry_ip.get()
+                usuario = entry_usuario.get()
+                senha = entry_senha.get()
+
+                # Lista dos dados
+                lista = [valor_id, nome, ip, usuario, senha]
+
+                # Verifica se os campos fora preenchidos
+                for item in lista:
+                    if item == "":
+                        messagebox.showerror(
+                            "Erro", "Preencha os campos corretamente.")
+                        return
+
+                # Confirmação para atualizar
+                res = messagebox.askquestion(
+                    'Confirmação', 'Deseja alterar os dados deste aluno?')
+
+                if res == 'yes':
+                    # Atualizando dados da camera
+                    utils.atualiza_camera(lista)
+                else:
+                    return
+
+                # Mensagem de sucesso na alteração da camera
+                messagebox.showinfo(
+                    "Sucesso", "Os dados fora alterados com sucesso.")
+
+                # Limpa os campos
+                entry_nome_camera.delete(0, END)
+                entry_ip.delete(0, END)
+                entry_usuario.delete(0, END)
+                entry_senha.delete(0, END)
+
+                # Destruindo Labels, Entry e botão desnecessários
+                botao_salvar.destroy()
+
+                # Atualiza tabela
+                mostra_camera()
+
+            # Botão salvar alterações da camera
+            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text='Salvar alterações'.upper(
+            ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+            botao_salvar.place(x=700, y=145)
+
+        except:
+            messagebox.showerror("Erro", "Camera não encontrada.")
 
     # Função mostra info da camera
     def info_camera():
@@ -1523,7 +1510,7 @@ def cameras():
             entry_senha.insert(0, tree_lista[4])
 
         except IndexError:
-            messagebox.showerror("Erro", "Selecione um aluno na tabela.")
+            messagebox.showerror("Erro", "Selecione uma camera na tabela.")
 
     # Label e entry do Nome da camera
     label_nome = Label(frame_info, text="Nome *",
@@ -1562,7 +1549,7 @@ def cameras():
     entry_senha.place(x=160, y=160)
 
     # Procura Aluno
-    label_procura_nome = Label(frame_info, text="Procurar camera [Entrar com nome]",
+    label_procura_nome = Label(frame_info, text="Procurar camera [Entrar com ip]",
                                height=1, anchor=NW, font=("Ivy, 10"), bg=AZUL_CLARO, fg=PRETO)
     label_procura_nome.place(x=620, y=10)
 
@@ -1651,7 +1638,6 @@ def cameras():
 
     mostra_camera()
 
-
 # Função para voltar
 def voltar():
     alunos()
@@ -1738,92 +1724,6 @@ botao_voltar = Button(frame_aluno_botoes, command=lambda: controle('voltar'), im
 botao_voltar.place(x=400, y=30)
 
 ttk.Separator(pagina_alunos, orient=HORIZONTAL).place(x=0, y=118, width=WIDTH)
-
-# ================ Pagina das Câmeras =======================
-
-pagina_cameras.configure(bg=AZUL_CLARO)
-
-pagina_cameras_titulo = Label(
-    pagina_cameras, text="Selecione uma câmera", font=fonte_titulo)
-pagina_cameras_titulo.configure(bg=AZUL_CLARO)
-pagina_cameras_titulo.pack(side=TOP, fill=X, pady=30)
-
-lista_cameras = Listbox(pagina_cameras, width=35)
-lista_cameras['height'] = 5
-lista_cameras.pack(padx=150, fill=BOTH)
-
-pagina_cameras_conectar = Button(
-    pagina_cameras, text="Conectar", font=fonte, command=lambda: conecta_camera())
-pagina_cameras_conectar.pack(padx=45, ipadx=30, side=RIGHT)
-
-pagina_cameras_apagar = Button(
-    pagina_cameras, text="Apagar", font=fonte, command=lambda: confirma_apagar_camera())
-pagina_cameras_apagar.pack(padx=45, ipadx=30, side=RIGHT)
-
-pagina_cameras_voltar = Button(
-    pagina_cameras, text="Voltar", font=fonte, command=lambda: show_frame(pagina_inicial))
-pagina_cameras_voltar.pack(padx=45, ipadx=30, side=RIGHT)
-
-
-# ================ Pagina de Cadastro de Câmeras =======================
-
-pagina_cadastro.configure(bg=AZUL_CLARO)
-
-pagina_cadastro_titulo = Label(
-    pagina_cadastro, text="Cadastre sua câmera", font=fonte_titulo)
-pagina_cadastro_titulo.configure(bg=AZUL_CLARO)
-pagina_cadastro_titulo.place(x=300 - 90, y=30)
-
-pagina_cadastro_nomeLabel = Label(pagina_cadastro, text="Nome:", font=fonte)
-pagina_cadastro_nomeLabel.configure(bg=AZUL_CLARO)
-pagina_cadastro_nomeLabel.place(x=220 - 45, y=87)
-
-pagina_cadastro_nome = Entry(pagina_cadastro)
-pagina_cadastro_nome["width"] = 20
-pagina_cadastro_nome["font"] = fonte
-pagina_cadastro_nome.place(x=300 - 70, y=90)
-
-pagina_cadastro_ipLabel = Label(pagina_cadastro, text="IP:", font=fonte)
-pagina_cadastro_ipLabel.configure(bg=AZUL_CLARO)
-pagina_cadastro_ipLabel.place(x=220 - 20, y=137)
-
-pagina_cadastro_ip = Entry(pagina_cadastro)
-pagina_cadastro_ip["width"] = 20
-pagina_cadastro_ip["font"] = fonte
-pagina_cadastro_ip.place(x=300 - 70, y=140)
-
-pagina_cadastro_usuLabel = Label(pagina_cadastro, text="Usuário:", font=fonte)
-pagina_cadastro_usuLabel.configure(bg=AZUL_CLARO)
-pagina_cadastro_usuLabel.place(x=220 - 55, y=187)
-
-pagina_cadastro_usuario = Entry(pagina_cadastro)
-pagina_cadastro_usuario["width"] = 20
-pagina_cadastro_usuario["font"] = fonte
-pagina_cadastro_usuario.place(x=300 - 70, y=190)
-
-pagina_cadastro_senhaLabel = Label(pagina_cadastro, text="Senha:", font=fonte)
-pagina_cadastro_senhaLabel.configure(bg=AZUL_CLARO)
-pagina_cadastro_senhaLabel.place(x=220 - 47, y=237)
-
-pagina_cadastro_senha = Entry(pagina_cadastro)
-pagina_cadastro_senha["width"] = 20
-pagina_cadastro_senha["font"] = fonte
-pagina_cadastro_senha["show"] = "*"
-pagina_cadastro_senha.place(x=300 - 70, y=240)
-
-pagina_cadastro_cadastrar = Button(pagina_cadastro, text="Cadastrar",
-                                   font=fonte, command=lambda: cadastra_camera())
-pagina_cadastro_cadastrar["width"] = 15
-pagina_cadastro_cadastrar.place(x=WIDTH/2 - 62, y=290)
-
-pagina_cadastro_label = Label(pagina_cadastro, text="", font=fonte)
-pagina_cadastro_label.configure(bg=AZUL_CLARO)
-pagina_cadastro_label.place(x=355 + 15, y=287)
-
-pagina_cadastro_voltar = Button(pagina_cadastro, text="Voltar",
-                                font=fonte, command=lambda: volta_pag_cadastro())
-pagina_cadastro_voltar["width"] = 15
-pagina_cadastro_voltar.place(x=WIDTH/2 - 62, y=340)
 
 # ================ Método de inicialização =======================
 

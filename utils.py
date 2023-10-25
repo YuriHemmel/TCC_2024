@@ -161,7 +161,7 @@ def mostra_aluno():
     
     return lista
 
-def mostra_aluno_ra(ra):
+def pesquisa_aluno(ra):
     conexao = sqlite3.connect("banco.db")
     
     with conexao:
@@ -243,3 +243,15 @@ def apaga_camera(id):
     with conexao:
         cursor = conexao.cursor()
         cursor.execute(f"""DELETE FROM cameras WHERE id="{id}" """)
+
+def pesquisa_camera(ip):
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""SELECT * FROM cameras
+                       WHERE ip = "{ip}" """)
+        
+        results = cursor.fetchone()
+    
+    return results
