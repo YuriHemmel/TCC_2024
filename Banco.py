@@ -44,11 +44,12 @@ class Banco():
         
         # Tabela Câmeras
         cursor.execute("""CREATE TABLE IF NOT EXISTS cameras (
-                     idcamera INTEGER PRIMARY KEY AUTOINCREMENT,
+                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                      nome TEXT NOT NULL,
                      ip TEXT UNIQUE NOT NULL,
-                     senha TEXT NOT NULL,
-                     usuario TEXT NOT NULL)""")
+                     usuario TEXT NOT NULL,
+                     senha TEXT NOT NULL
+                     )""")
         
         self.conexao.commit()
         cursor.close()

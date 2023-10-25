@@ -188,3 +188,58 @@ def apaga_aluno(ra):
     with conexao:
         cursor = conexao.cursor()
         cursor.execute(f"""DELETE FROM alunos WHERE ra="{ra}" """)
+
+def verifica_chegada_aluno():
+
+    conexao = sqlite3.connect("banco.db")
+    cursor = conexao.cursor()
+
+    cursor.execute(f"""
+    SELECT ra, nome, email FROM alunos
+    WHERE presente = false
+                    """)
+    
+    results = cursor.fetchall()
+    conexao.close()
+    
+    return results
+
+#--------------------------------- Tabela cameras -------------------------------------------
+
+# Função criar camera
+def cria_camera(lista):
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute(f"""INSERT INTO cameras (nome, ip, usuario, senha) VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}", "{lista[3]}") """)
+
+# Mostra as cameras
+def mostra_camera():
+    lista = []
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute("""SELECT * FROM cameras""")
+        results = cursor.fetchall()
+
+        for linha in results:
+            lista.append(linha)
+    
+    return lista
+
+# Atualiza dados do cursos
+def atualiza_camera(lista):
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""UPDATE cameras SET nome="{lista[1]}", ip="{lista[2]}", usuario="{lista[3]}", senha="{lista[4]}"  WHERE id="{lista[0]}" """)
+
+# Deleta dados do cursos
+def apaga_camera(id):
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""DELETE FROM cameras WHERE id="{id}" """)
