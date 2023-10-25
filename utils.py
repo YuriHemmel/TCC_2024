@@ -161,6 +161,18 @@ def mostra_aluno():
     
     return lista
 
+def mostra_aluno_ra(ra):
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""SELECT * FROM alunos
+                       WHERE ra = "{ra}" """)
+        
+        results = cursor.fetchone()
+    
+    return results
+
 # Atualiza dados do cursos
 def atualiza_aluno(lista):
     conexao = sqlite3.connect("banco.db")

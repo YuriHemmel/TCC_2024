@@ -29,9 +29,6 @@ BRANCO = "#FFFFFF"
 VERDE = "#68C177"
 VERMELHO = "#FF373E"
 
-TEMP_ID = ""
-TAMANHO_BOTAO = 15
-
 # Lê as variáveis de ambiente presentes no arquivo .env
 load_dotenv()
 
@@ -47,10 +44,7 @@ janela.resizable(False, False)
 pagina_inicial = Frame(janela)
 pagina_cameras = Frame(janela)
 pagina_cadastro = Frame(janela)
-pagina_cadastro_pessoa = Frame(janela)
 pagina_alunos = Frame(janela)
-pagina_list_pessoa = Frame(janela)
-pagina_edit_pessoa = Frame(janela)
 
 # Fontes
 fonte = ("Ivy", 11)
@@ -58,25 +52,28 @@ fonte_titulo = ("Ivy", 15, 'bold')
 fonte_botao = ("Ivy", 8, 'bold')
 
 # Adicionando as páginas
-paginas = (pagina_inicial, pagina_cameras, pagina_cadastro,
-           pagina_cadastro_pessoa, pagina_list_pessoa, pagina_edit_pessoa, pagina_alunos)
+paginas = (pagina_inicial, pagina_cameras, pagina_cadastro, pagina_alunos)
 
 # Adiciona os frames nas páginas
 for frame in paginas:
     frame.grid(row=0, column=0, sticky='nsew')
 
 # Mostra o Frame que queremos
+
+
 def show_frame(frame):
     frame.tkraise()
 
+
 # Primeira página a aparecer
-# show_frame(pagina_inicial)
-show_frame(pagina_alunos)
+show_frame(pagina_inicial)
 
 # Cria o banco de dados se não existir ainda
 db = Banco.Banco()
 
 # Lista as cameras já cadastradas no sistema
+
+
 def listar_cameras():
     cams = Cam.list_camera()
 
@@ -84,6 +81,8 @@ def listar_cameras():
         lista_cameras.insert(c[0], f"Nome: {c[1]}       IP: {c[2]}")
 
 # Cadastra câmeras no banco de dados
+
+
 def cadastra_camera():
     # Recebe as informações de cada campo do formulário
     dados = [pagina_cadastro_nome.get(), pagina_cadastro_ip.get(),
@@ -194,7 +193,6 @@ def volta_pag_cadastro():
     show_frame(pagina_inicial)
 
 
-
 # Apaga camera do banco de dados
 def confirma_apagar_camera():
     camSelecionada = lista_cameras.get(ACTIVE)
@@ -274,71 +272,36 @@ def inicia_app():
 # ================ Pagina inicial =======================
 pagina_inicial.configure(bg=AZUL_CLARO)
 
-pagina_inicial_titulo = Label(
-    pagina_inicial, text="Menu Inicial", font=fonte_titulo)
-pagina_inicial_titulo.configure(bg=AZUL_CLARO)
-pagina_inicial_titulo.place(x=WIDTH/2 - 45, y=20)
+# Frame Titulo
+frame_titulo_inicial = Frame(
+    pagina_inicial, width=WIDTH, height=52, bg=AZUL_ESCURO)
+frame_titulo_inicial.place(x=0, y=0)
 
+home_icone_titulo = Image.open('images/icon_home.png')
+home_icone_titulo = home_icone_titulo.resize((45, 45))
+home_icone_titulo = ImageTk.PhotoImage(home_icone_titulo)
 
-pagina_inicial_camsLabel = Label(
-    pagina_inicial, text="Lista de câmera", font=fonte)
-pagina_inicial_camsLabel.configure(bg=AZUL_CLARO)
-pagina_inicial_camsLabel.place(x=60 - 10, y=105)
+pagina_inicial_titulo = Label(frame_titulo_inicial, image=home_icone_titulo, text="  Menu Principal",
+                              width=WIDTH, compound=LEFT, anchor=NW, font=fonte_titulo, bg=AZUL_ESCURO, fg=BRANCO)
+pagina_inicial_titulo.place(x=10, y=0)
 
-pagina_inicial_cams = Button(pagina_inicial, text="Lista de cameras",
-                             font=fonte, command=lambda: show_frame(pagina_cameras))
-pagina_inicial_cams['width'] = TAMANHO_BOTAO
-pagina_inicial_cams.place(x=50 - 10, y=135)
+aluno_icone = Image.open('images/icon_student.png')
+aluno_icone = aluno_icone.resize((50, 50))
+aluno_icone = ImageTk.PhotoImage(aluno_icone)
 
-pagina_inicial_listPesLabel = Label(
-    pagina_inicial, text="Listar Pessoas", font=fonte)
-pagina_inicial_listPesLabel.configure(bg=AZUL_CLARO)
-pagina_inicial_listPesLabel.place(x=65 - 10, y=210)
+botao_pagina_aluno = Button(pagina_inicial, command=lambda: show_frame(pagina_alunos), image=aluno_icone, text="Alunos/Cursos/Turmas",
+                            compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
+botao_pagina_aluno['width'] = 160
+botao_pagina_aluno.place(x=WIDTH/3 - 100, y=135)
 
-pagina_inicial_listPes = Button(pagina_inicial, text="Lista de pessoas",
-                                font=fonte, command=lambda: show_frame(pagina_list_pessoa))
-pagina_inicial_listPes['width'] = TAMANHO_BOTAO
-pagina_inicial_listPes.place(x=50 - 10, y=240)
+saida_icone = Image.open('images/icon_saida.png')
+saida_icone = saida_icone.resize((50, 50))
+saida_icone = ImageTk.PhotoImage(saida_icone)
 
-pagina_inicial_iniciaLabel = Label(
-    pagina_inicial, text="Iniciar app", font=fonte)
-pagina_inicial_iniciaLabel.configure(bg=AZUL_CLARO)
-pagina_inicial_iniciaLabel.place(x=280 - 10, y=105)
-
-pagina_inicial_inicia = Button(pagina_inicial, text="Iniciar",
-                               font=fonte, command=lambda: inicia_app())
-pagina_inicial_inicia['width'] = TAMANHO_BOTAO
-pagina_inicial_inicia.place(x=250 - 10, y=135)
-
-pagina_inicial_sairLabel = Label(
-    pagina_inicial, text="Sair do app", font=fonte)
-pagina_inicial_sairLabel.configure(bg=AZUL_CLARO)
-pagina_inicial_sairLabel.place(x=265, y=210)
-
-pagina_inicial_sair = Button(
-    pagina_inicial, text="Sair", font=fonte, command=lambda: sys.exit())
-pagina_inicial_sair['width'] = TAMANHO_BOTAO
-pagina_inicial_sair.place(x=240, y=240)
-
-pagina_inicial_cadLabel = Label(
-    pagina_inicial, text="Cadastrar câmeras", font=fonte)
-pagina_inicial_cadLabel.configure(bg=AZUL_CLARO)
-pagina_inicial_cadLabel.place(x=330 + 111, y=105)
-
-pagina_inicial_cadastro = Button(
-    pagina_inicial, text="Cadastrar Câmera", font=fonte, command=lambda: show_frame(pagina_cadastro))
-pagina_inicial_cadastro['width'] = TAMANHO_BOTAO
-pagina_inicial_cadastro.place(x=330 + 108, y=135)
-
-pagina_inicial_pessoaLabel = Label(
-    pagina_inicial, text="Cadastrar pessoas", font=fonte)
-pagina_inicial_pessoaLabel.configure(bg=AZUL_CLARO)
-pagina_inicial_pessoaLabel.place(x=330 + 112, y=210)
-
-pagina_inicial_pessoa = Button(
-    pagina_inicial, text="Cadastrar Pessoa", font=fonte, command=lambda: show_frame(pagina_cadastro_pessoa))
-pagina_inicial_pessoa['width'] = TAMANHO_BOTAO
-pagina_inicial_pessoa.place(x=330 + 108, y=240)
+pagina_inicial_sair = Button(pagina_inicial, command=lambda: sys.exit(), image=saida_icone, text="Sair",
+                             compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
+pagina_inicial_sair['width'] = 160
+pagina_inicial_sair.place(x=WIDTH/2 - 50, y=135)
 
 # ================ Pagina dos alunos =======================
 
@@ -346,9 +309,10 @@ pagina_alunos.configure(bg=AZUL_CLARO)
 
 # -------------------------- Frames da página -------------------------------
 
-# Frame "Cadastro de Aluno"
-frame_titulo = Frame(pagina_alunos, width=WIDTH, height=52, bg=AZUL_ESCURO)
-frame_titulo.place(x=0, y=0)
+# Frame Titulo
+frame_titulo_aluno = Frame(pagina_alunos, width=WIDTH,
+                           height=52, bg=AZUL_ESCURO)
+frame_titulo_aluno.place(x=0, y=0)
 
 # Frame dos botões
 frame_aluno_botoes = Frame(
@@ -371,14 +335,14 @@ aluno_icone_titulo = Image.open('images/icon_student.png')
 aluno_icone_titulo = aluno_icone_titulo.resize((50, 50))
 aluno_icone_titulo = ImageTk.PhotoImage(aluno_icone_titulo)
 
-aluno_icone_titulo_label = Label(frame_titulo, image=aluno_icone_titulo, text="Cadastro de alunos",
+aluno_icone_titulo_label = Label(frame_titulo_aluno, image=aluno_icone_titulo, text="Cadastro de alunos",
                                  width=WIDTH, compound=LEFT, relief=RAISED, anchor=NW, font=fonte_titulo, bg=AZUL_ESCURO, fg=BRANCO)
 aluno_icone_titulo_label.place(x=0, y=0)
 
 ttk.Separator(pagina_alunos, orient=HORIZONTAL).place(x=0, y=52, width=WIDTH)
 
 # ------------------------ Funções / Sub-paginas de alunos -----------------------------
-
+i = 0
 # Função de cadastro de alunos
 
 
@@ -389,38 +353,42 @@ def alunos():
         # Dados da Imagem
         global aluno_foto, label_foto, foto_string
 
-        # Dados do aluno
-        ra = entry_ra.get()
-        nome = entry_nome_aluno.get()
-        email = entry_email.get()
-        telefone = entry_telefone.get()
-        sexo = combobox_sexo.get()
-        foto = foto_string
-        turma = combobox_turma.get()
+        try:
+            # Dados do aluno
+            ra = entry_ra.get()
+            nome = entry_nome_aluno.get()
+            email = entry_email.get()
+            telefone = entry_telefone.get()
+            sexo = combobox_sexo.get()
+            foto = foto_string
+            turma = combobox_turma.get()
 
-        lista = [ra, nome, email, telefone, sexo, foto, turma]
+            lista = [ra, nome, email, telefone, sexo, foto, turma]
 
-        # Verifica se os campos fora preenchidos
-        for item in lista:
-            if item == "":
-                messagebox.showerror(
-                    "Erro", "Preencha os campos corretamente.")
-                return
+            # Verifica se os campos fora preenchidos
+            for item in lista:
+                if item == "":
+                    messagebox.showerror(
+                        "Erro", "Preencha os campos corretamente.")
+                    return
 
-        # Criando aluno
-        utils.cria_aluno(lista)
+            # Criando aluno
+            utils.cria_aluno(lista)
 
-        # Mensagem de sucesso na criação do aluno
-        messagebox.showinfo("Sucesso", "Os dados fora inseridos com sucesso.")
+            # Mensagem de sucesso na criação do aluno
+            messagebox.showinfo(
+                "Sucesso", "Os dados fora inseridos com sucesso.")
 
-        entry_ra.delete(0, END)
-        entry_nome_aluno.delete(0, END)
-        entry_email.delete(0, END)
-        entry_telefone.delete(0, END)
-        combobox_sexo.delete(0, END)
-        combobox_turma.delete(0, END)
+            entry_ra.delete(0, END)
+            entry_nome_aluno.delete(0, END)
+            entry_email.delete(0, END)
+            entry_telefone.delete(0, END)
+            combobox_sexo.delete(0, END)
+            combobox_turma.delete(0, END)
 
-        mostra_alunos()
+            mostra_alunos()
+        except:
+            messagebox.showerror("Erro", "RA já cadastrado")
 
     # Carrega informações do aluno
     def carregar_aluno():
@@ -536,6 +504,7 @@ def alunos():
 
     # Função apagar aluno
     def apagar_aluno():
+
         try:
             tree_itens = tree_alunos.focus()
             tree_dicionario = tree_alunos.item(tree_itens)
@@ -557,6 +526,171 @@ def alunos():
                 "Sucesso", "Os dados foram apagados com sucesso")
 
             mostra_alunos()
+
+        except IndexError:
+            messagebox.showerror("Erro", "Selecione um aluno na tabela.")
+
+    # Pesquisa informações do aluno pelo RA
+    def pesquisa_aluno():
+        global aluno_foto, label_foto, foto_string
+
+        valor_ra = entry_procura.get()
+
+        try:
+            dados = utils.mostra_aluno_ra(valor_ra)
+
+            # Limpa os campos
+            entry_procura.delete(0, END)
+            entry_ra.delete(0, END)
+            entry_nome_aluno.delete(0, END)
+            entry_email.delete(0, END)
+            entry_telefone.delete(0, END)
+            combobox_sexo.delete(0, END)
+            combobox_turma.delete(0, END)
+
+            # Label e Entry das faltas
+            label_faltas = Label(frame_aluno_info, text="Faltas",
+                                 height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+            label_faltas.place(x=451, y=10)
+
+            entry_faltas = Entry(frame_aluno_info, width=10,
+                                 justify=LEFT, relief=SOLID)
+            entry_faltas.place(x=455, y=40)
+
+            # Inserindo dados nas entrys
+            entry_ra.insert(0, dados[0])
+            entry_nome_aluno.insert(0, dados[1])
+            entry_email.insert(0, dados[2])
+            entry_telefone.insert(0, dados[3])
+            combobox_sexo.set(dados[4])
+            combobox_turma.set(dados[6])
+            entry_faltas.insert(0, dados[7])
+
+            aluno_foto = dados[5]
+            foto_string = aluno_foto
+
+            # Inserindo foto do Aluno na tela
+            aluno_foto = Image.open(aluno_foto)
+            aluno_foto = aluno_foto.resize((130, 130))
+            aluno_foto = ImageTk.PhotoImage(aluno_foto)
+
+            label_foto = Label(frame_aluno_info, image=aluno_foto,
+                               bg=AZUL_CLARO, fg=BRANCO)
+            label_foto.place(x=300, y=10)
+
+            def atualiza():
+
+                # Dados do aluno
+                ra = entry_ra.get()
+                nome = entry_nome_aluno.get()
+                email = entry_email.get()
+                telefone = entry_telefone.get()
+                sexo = combobox_sexo.get()
+                foto = foto_string
+                turma = combobox_turma.get()
+                faltas = entry_faltas.get()
+
+                # Lista dos dados
+                lista = [ra, nome, email, telefone,
+                         sexo, foto, turma, faltas, valor_ra]
+
+                # Verifica se os campos fora preenchidos
+                for item in lista:
+                    if item == "":
+                        messagebox.showerror(
+                            "Erro", "Preencha os campos corretamente.")
+                        return
+
+                # Confirmação para apagar
+                res = messagebox.askquestion(
+                    'Confirmação', 'Deseja alterar os dados deste aluno?')
+
+                if res == 'yes':
+                    # Atualizando dados do aluno
+                    utils.atualiza_aluno(lista)
+                else:
+                    return
+
+                # Mensagem de sucesso na criação do aluno
+                messagebox.showinfo(
+                    "Sucesso", "Os dados fora alterados com sucesso.")
+
+                # Limpa os campos
+                entry_ra.delete(0, END)
+                entry_nome_aluno.delete(0, END)
+                entry_email.delete(0, END)
+                entry_telefone.delete(0, END)
+                combobox_sexo.set("")
+                combobox_turma.set("")
+
+                # Destruindo Labels, Entry e botão desnecessários
+                label_foto.destroy()
+                label_faltas.destroy()
+                entry_faltas.destroy()
+                botao_salvar.destroy()
+
+                # Atualiza tabela
+                mostra_alunos()
+
+            # Botão salvar alterações do aluno
+            botao_salvar = Button(frame_aluno_info, command=atualiza, anchor=CENTER, text='Salvar alterações'.upper(
+            ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+            botao_salvar.place(x=700, y=145)
+
+        except:
+            label_faltas.destroy()
+            entry_faltas.destroy()
+            messagebox.showerror("Erro", "Aluno não encontrado.")
+
+    # Mostra informações do aluno pela tabela
+    def info_aluno():
+        global aluno_foto, label_foto, foto_string
+
+        try:
+            tree_itens = tree_alunos.focus()
+            tree_dicionario = tree_alunos.item(tree_itens)
+            tree_lista = tree_dicionario["values"]
+
+            # Guarda RA antigo
+            valor_ra = tree_lista[0]
+
+            # Limpa os campos
+            entry_ra.delete(0, END)
+            entry_nome_aluno.delete(0, END)
+            entry_email.delete(0, END)
+            entry_telefone.delete(0, END)
+            combobox_sexo.delete(0, END)
+            combobox_turma.delete(0, END)
+
+            # Label e Entry das faltas
+            label_faltas = Label(frame_aluno_info, text="Faltas",
+                                 height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+            label_faltas.place(x=451, y=10)
+
+            entry_faltas = Entry(frame_aluno_info, width=10,
+                                 justify=LEFT, relief=SOLID)
+            entry_faltas.place(x=455, y=40)
+
+            # Inserindo dados nas entrys
+            entry_ra.insert(0, tree_lista[0])
+            entry_nome_aluno.insert(0, tree_lista[1])
+            entry_email.insert(0, tree_lista[2])
+            entry_telefone.insert(0, tree_lista[3])
+            combobox_sexo.set(tree_lista[4])
+            combobox_turma.set(tree_lista[6])
+            entry_faltas.insert(0, tree_lista[7])
+
+            aluno_foto = tree_lista[5]
+            foto_string = aluno_foto
+
+            # Inserindo foto do Aluno na tela
+            aluno_foto = Image.open(aluno_foto)
+            aluno_foto = aluno_foto.resize((130, 130))
+            aluno_foto = ImageTk.PhotoImage(aluno_foto)
+
+            label_foto = Label(frame_aluno_info, image=aluno_foto,
+                               bg=AZUL_CLARO, fg=BRANCO)
+            label_foto.place(x=300, y=10)
 
         except IndexError:
             messagebox.showerror("Erro", "Selecione um aluno na tabela.")
@@ -659,16 +793,16 @@ def alunos():
     label_linha.place(x=603, y=0)
 
     # Procura Aluno
-    label_procura_nome = Label(frame_aluno_info, text="Procurar Aluno [Entrar com o nome]",
+    label_procura_nome = Label(frame_aluno_info, text="Procurar Aluno [Entrar com RA]",
                                height=1, anchor=NW, font=("Ivy, 10"), bg=AZUL_CLARO, fg=PRETO)
     label_procura_nome.place(x=620, y=10)
 
-    entry_procura_nome = Entry(frame_aluno_info, width=17,
-                               justify='left', relief=SOLID, font=("Ivy, 10"))
-    entry_procura_nome.place(x=622, y=35)
+    entry_procura = Entry(frame_aluno_info, width=17,
+                          justify='left', relief=SOLID, font=("Ivy, 10"))
+    entry_procura.place(x=622, y=35)
 
-    botao_procurar = Button(frame_aluno_info, text='Procurar', overrelief=RIDGE,
-                            anchor=CENTER, font=("Ivy, 8 bold"), bg=AZUL_ESCURO, foreground=BRANCO)
+    botao_procurar = Button(frame_aluno_info, command=pesquisa_aluno, text="Pesquisar",
+                            font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
     botao_procurar.place(x=757, y=33)
 
     # ------------------------------------ Botões ---------------------------------
@@ -688,8 +822,8 @@ def alunos():
                            overrelief=RIDGE, font=fonte_botao, bg=VERMELHO, foreground=BRANCO)
     botao_deletar.place(x=617, y=180)
 
-    # Botão ver aluno
-    botao_mostrar = Button(frame_aluno_info, anchor=CENTER, text='VER', width=9,
+    # Botão informações do aluno
+    botao_mostrar = Button(frame_aluno_info, command=info_aluno, anchor=CENTER, text='INFO', width=9,
                            overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
     botao_mostrar.place(x=727, y=180)
 
@@ -1195,6 +1329,7 @@ def cursos_turmas():
 
 
 def voltar():
+    alunos()
     show_frame(pagina_inicial)
 
 # Função de troca de janelas
@@ -1231,12 +1366,13 @@ def controle(comando_botao):
 
 # ------------------------ Botões de navegação -----------------------------
 
+
 icone_cadastro = Image.open('images/icon_add.png')
 icone_cadastro = icone_cadastro.resize((20, 20))
 icone_cadastro = ImageTk.PhotoImage(icone_cadastro)
 
 botao_cadastro = Button(frame_aluno_botoes, command=lambda: controle('cadastro'), image=icone_cadastro,
-                              text="Cadastro", width=100, compound=LEFT, overrelief=RIDGE, font=fonte, bg=AZUL_ESCURO, fg=BRANCO)
+                        text="Cadastro", width=100, compound=LEFT, overrelief=RIDGE, font=fonte, bg=AZUL_ESCURO, fg=BRANCO)
 botao_cadastro.place(x=10, y=30)
 
 icone_cursos = Image.open('images/icon_cursos.png')
@@ -1331,7 +1467,7 @@ pagina_cadastro_senha.place(x=300 - 70, y=240)
 
 pagina_cadastro_cadastrar = Button(pagina_cadastro, text="Cadastrar",
                                    font=fonte, command=lambda: cadastra_camera())
-pagina_cadastro_cadastrar["width"] = TAMANHO_BOTAO
+pagina_cadastro_cadastrar["width"] = 15
 pagina_cadastro_cadastrar.place(x=WIDTH/2 - 62, y=290)
 
 pagina_cadastro_label = Label(pagina_cadastro, text="", font=fonte)
@@ -1340,16 +1476,10 @@ pagina_cadastro_label.place(x=355 + 15, y=287)
 
 pagina_cadastro_voltar = Button(pagina_cadastro, text="Voltar",
                                 font=fonte, command=lambda: volta_pag_cadastro())
-pagina_cadastro_voltar["width"] = TAMANHO_BOTAO
+pagina_cadastro_voltar["width"] = 15
 pagina_cadastro_voltar.place(x=WIDTH/2 - 62, y=340)
 
 # ================ Método de inicialização =======================
-
-# Adiciona as câmeras à lista
-"""listar_cameras()
-
-# Adiciona as pessoas à lista
-listar_pessoas()"""
 
 alunos()
 
