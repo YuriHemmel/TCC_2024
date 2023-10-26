@@ -43,7 +43,6 @@ janela.resizable(False, False)
 pagina_inicial = Frame(janela)
 pagina_cameras = Frame(janela)
 pagina_cadastro = Frame(janela)
-pagina_cadastro = Frame(janela)
 
 # Fontes
 fonte = ("Ivy", 11)
@@ -51,7 +50,7 @@ fonte_titulo = ("Ivy", 15, 'bold')
 fonte_botao = ("Ivy", 8, 'bold')
 
 # Adicionando as páginas
-paginas = (pagina_inicial, pagina_cameras, pagina_cadastro, pagina_cadastro)
+paginas = (pagina_inicial, pagina_cameras, pagina_cadastro)
 
 # Adiciona os frames nas páginas
 for frame in paginas:
@@ -136,71 +135,49 @@ def cadastra_pessoa():
 
     return
 
+"""
 def conecta_camera():
-    camSelecionada = lista_cameras.get(ACTIVE)
+    lista = utils.mostra_camera()
 
-    if camSelecionada == "":
-        messagebox.showinfo('Erro', 'Nenhuma câmera selecionada')
+    if lista == []:
+        messagebox.showinfo('Erro', 'Nenhuma câmera cadastrada')
         return
 
-    camSelecionada = camSelecionada.split()[3]
+    for cam in lista:
 
-    cam = Cam.load_camera(camSelecionada)
+        if cam[1].upper() == "WEBCAM" or cam[1].upper() == "CAMERA TESTE":
+            cap = cv2.VideoCapture(0)
 
-    if cam[1] == "CameraTeste":
-        cap = cv2.VideoCapture(0)
+        else:
+            ip = cam[2]
+            usuario = cam[3]
+            senha = cam[4]
 
-    else:
-        user = cam[4]
-        password = cam[3]
-        ip = cam[2]
-        port = '554'
+            porta = '554'
 
-        url = f"rtsp://{user}:{password}@{ip}:{port}/onvif1"
+            url = f"rtsp://{usuario}:{senha}@{ip}:{porta}/onvif1"
 
-        print('Tentando conectar com ' + url)
+            print('Tentando conectar com ' + url)
 
-        cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
+            cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
 
-    while True:
-        ret, frame = cap.read()
+        while True:
+            ret, pagina_cameras = cap.read()
 
-        if not ret:
-            print("Sem frame ou erro na captura de video")
-            break
+            if not ret:
+                print("Sem frame ou erro na captura de video")
+                break
 
-        cv2.imshow("VIDEO", frame)
+            cv2.imshow("VIDEO", pagina_cameras)
 
-        if cv2.waitKey(1) == ord('q'):
-            print("Desconectando camera IP")
-            break
+            if cv2.waitKey(1) == ord('q'):
+                print("Desconectando camera IP")
+                break
 
-    cap.release()
-    cv2.destroyAllWindows()
-"""
-
-def liga_camera():
-    cap = cv2.VideoCapture(0)
-
-    while True:
-        ret, frame = cap.read()
-
-        if not ret:
-            print("Sem frame ou erro na captura de video")
-            break
-
-        cv2.imshow("VIDEO", frame)
-
-        if cv2.waitKey(1) == ord('q'):
-            print("Desconectando camera IP")
-            break
-
-    cap.release()
-    cv2.destroyAllWindows()
+        cap.release()
+        cv2.destroyAllWindows()
 
 # Inicia o programa
-
-
 def inicia_app():
 
     global botao_parar
@@ -211,7 +188,9 @@ def inicia_app():
     botao_parar['height'] = 160
     botao_parar.place(x=190*2 - 45, y=HEIGHT/2 - 80)
 
-    # Lista de pessoas que não chegaram
+    show_frame(pagina_cameras)
+
+    """# Lista de pessoas que não chegaram
     nao_chegaram = utils.verifica_chegada_aluno()
 
     # Manda email para cada um na lista
@@ -220,7 +199,7 @@ def inicia_app():
         aluno = item[1]
         email = item[2]
         envia_email_alerta(aluno, ra, email)
-    return
+    return"""
 
 
 def para_app():
@@ -261,7 +240,7 @@ iniciar_icone = iniciar_icone.resize((50, 50))
 iniciar_icone = ImageTk.PhotoImage(iniciar_icone)
 
 botao_iniciar = Button(pagina_inicial, command=lambda: inicia_app(), image=iniciar_icone, text="Iniciar".upper(),
-                       compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
+                        compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
 botao_iniciar['width'] = 160
 botao_iniciar['height'] = 160
 botao_iniciar.place(x=190*2 - 45, y=HEIGHT/2 - 80)
@@ -384,6 +363,8 @@ def alunos():
             entry_telefone.delete(0, END)
             combobox_sexo.delete(0, END)
             combobox_turma.delete(0, END)
+
+            label_foto.destroy()
 
             mostra_alunos()
         except:
@@ -1785,20 +1766,29 @@ botao_voltar.place(x=400, y=30)
 ttk.Separator(pagina_cadastro, orient=HORIZONTAL).place(
     x=0, y=118, width=WIDTH)
 
-# ================ Método de inicialização =======================
+# ===================================== Método de inicialização =========================================
+
+pagina_cameras.configure(bg=AZUL_CLARO)
+
+# -------------------------- Frames da página -------------------------------
+
+# ===================================== Método de inicialização =========================================
 
 alunos()
 
-# ================ Main Loop =======================
+# ===================================== Main loop =========================================
+
 def run():
     janela.mainloop()
 
+# "IF" necessário para não gerar subprocessos
 if __name__ == "__main__":
-    codigo1 = multiprocessing.Process(target=run)
-    codigo2 = multiprocessing.Process(target=liga_camera)
-
-    codigo1.start()
-    codigo2.start()
+    # Multiprocessamento
+    codigo_janela = multiprocessing.Process(target=run)
+    #codigo_camera = multiprocessing.Process(target=)
     
-    codigo1.join()
-    codigo2.join()
+    codigo_janela.start()
+    #codigo_camera.start()
+
+    codigo_janela.join()
+    #codigo_camera.join()
