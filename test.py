@@ -7,7 +7,7 @@ os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;0"
 
 user = "admin"
 password = "arifym2023"
-ip = "192.168.1.220"
+ip = "192.168.1.16"
 port = "554"
 url = f"rtsp://{user}:{password}@{ip}:{port}/onvif1"
 

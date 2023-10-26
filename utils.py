@@ -2,7 +2,6 @@ import base64
 import io
 import cv2 as cv
 import sqlite3
-import Camera
 from PIL import Image
 
 
