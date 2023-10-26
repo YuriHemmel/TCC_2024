@@ -63,49 +63,208 @@ def convertToImage(bytes):
     image = Image.open(io.BytesIO(binary_data))
     image.save('imagem_binario.jpg')
 
+#============================== Funções de Tabelas ========================================= 
 
-def listar_cursos():
-    lista_cursos = []
+#--------------------------------- Tabela cursos -------------------------------------------
+
+# Função criar cursos
+def cria_curso(lista):
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute(f"""INSERT INTO cursos (nome, duracao, preco) VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}") """)
+
+# Mostra os cursos
+def mostra_curso():
+    lista = []
 
     conexao = sqlite3.connect("banco.db")
     cursor = conexao.cursor()
-
-    cursor.execute("""SELECT nome FROM cursos""")
+    
+    cursor.execute("""SELECT * FROM cursos""")
 
     results = cursor.fetchall()
     conexao.close()
 
-    for curso in results:
-        nome_curso = ""
-        for letra in curso:
-            nome_curso = nome_curso + letra
-        lista_cursos.append(nome_curso)
-
-    return lista_cursos
-
-# Retorna id do curso cadastrado
-def retorna_curso_id(nome_curso):
+    for row in results:
+        lista.append(row)
     
+    return lista
+
+# Atualiza dados do cursos
+def atualiza_curso(lista):
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""UPDATE cursos SET nome="{lista[1]}", duracao="{lista[2]}", preco="{lista[3]}" WHERE id="{lista[0]}" """)
+
+# Deleta dados do cursos
+def apaga_curso(id):
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""DELETE FROM cursos WHERE id="{id}" """)
+
+#--------------------------------- Tabela turmas -------------------------------------------
+
+# Função criar turma
+def cria_turma(lista):
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute(f"""INSERT INTO turmas (nome, curso_id, data_inicio) VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}") """)
+
+# Mostra as turmas
+def mostra_turma():
+    lista = []
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute("""SELECT * FROM turmas""")
+        results = cursor.fetchall()
+
+        for linha in results:
+            lista.append(linha)
+    
+    return lista
+
+# Atualiza dados do cursos
+def atualiza_turma(lista):
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""UPDATE turmas SET nome="{lista[1]}", curso_id="{lista[2]}", data_inicio="{lista[3]}" WHERE id="{lista[0]}" """)
+
+# Deleta dados do cursos
+def apaga_turma(id):
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""DELETE FROM turmas WHERE id="{id}" """)
+
+#--------------------------------- Tabela alunos -------------------------------------------
+
+# Função criar aluno
+def cria_aluno(lista):
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute(f"""INSERT INTO alunos (ra, nome, email, telefone, sexo, foto, turma_id, faltas, presente)
+                                       VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}", "{lista[3]}", "{lista[4]}", "{lista[5]}", "{lista[6]}", 0, 0 ) """)
+
+# Mostra os alunos
+def mostra_aluno():
+    lista = []
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute("""SELECT * FROM alunos""")
+        results = cursor.fetchall()
+
+        for linha in results:
+            lista.append(linha)
+    
+    return lista
+
+def pesquisa_aluno(ra):
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""SELECT * FROM alunos
+                       WHERE ra = "{ra}" """)
+        
+        results = cursor.fetchone()
+    
+    return results
+
+# Atualiza dados do cursos
+def atualiza_aluno(lista):
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""UPDATE alunos SET ra = "{lista[0]}", nome="{lista[1]}", email="{lista[2]}", telefone="{lista[3]}", sexo="{lista[4]}",
+                       foto="{lista[5]}", turma_id="{lista[6]}", faltas="{lista[7]}" 
+                       WHERE ra="{lista[8]}" """)
+
+# Deleta dados do cursos
+def apaga_aluno(ra):
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""DELETE FROM alunos WHERE ra="{ra}" """)
+
+def verifica_chegada_aluno():
+
     conexao = sqlite3.connect("banco.db")
     cursor = conexao.cursor()
 
-    cursor.execute(f"""SELECT CursoID FROM cursos
-                    WHERE nome = "{nome_curso}" """)
-
-    results = cursor.fetchone()
-    conexao.close()
-
-    return results[0]
-
-def retorna_curso_nome(curso_id):
+    cursor.execute(f"""
+    SELECT ra, nome, email FROM alunos
+    WHERE presente = false
+                    """)
     
-    conexao = sqlite3.connect("banco.db")
-    cursor = conexao.cursor()
-
-    cursor.execute(f"""SELECT nome FROM cursos
-                    WHERE CursoID = "{curso_id}" """)
-
-    results = cursor.fetchone()
+    results = cursor.fetchall()
     conexao.close()
+    
+    return results
 
-    return results[0]
+#--------------------------------- Tabela cameras -------------------------------------------
+
+# Função criar camera
+def cria_camera(lista):
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute(f"""INSERT INTO cameras (nome, ip, usuario, senha) VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}", "{lista[3]}") """)
+
+# Mostra as cameras
+def mostra_camera():
+    lista = []
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute("""SELECT * FROM cameras""")
+        results = cursor.fetchall()
+
+        for linha in results:
+            lista.append(linha)
+    
+    return lista
+
+# Atualiza dados do cursos
+def atualiza_camera(lista):
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""UPDATE cameras SET nome="{lista[1]}", ip="{lista[2]}", usuario="{lista[3]}", senha="{lista[4]}"  WHERE id="{lista[0]}" """)
+
+# Deleta dados do cursos
+def apaga_camera(id):
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""DELETE FROM cameras WHERE id="{id}" """)
+
+def pesquisa_camera(ip):
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""SELECT * FROM cameras
+                       WHERE ip = "{ip}" """)
+        
+        results = cursor.fetchone()
+    
+    return results
