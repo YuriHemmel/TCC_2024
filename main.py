@@ -14,6 +14,7 @@ from tkcalendar import Calendar, DateEntry
 from datetime import *
 from email_utils import envia_email_alerta
 from PIL import Image, ImageTk
+import multiprocessing
 
 # Tamanho da janela
 WIDTH = 850
@@ -42,7 +43,7 @@ janela.resizable(False, False)
 pagina_inicial = Frame(janela)
 pagina_cameras = Frame(janela)
 pagina_cadastro = Frame(janela)
-pagina_alunos = Frame(janela)
+pagina_cadastro = Frame(janela)
 
 # Fontes
 fonte = ("Ivy", 11)
@@ -50,7 +51,7 @@ fonte_titulo = ("Ivy", 15, 'bold')
 fonte_botao = ("Ivy", 8, 'bold')
 
 # Adicionando as páginas
-paginas = (pagina_inicial, pagina_cameras, pagina_cadastro, pagina_alunos)
+paginas = (pagina_inicial, pagina_cameras, pagina_cadastro, pagina_cadastro)
 
 # Adiciona os frames nas páginas
 for frame in paginas:
@@ -69,7 +70,8 @@ show_frame(pagina_inicial)
 # Cria o banco de dados se não existir ainda
 db = Banco.Banco()
 
-# Cadastra pessoas no banco de dados
+# Funções que podem ser úteis depois
+"""
 def cadastra_pessoa():
     # Padrões de regex para cada campo ser validado
     PATTERN_RA = "^[A-z0-9]{7}$"
@@ -134,7 +136,6 @@ def cadastra_pessoa():
 
     return
 
-
 def conecta_camera():
     camSelecionada = lista_cameras.get(ACTIVE)
 
@@ -176,9 +177,40 @@ def conecta_camera():
 
     cap.release()
     cv2.destroyAllWindows()
+"""
+
+def liga_camera():
+    cap = cv2.VideoCapture(0)
+
+    while True:
+        ret, frame = cap.read()
+
+        if not ret:
+            print("Sem frame ou erro na captura de video")
+            break
+
+        cv2.imshow("VIDEO", frame)
+
+        if cv2.waitKey(1) == ord('q'):
+            print("Desconectando camera IP")
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
 
 # Inicia o programa
+
+
 def inicia_app():
+
+    global botao_parar
+
+    botao_parar = Button(pagina_inicial, command=lambda: para_app(), image=parar_icone, text="Parar".upper(),
+                     compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
+    botao_parar['width'] = 160
+    botao_parar['height'] = 160
+    botao_parar.place(x=190*2 - 45, y=HEIGHT/2 - 80)
+
     # Lista de pessoas que não chegaram
     nao_chegaram = utils.verifica_chegada_aluno()
 
@@ -191,8 +223,15 @@ def inicia_app():
     return
 
 
+def para_app():
+    global botao_parar
+
+    botao_parar.destroy()
+
 # ================ Pagina inicial =======================
 pagina_inicial.configure(bg=AZUL_CLARO)
+
+global botao_parar
 
 # Frame Titulo
 frame_titulo_inicial = Frame(
@@ -211,7 +250,7 @@ cadastro_icone = Image.open('images/icon_cadastro.png')
 cadastro_icone = cadastro_icone.resize((50, 50))
 cadastro_icone = ImageTk.PhotoImage(cadastro_icone)
 
-botao_pagina_aluno = Button(pagina_inicial, command=lambda: show_frame(pagina_alunos), image=cadastro_icone, text="Cadastro geral".upper(),
+botao_pagina_aluno = Button(pagina_inicial, command=lambda: show_frame(pagina_cadastro), image=cadastro_icone, text="Cadastro geral".upper(),
                             compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
 botao_pagina_aluno['width'] = 160
 botao_pagina_aluno['height'] = 160
@@ -221,11 +260,23 @@ iniciar_icone = Image.open('images/icon_iniciar.png')
 iniciar_icone = iniciar_icone.resize((50, 50))
 iniciar_icone = ImageTk.PhotoImage(iniciar_icone)
 
-botao_pagina_aluno = Button(pagina_inicial, command=lambda: inicia_app(), image=iniciar_icone, text="Iniciar".upper(),
-                            compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
-botao_pagina_aluno['width'] = 160
-botao_pagina_aluno['height'] = 160
-botao_pagina_aluno.place(x=190*2 - 45, y=HEIGHT/2 - 80)
+botao_iniciar = Button(pagina_inicial, command=lambda: inicia_app(), image=iniciar_icone, text="Iniciar".upper(),
+                       compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
+botao_iniciar['width'] = 160
+botao_iniciar['height'] = 160
+botao_iniciar.place(x=190*2 - 45, y=HEIGHT/2 - 80)
+
+parar_icone = Image.open('images/icon_parar.png')
+parar_icone = parar_icone.resize((50, 50))
+parar_icone = ImageTk.PhotoImage(parar_icone)
+
+botao_parar = Button(pagina_inicial, command=lambda: para_app(), image=parar_icone, text="Parar".upper(),
+                     compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
+botao_parar['width'] = 160
+botao_parar['height'] = 160
+botao_parar.place(x=190*2 - 45, y=HEIGHT/2 - 80)
+
+botao_parar.destroy()
 
 saida_icone = Image.open('images/icon_saida.png')
 saida_icone = saida_icone.resize((50, 50))
@@ -237,29 +288,29 @@ botao_sair['width'] = 160
 botao_sair['height'] = 160
 botao_sair.place(x=190*3 - 45, y=HEIGHT/2 - 80)
 
-# ================ Pagina dos alunos =======================
+# ================ Pagina de cadastro =======================
 
-pagina_alunos.configure(bg=AZUL_CLARO)
+pagina_cadastro.configure(bg=AZUL_CLARO)
 
 # -------------------------- Frames da página -------------------------------
 
 # Frame Titulo
-frame_titulo_aluno = Frame(pagina_alunos, width=WIDTH,
+frame_titulo_aluno = Frame(pagina_cadastro, width=WIDTH,
                            height=52, bg=AZUL_ESCURO)
 frame_titulo_aluno.place(x=0, y=0)
 
 # Frame dos botões
 frame_aluno_botoes = Frame(
-    pagina_alunos, width=WIDTH, height=65, bg=AZUL_CLARO)
+    pagina_cadastro, width=WIDTH, height=65, bg=AZUL_CLARO)
 frame_aluno_botoes.place(x=0, y=53)
 
 # Frame do conteúdo / informações
-frame_info = Frame(pagina_alunos, width=WIDTH,
+frame_info = Frame(pagina_cadastro, width=WIDTH,
                    height=230, bg=AZUL_CLARO, padx=10)
 frame_info.place(x=0, y=118)
 
 # Frame das tabelas
-frame_tabela = Frame(pagina_alunos, width=WIDTH,
+frame_tabela = Frame(pagina_cadastro, width=WIDTH,
                      height=250, bg=AZUL_CLARO, padx=10)
 frame_tabela.place(x=0, y=118+240)
 
@@ -282,6 +333,8 @@ icone_titulo_camera = ImageTk.PhotoImage(icone_titulo_camera)
 # ------------------------ Funções / Sub-paginas de alunos -----------------------------
 
 # Função de cadastro de alunos
+
+
 def alunos():
     # Titulo da página
     global titulo_cadastro_label
@@ -289,7 +342,7 @@ def alunos():
     titulo_cadastro_label = Label(frame_titulo_aluno, image=icone_titulo_aluno, text="Cadastro de alunos",
                                   width=WIDTH, compound=LEFT, relief=RAISED, anchor=NW, font=fonte_titulo, bg=AZUL_ESCURO, fg=BRANCO)
     titulo_cadastro_label.place(x=0, y=0)
-    ttk.Separator(pagina_alunos, orient=HORIZONTAL).place(
+    ttk.Separator(pagina_cadastro, orient=HORIZONTAL).place(
         x=0, y=52, width=WIDTH)
 
     # ------------------------------------------------- Detalhes do Aluno ---------------------------------------------------
@@ -816,6 +869,8 @@ def alunos():
     mostra_alunos()
 
 # Função de cadastro de cursos e turmas
+
+
 def cursos_turmas():
     # Titulo da página
     global titulo_cadastro_label
@@ -823,7 +878,7 @@ def cursos_turmas():
     titulo_cadastro_label = Label(frame_titulo_aluno, image=icone_titulo_curso, text="Cadastro de Cursos e Turmas",
                                   width=WIDTH, compound=LEFT, relief=RAISED, anchor=NW, font=fonte_titulo, bg=AZUL_ESCURO, fg=BRANCO)
     titulo_cadastro_label.place(x=0, y=0)
-    ttk.Separator(pagina_alunos, orient=HORIZONTAL).place(
+    ttk.Separator(pagina_cadastro, orient=HORIZONTAL).place(
         x=0, y=52, width=WIDTH)
 
     # Tabela de cursos
@@ -1271,6 +1326,8 @@ def cursos_turmas():
     mostra_turmas()
 
 # Função de cadastro de cameras
+
+
 def cameras():
     # ------------------------------------------------- Titulo da página ----------------------------------------------------
     global titulo_cadastro_label
@@ -1278,7 +1335,7 @@ def cameras():
     titulo_cadastro_label = Label(frame_titulo_aluno, image=icone_titulo_camera, text="Cadastro de cameras",
                                   width=WIDTH, compound=LEFT, relief=RAISED, anchor=NW, font=fonte_titulo, bg=AZUL_ESCURO, fg=BRANCO)
     titulo_cadastro_label.place(x=0, y=0)
-    ttk.Separator(pagina_alunos, orient=HORIZONTAL).place(
+    ttk.Separator(pagina_cadastro, orient=HORIZONTAL).place(
         x=0, y=52, width=WIDTH)
 
     # ------------------------------------------------- Detalhes da Camera ---------------------------------------------------
@@ -1302,7 +1359,8 @@ def cameras():
             # Cria a camera
             utils.cria_camera(lista)
 
-            messagebox.showinfo("Sucesso", "Os dados foram inseridos com sucesso")
+            messagebox.showinfo(
+                "Sucesso", "Os dados foram inseridos com sucesso")
 
             entry_nome_camera.delete(0, END)
             entry_ip.delete(0, END)
@@ -1433,7 +1491,6 @@ def cameras():
             entry_ip.insert(0, dados[2])
             entry_usuario.insert(0, dados[3])
             entry_senha.insert(0, dados[4])
-
 
             def atualiza():
 
@@ -1639,6 +1696,8 @@ def cameras():
     mostra_camera()
 
 # Função para voltar
+
+
 def voltar():
     alunos()
     show_frame(pagina_inicial)
@@ -1723,12 +1782,23 @@ botao_voltar = Button(frame_aluno_botoes, command=lambda: controle('voltar'), im
                       text=" Voltar", width=100, compound=LEFT, overrelief=RIDGE, font=fonte, bg=AZUL_ESCURO, fg=BRANCO)
 botao_voltar.place(x=400, y=30)
 
-ttk.Separator(pagina_alunos, orient=HORIZONTAL).place(x=0, y=118, width=WIDTH)
+ttk.Separator(pagina_cadastro, orient=HORIZONTAL).place(
+    x=0, y=118, width=WIDTH)
 
 # ================ Método de inicialização =======================
 
 alunos()
 
 # ================ Main Loop =======================
+def run():
+    janela.mainloop()
 
-janela.mainloop()
+if __name__ == "__main__":
+    codigo1 = multiprocessing.Process(target=run)
+    codigo2 = multiprocessing.Process(target=liga_camera)
+
+    codigo1.start()
+    codigo2.start()
+    
+    codigo1.join()
+    codigo2.join()
