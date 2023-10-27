@@ -1,0 +1,4 @@
+opencv-python
+tkcalendar
+Pillow
+python-dotenv

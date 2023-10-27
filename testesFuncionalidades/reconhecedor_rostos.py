@@ -25,17 +25,26 @@
 import cv2 
 import os
 
-xml_path = '/home/pi/projects/TCC_2023/haarcascade_frontalface_alt2.xml'
+def find_files(filename, search_path):
+   result = []
+
+# Procura o path do arquivo no disco (para windows C:, para raspberry deve ser /home/pi/)
+   for root, dir, files in os.walk(search_path):
+      if filename in files:
+         result.append(os.path.join(root, filename))
+   return result
+
+xml_path = find_files('haarcascade_frontalface_alt2.xml', 'C:')[0]
 # xml_path = os.path.join(haar_path, xml_name)
 
 # TODO: Inicializar Classificador
 clf = cv2.CascadeClassifier(xml_path)
 
 # Inicializar webcam
-os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;0"
+#os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;0"
 
-url = "rtsp://admin:arifym2023@192.168.1.16:554/onvif1"
-cap = cv2.VideoCapture(url)
+# url = "rtsp://admin:arifym2023@192.168.1.16:554/onvif1"
+cap = cv2.VideoCapture(0)
 
 # Loop para leitura do conteúdo
 while True:
