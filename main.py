@@ -202,8 +202,10 @@ def teste_camera():
     return ra
 
 # Inicia o programa
+
+
 def inicia_app():
- 
+
     current_time = datetime.now()
 
     # Verifica se hoje é dia de semana ou fim de semana
@@ -215,7 +217,9 @@ def inicia_app():
         if hora == "00:00:00":
             utils.computa_falta()
             print("feito")
-        
+
+        print("É dia da semana")
+
         """
         global botao_parar
 
@@ -405,8 +409,8 @@ def alunos():
             entry_nome_aluno.delete(0, END)
             entry_email.delete(0, END)
             entry_telefone.delete(0, END)
-            combobox_sexo.delete(0, END)
-            combobox_turma.delete(0, END)
+            combobox_sexo.set("")
+            combobox_turma.set("")
 
             label_foto.destroy()
 
@@ -431,8 +435,8 @@ def alunos():
             entry_nome_aluno.delete(0, END)
             entry_email.delete(0, END)
             entry_telefone.delete(0, END)
-            combobox_sexo.delete(0, END)
-            combobox_turma.delete(0, END)
+            combobox_sexo.set("")
+            combobox_turma.set("")
 
             # Label e Entry das faltas
             label_faltas = Label(frame_info, text="Faltas",
@@ -450,13 +454,13 @@ def alunos():
             entry_telefone.insert(0, tree_lista[3])
             combobox_sexo.set(tree_lista[4])
             combobox_turma.set(tree_lista[6])
-            entry_faltas.insert(0, tree_lista[7])
+            entry_faltas.insert(0, tree_lista[7])  
 
             aluno_foto = tree_lista[5]
             foto_string = aluno_foto
 
             # Inserindo foto do Aluno na tela
-            aluno_foto = Image.open(aluno_foto)
+            aluno_foto = utils.convertToImage(aluno_foto)
             aluno_foto = aluno_foto.resize((130, 130))
             aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
@@ -569,8 +573,8 @@ def alunos():
             entry_nome_aluno.delete(0, END)
             entry_email.delete(0, END)
             entry_telefone.delete(0, END)
-            combobox_sexo.delete(0, END)
-            combobox_turma.delete(0, END)
+            combobox_sexo.set("")
+            combobox_turma.set("")
 
             # Label e Entry das faltas
             label_faltas = Label(frame_info, text="Faltas",
@@ -594,7 +598,7 @@ def alunos():
             foto_string = aluno_foto
 
             # Inserindo foto do Aluno na tela
-            aluno_foto = Image.open(aluno_foto)
+            aluno_foto = utils.convertToImage(aluno_foto)
             aluno_foto = aluno_foto.resize((130, 130))
             aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
@@ -680,8 +684,8 @@ def alunos():
             entry_nome_aluno.delete(0, END)
             entry_email.delete(0, END)
             entry_telefone.delete(0, END)
-            combobox_sexo.delete(0, END)
-            combobox_turma.delete(0, END)
+            combobox_sexo.set("")
+            combobox_turma.set("")
 
             # Label e Entry das faltas
             label_faltas = Label(frame_info, text="Faltas",
@@ -705,7 +709,7 @@ def alunos():
             foto_string = aluno_foto
 
             # Inserindo foto do Aluno na tela
-            aluno_foto = Image.open(aluno_foto)
+            aluno_foto = utils.convertToImage(aluno_foto)
             aluno_foto = aluno_foto.resize((130, 130))
             aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
@@ -786,11 +790,11 @@ def alunos():
     def escolhe_imagem():
         global aluno_foto, label_foto, foto_string
 
-        aluno_foto = fd.askopenfilename()
+        aluno_foto = utils.convertToBinaryData(fd.askopenfilename())
         foto_string = aluno_foto
 
         # Abrindo imagem
-        aluno_foto = Image.open(aluno_foto)
+        aluno_foto = utils.convertToImage(aluno_foto)
         aluno_foto = aluno_foto.resize((130, 130))
         aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
@@ -800,10 +804,29 @@ def alunos():
 
         botao_carregar['text'] = "TROCAR DE FOTO"
 
-    # Botão Carregar
+    def tira_foto():
+        global aluno_foto, label_foto, foto_string
+
+        foto_string = utils.recebe_foto_binario()
+
+        aluno_foto = utils.convertToImage(foto_string)
+        aluno_foto = aluno_foto.resize((130, 130))
+        aluno_foto = ImageTk.PhotoImage(aluno_foto)
+
+        label_foto = Label(frame_info, image=aluno_foto,
+                           bg=AZUL_CLARO, fg=BRANCO)
+        label_foto.place(x=300, y=10)
+
+
+    # Botão Tira foto
+    botao_foto = Button(frame_info, command=tira_foto, text='Tirar foto'.upper(
+    ), width=18, compound=CENTER, overrelief=RIDGE, anchor=CENTER, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
+    botao_foto.place(x=300, y=160)
+
+    # Botão Carregar Foto
     botao_carregar = Button(frame_info, command=escolhe_imagem, text='Carregar foto'.upper(
     ), width=18, compound=CENTER, overrelief=RIDGE, anchor=CENTER, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_carregar.place(x=300, y=160)
+    botao_carregar.place(x=300, y=190)
 
     # Linha de separação
     label_linha = Label(frame_info, relief=GROOVE, text='h', width=1,
@@ -1836,7 +1859,7 @@ def cameras():
             botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text="Salvar alterações".upper(
             ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, fg=BRANCO)
             botao_salvar.place(x=700, y=145)
-            
+
         except IndexError:
             messagebox.showerror("Erro", "Selecione uma camera na tabela.")
 
@@ -1963,7 +1986,6 @@ def cameras():
             entry_ip.insert(0, tree_lista[2])
             entry_usuario.insert(0, tree_lista[3])
 
-
         except IndexError:
             messagebox.showerror("Erro", "Selecione uma camera na tabela.")
 
@@ -1995,7 +2017,8 @@ def cameras():
     entry_usuario.place(x=12, y=160)
 
     # Label e combobox do Sexo
-    label_senha = Label(frame_info, text="Senha *", height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+    label_senha = Label(frame_info, text="Senha *", height=1,
+                        anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
     label_senha.place(x=157, y=130)
 
     entry_senha = Entry(frame_info, width=20,
@@ -2130,11 +2153,11 @@ def controle(comando_botao):
 # ------------------------ Botões de navegação -----------------------------
 
 
-icone_cadastro = Image.open('images/icon_aluno_2.png')
-icone_cadastro = icone_cadastro.resize((20, 20))
-icone_cadastro = ImageTk.PhotoImage(icone_cadastro)
+icone_aluno_cadastro = Image.open('images/icon_aluno_2.png')
+icone_aluno_cadastro = icone_aluno_cadastro.resize((20, 20))
+icone_aluno_cadastro = ImageTk.PhotoImage(icone_aluno_cadastro)
 
-botao_cadastro = Button(frame_aluno_botoes, command=lambda: controle('alunos'), image=icone_cadastro,
+botao_cadastro = Button(frame_aluno_botoes, command=lambda: controle('alunos'), image=icone_aluno_cadastro,
                         text="Alunos", width=100, compound=LEFT, overrelief=RIDGE, font=fonte, bg=AZUL_ESCURO, fg=BRANCO)
 botao_cadastro.place(x=10, y=30)
 
@@ -2188,10 +2211,10 @@ def run():
 if __name__ == "__main__":
     # Multiprocessamento
     codigo_janela = multiprocessing.Process(target=run)
-    #codigo_camera = multiprocessing.Process(target=inicia_app)
+    # codigo_camera = multiprocessing.Process(target=inicia_app)
 
     codigo_janela.start()
-    #codigo_camera.start()
+    # codigo_camera.start()
 
     codigo_janela.join()
-    #codigo_camera.join()
+    # codigo_camera.join()

@@ -48,8 +48,7 @@ def convertToBinaryData(filename):
 def convertToImage(bytes):
     binary_data = base64.b64decode(bytes)
     image = Image.open(io.BytesIO(binary_data))
-    image.save('imagem_binario.jpg')
-
+    return image
 #============================== Funções de Tabelas ========================================= 
 
 #--------------------------------- Tabela cursos -------------------------------------------

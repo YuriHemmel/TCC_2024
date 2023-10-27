@@ -45,7 +45,7 @@ class Banco():
                     email TEXT NOT NULL,
                     telefone TEXT NOT NULL,
                     sexo TEXT,
-                    foto TEXT NOT NULL,
+                    foto LONGTEXT NOT NULL,
                     turma_id INTEGER NOT NULL,
                     faltas INTEGER NOT NULL,
                     presente BOOL NOT NULL,
