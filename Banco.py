@@ -11,6 +11,16 @@ class Banco():
 
         cursor = self.conexao.cursor()
 
+        # Tabela Aulas
+        cursor.execute("""CREATE TABLE IF NOT EXISTS aulas (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    nome TEXT NOT NULL,
+                    dia TEXT NOT NULL,
+                    hora TEXT NOT NULL,
+                    turma_id INTEGER NOT NULL,
+                    FOREIGN KEY (turma_id) REFERENCES turmas (id) ON UPDATE CASCADE ON DELETE CASCADE
+                    )""")  
+
         # Tabela Cursos
         cursor.execute("""CREATE TABLE IF NOT EXISTS cursos (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -39,7 +49,7 @@ class Banco():
                     turma_id INTEGER NOT NULL,
                     faltas INTEGER NOT NULL,
                     presente BOOL NOT NULL,
-                    FOREIGN KEY(turma_id) REFERENCES turmas(turma_id) ON DELETE CASCADE
+                    FOREIGN KEY(turma_id) REFERENCES turmas(id) ON DELETE CASCADE
                     )""")
         
         # Tabela Câmeras

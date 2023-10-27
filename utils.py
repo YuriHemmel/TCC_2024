@@ -149,6 +149,60 @@ def apaga_turma(id):
         cursor = conexao.cursor()
         cursor.execute(f"""DELETE FROM turmas WHERE id="{id}" """)
 
+#--------------------------------- Tabela aulas -------------------------------------------
+
+# Função criar aula
+def cria_aula(lista):
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute(f"""INSERT INTO aulas (nome, dia, hora, turma_id)
+                                    VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}", "{lista[3]}") """)
+
+# Mostra os aulas
+def mostra_aula():
+    lista = []
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute("""SELECT * FROM aulas""")
+        results = cursor.fetchall()
+
+        for linha in results:
+            lista.append(linha)
+    
+    return lista
+
+def pesquisa_aula(nome):
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""SELECT * FROM aulas
+                       WHERE nome = "{nome}" """)
+        
+        results = cursor.fetchone()
+    
+    return results
+
+# Atualiza dados do cursos
+def atualiza_aula(lista):
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""UPDATE aulas SET nome="{lista[1]}", dia="{lista[2]}", hora="{lista[3]}", turma_id="{lista[4]}"
+                       WHERE id="{lista[0]}" """)
+
+# Deleta dados do cursos
+def apaga_aula(id):
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""DELETE FROM aulas WHERE id="{id}" """)
+
 #--------------------------------- Tabela alunos -------------------------------------------
 
 # Função criar aluno
@@ -204,19 +258,47 @@ def apaga_aluno(ra):
         cursor = conexao.cursor()
         cursor.execute(f"""DELETE FROM alunos WHERE ra="{ra}" """)
 
+# Conta presença parar o aluno
+def presenca_aluno(ra):
+    conexao = sqlite3.connect("banco.db")
+
+    with conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute(f"""UPDATE alunos SET presente = 1
+                        WHERE ra = "{ra}"
+                        """)
+
+def computa_falta():
+    conexao = sqlite3.connect("banco.db")
+
+    with conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute(f"""UPDATE alunos SET
+                        faltas = faltas + 1
+                        WHERE presente = 0
+                        """)
+        
+        cursor.execute(f"""UPDATE alunos SET
+                        presente = 0
+                        WHERE presente = 1
+                        """)
+
 def verifica_chegada_aluno():
 
     conexao = sqlite3.connect("banco.db")
-    cursor = conexao.cursor()
 
-    cursor.execute(f"""
-    SELECT ra, nome, email FROM alunos
-    WHERE presente = false
-                    """)
-    
-    results = cursor.fetchall()
-    conexao.close()
-    
+    with conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute(f"""
+        SELECT ra, nome, email FROM alunos
+        WHERE presente = 0
+                        """)
+        
+        results = cursor.fetchall()
+
     return results
 
 #--------------------------------- Tabela cameras -------------------------------------------
@@ -237,7 +319,7 @@ def mostra_camera():
     
     with conexao:
         cursor = conexao.cursor()
-        cursor.execute("""SELECT * FROM cameras""")
+        cursor.execute("""SELECT id, nome, ip, usuario FROM cameras""")
         results = cursor.fetchall()
 
         for linha in results:
@@ -250,7 +332,7 @@ def atualiza_camera(lista):
     conexao = sqlite3.connect("banco.db")
     with conexao:
         cursor = conexao.cursor()
-        cursor.execute(f"""UPDATE cameras SET nome="{lista[1]}", ip="{lista[2]}", usuario="{lista[3]}", senha="{lista[4]}"  WHERE id="{lista[0]}" """)
+        cursor.execute(f"""UPDATE cameras SET nome="{lista[1]}", ip="{lista[2]}", usuario="{lista[3]}"  WHERE id="{lista[0]}" """)
 
 # Deleta dados do cursos
 def apaga_camera(id):
@@ -264,7 +346,7 @@ def pesquisa_camera(ip):
     
     with conexao:
         cursor = conexao.cursor()
-        cursor.execute(f"""SELECT * FROM cameras
+        cursor.execute(f"""SELECT id, nome, ip, usuario FROM cameras
                        WHERE ip = "{ip}" """)
         
         results = cursor.fetchone()
