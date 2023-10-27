@@ -1,8 +1,5 @@
 import utils
-import os
-import re
 import Banco
-import tkinter as tk
 import cv2
 import sys
 from dotenv import load_dotenv
@@ -10,7 +7,7 @@ from tkinter import *  # Interface gráfica
 from tkinter import messagebox  # Caixa de mensagem para confirmações
 from tkinter import ttk
 from tkinter import filedialog as fd
-from tkcalendar import Calendar, DateEntry
+from tkcalendar import DateEntry
 from datetime import *
 from email_utils import envia_email_alerta
 from PIL import Image, ImageTk

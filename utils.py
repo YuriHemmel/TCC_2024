@@ -20,6 +20,8 @@ def tira_foto():
     cv.destroyAllWindows()
 
 
+# TODO: consertar e adaptar ao novo banco
+'''
 def recebe_foto_binario():
     global bytes
     cam = Camera.load_camera("192.168.1.220")
@@ -50,6 +52,7 @@ def recebe_foto_binario():
     cap.release()
     cv.destroyAllWindows()
     return bytes
+'''
 
 
 def convertToBinaryData(filename):
