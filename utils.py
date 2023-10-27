@@ -243,19 +243,47 @@ def apaga_aluno(ra):
         cursor = conexao.cursor()
         cursor.execute(f"""DELETE FROM alunos WHERE ra="{ra}" """)
 
+# Conta presença parar o aluno
+def presenca_aluno(ra):
+    conexao = sqlite3.connect("banco.db")
+
+    with conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute(f"""UPDATE alunos SET presente = 1
+                        WHERE ra = "{ra}"
+                        """)
+
+def computa_falta():
+    conexao = sqlite3.connect("banco.db")
+
+    with conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute(f"""UPDATE alunos SET
+                        faltas = faltas + 1
+                        WHERE presente = 0
+                        """)
+        
+        cursor.execute(f"""UPDATE alunos SET
+                        presente = 0
+                        WHERE presente = 1
+                        """)
+
 def verifica_chegada_aluno():
 
     conexao = sqlite3.connect("banco.db")
-    cursor = conexao.cursor()
 
-    cursor.execute(f"""
-    SELECT ra, nome, email FROM alunos
-    WHERE presente = false
-                    """)
-    
-    results = cursor.fetchall()
-    conexao.close()
-    
+    with conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute(f"""
+        SELECT ra, nome, email FROM alunos
+        WHERE presente = 0
+                        """)
+        
+        results = cursor.fetchall()
+
     return results
 
 #--------------------------------- Tabela cameras -------------------------------------------

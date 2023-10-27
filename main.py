@@ -68,8 +68,8 @@ show_frame(pagina_inicial)
 # Cria o banco de dados se não existir ainda
 db = Banco.Banco()
 
+'''
 # Funções que podem ser úteis depois
-"""
 def cadastra_pessoa():
     # Padrões de regex para cada campo ser validado
     PATTERN_RA = "^[A-z0-9]{7}$"
@@ -134,8 +134,6 @@ def cadastra_pessoa():
 
     return
 
-"""
-
 def conecta_camera():
     lista = utils.mostra_camera()
 
@@ -177,33 +175,77 @@ def conecta_camera():
         cap.release()
         cv2.destroyAllWindows()
 
+'''
+
+
+def teste_camera():
+    cap = cv2.VideoCapture(0)
+
+    while True:
+        ret, frame = cap.read()
+
+        if not ret:
+            print("Sem frame ou erro na captura de video")
+            break
+
+        cv2.imshow("VIDEO", frame)
+
+        if cv2.waitKey(1) == ord('q'):
+            print("Desconectando camera IP")
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+    ra = "F22HFA7"
+
+    return ra
+
 # Inicia o programa
 def inicia_app():
+ 
+    current_time = datetime.now()
 
-    global botao_parar
+    # Verifica se hoje é dia de semana ou fim de semana
+    dia_semana = current_time.weekday()
 
-    botao_parar = Button(pagina_inicial, command=lambda: para_app(), image=parar_icone, text="Parar".upper(),
-                     compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_parar['width'] = 160
-    botao_parar['height'] = 160
-    botao_parar.place(x=190*2 - 45, y=HEIGHT/2 - 80)
+    # 0 = Segunda e 4 = Sexta
+    if dia_semana in [0, 1, 2, 3, 4]:
+        hora = current_time.strftime("%H:%M:%S")
+        if hora == "00:00:00":
+            utils.computa_falta()
+            print("feito")
+        
+        """
+        global botao_parar
 
-    """# Lista de pessoas que não chegaram
-    nao_chegaram = utils.verifica_chegada_aluno()
+        botao_parar = Button(pagina_inicial, command=lambda: para_app(), image=parar_icone, text="Parar".upper(),compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
+        botao_parar['width'] = 160
+        botao_parar['height'] = 160
+        botao_parar.place(x=190*2 - 45, y=HEIGHT/2 - 80)
 
-    # Manda email para cada um na lista
-    for item in nao_chegaram:
-        ra = item[0]
-        aluno = item[1]
-        email = item[2]
-        envia_email_alerta(aluno, ra, email)
-    return"""
+        ra = teste_camera()
+        utils.presenca_aluno(ra)
+
+        # Lista de pessoas que não chegaram
+        nao_chegaram = utils.verifica_chegada_aluno()
+
+        # Manda email para cada um na lista
+        for item in nao_chegaram:
+            ra = item[0]
+            aluno = item[1]
+            email = item[2]
+            envia_email_alerta(aluno, ra, email)
+        return"""
+    else:
+        print("Hoje é fim de semana")
 
 
 def para_app():
     global botao_parar
 
     botao_parar.destroy()
+
 
 # ================ Pagina inicial =======================
 pagina_inicial.configure(bg=AZUL_CLARO)
@@ -238,7 +280,7 @@ iniciar_icone = iniciar_icone.resize((50, 50))
 iniciar_icone = ImageTk.PhotoImage(iniciar_icone)
 
 botao_iniciar = Button(pagina_inicial, command=lambda: inicia_app(), image=iniciar_icone, text="Iniciar".upper(),
-                        compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
+                       compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
 botao_iniciar['width'] = 160
 botao_iniciar['height'] = 160
 botao_iniciar.place(x=190*2 - 45, y=HEIGHT/2 - 80)
@@ -314,6 +356,8 @@ icone_titulo_camera = ImageTk.PhotoImage(icone_titulo_camera)
 # ------------------------ Funções / Sub-paginas de alunos -----------------------------
 
 # Função de cadastro de alunos
+
+
 def alunos():
     # Titulo da página
     global titulo_cadastro_label
@@ -850,6 +894,8 @@ def alunos():
     mostra_alunos()
 
 # Função de cadastro de cursos e turmas
+
+
 def cursos_turmas():
     # Titulo da página
     global titulo_cadastro_label
@@ -1305,6 +1351,8 @@ def cursos_turmas():
     mostra_turmas()
 
 # Função de cadastro de aulas
+
+
 def aulas():
     # ------------------------------------------------- Titulo da página ----------------------------------------------------
     global titulo_cadastro_label
@@ -1378,11 +1426,13 @@ def aulas():
                 # Se os campos não forem preenchidos corretamente
                 for item in lista:
                     if item == "":
-                        messagebox.showerror("Erro", "Preencha todos os campos")
+                        messagebox.showerror(
+                            "Erro", "Preencha todos os campos")
                         return
 
                 # Confirmação para apagar
-                res = messagebox.askquestion('Confirmação', 'Deseja alterar os dados desta aula?')
+                res = messagebox.askquestion(
+                    'Confirmação', 'Deseja alterar os dados desta aula?')
 
                 if res == 'yes':
                     # Atualiza os dados da aula
@@ -1390,7 +1440,8 @@ def aulas():
                 else:
                     return
 
-                messagebox.showinfo("Sucesso", "Os dados foram atualizados com sucesso")
+                messagebox.showinfo(
+                    "Sucesso", "Os dados foram atualizados com sucesso")
 
                 # Limpa os campos
                 entry_nome_aula.delete(0, END)
@@ -1473,11 +1524,13 @@ def aulas():
                 # Verifica se os campos fora preenchidos
                 for item in lista:
                     if item == "":
-                        messagebox.showerror("Erro", "Preencha os campos corretamente.")
+                        messagebox.showerror(
+                            "Erro", "Preencha os campos corretamente.")
                         return
 
                 # Confirmação para atualizar
-                res = messagebox.askquestion('Confirmação', 'Deseja alterar os dados deste aluno?')
+                res = messagebox.askquestion(
+                    'Confirmação', 'Deseja alterar os dados deste aluno?')
 
                 if res == 'yes':
                     # Atualizando dados da aula
@@ -1539,16 +1592,17 @@ def aulas():
     label_nome.place(x=10, y=10)
 
     entry_nome_aula = Entry(frame_info, width=45,
-                              justify='left', relief=SOLID)
+                            justify='left', relief=SOLID)
     entry_nome_aula.place(x=12, y=40)
 
     # Label e entry do dia
     label_dia = Label(frame_info, text="Dia da Semana *",
-                     height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+                      height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
     label_dia.place(x=10, y=70)
 
     # Dias da semana
-    dia_semana = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira']
+    dia_semana = ['Segunda-feira', 'Terça-feira',
+                  'Quarta-feira', 'Quinta-feira', 'Sexta-feira']
 
     combobox_dia = ttk.Combobox(frame_info, width=20, font=fonte_botao)
     combobox_dia['values'] = dia_semana
@@ -1557,11 +1611,11 @@ def aulas():
 
     # Label e entry da hora de inicio
     label_hora = Label(frame_info, text="Hora de inicio *",
-                          height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+                       height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
     label_hora.place(x=10, y=130)
 
     entry_hora = Entry(frame_info, width=20,
-                          justify='left', relief=SOLID)
+                       justify='left', relief=SOLID)
     entry_hora.place(x=12, y=160)
 
     # Pegando as Turmas
@@ -1629,7 +1683,7 @@ def aulas():
 
     def mostra_aula():
         tabela_aula_label = Label(frame_info, text="Tabela de aulas",
-                                    height=1, relief="flat", anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+                                  height=1, relief="flat", anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
         tabela_aula_label.place(x=0, y=210)
 
         lista_cabecalho = ['ID', 'Nome', 'Dia', 'Hora', 'ID Turma']
@@ -1648,7 +1702,7 @@ def aulas():
             frame_tabela, orient="horizontal", command=tree_aulas.xview)
 
         tree_aulas.configure(yscrollcommand=scroll_vertical,
-                               xscrollcommand=scroll_horizontal)
+                             xscrollcommand=scroll_horizontal)
 
         tree_aulas.place(x=0, y=0, width=WIDTH - 60, height=200)
         scroll_vertical.place(x=WIDTH - 60, y=0 + 1, height=200)
@@ -1672,6 +1726,8 @@ def aulas():
     mostra_aula()
 
 # Função de cadastro de cameras
+
+
 def cameras():
     # ------------------------------------------------- Titulo da página ----------------------------------------------------
     global titulo_cadastro_label
@@ -2040,11 +2096,15 @@ def cameras():
     mostra_camera()
 
 # Função para voltar
+
+
 def voltar():
     alunos()
     show_frame(pagina_inicial)
 
 # Função de troca de janelas
+
+
 def controle(comando_botao):
 
     for widget in frame_info.winfo_children():
@@ -2094,7 +2154,7 @@ icone_aula = icone_aula.resize((20, 20))
 icone_aula = ImageTk.PhotoImage(icone_aula)
 
 botao_aula = Button(frame_aluno_botoes, command=lambda: controle('aulas'), image=icone_aula,
-                      text=" aula", width=100, compound=LEFT, overrelief=RIDGE, font=fonte, bg=AZUL_ESCURO, fg=BRANCO)
+                    text=" aula", width=100, compound=LEFT, overrelief=RIDGE, font=fonte, bg=AZUL_ESCURO, fg=BRANCO)
 botao_aula.place(x=280, y=30)
 
 icone_camera = Image.open('images/icon_camera.png')
@@ -2122,15 +2182,17 @@ alunos()
 
 # ===================================== Main loop =========================================
 
+
 def run():
     janela.mainloop()
+
 
 # "IF" necessário para não gerar subprocessos
 if __name__ == "__main__":
     # Multiprocessamento
     codigo_janela = multiprocessing.Process(target=run)
-    #codigo_camera = multiprocessing.Process(target=)
-    
+    #codigo_camera = multiprocessing.Process(target=inicia_app)
+
     codigo_janela.start()
     #codigo_camera.start()
 
