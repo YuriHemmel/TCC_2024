@@ -314,8 +314,6 @@ icone_titulo_camera = ImageTk.PhotoImage(icone_titulo_camera)
 # ------------------------ Funções / Sub-paginas de alunos -----------------------------
 
 # Função de cadastro de alunos
-
-
 def alunos():
     # Titulo da página
     global titulo_cadastro_label
@@ -852,8 +850,6 @@ def alunos():
     mostra_alunos()
 
 # Função de cadastro de cursos e turmas
-
-
 def cursos_turmas():
     # Titulo da página
     global titulo_cadastro_label
@@ -1308,7 +1304,6 @@ def cursos_turmas():
 
     mostra_turmas()
 
-
 # Função de cadastro de aulas
 def aulas():
     # ------------------------------------------------- Titulo da página ----------------------------------------------------
@@ -1637,7 +1632,7 @@ def aulas():
                                     height=1, relief="flat", anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
         tabela_aula_label.place(x=0, y=210)
 
-        lista_cabecalho = ['ID', 'Nome', 'IP', 'Usuario', 'Senha']
+        lista_cabecalho = ['ID', 'Nome', 'Dia', 'Hora', 'ID Turma']
 
         lista_itens = utils.mostra_aula()
 
@@ -1661,7 +1656,7 @@ def aulas():
 
         posicao_coluna = ["nw", "nw", "nw", "nw",
                           "nw"]
-        largura_coluna = [60, 150, 150, 70, 70]
+        largura_coluna = [60, 150, 150, 70, 150]
         cont = 0
 
         for coluna in lista_cabecalho:
