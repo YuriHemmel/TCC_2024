@@ -41,7 +41,6 @@ janela.resizable(False, False)
 
 # Páginas
 pagina_inicial = Frame(janela)
-pagina_cameras = Frame(janela)
 pagina_cadastro = Frame(janela)
 
 # Fontes
@@ -50,7 +49,7 @@ fonte_titulo = ("Ivy", 15, 'bold')
 fonte_botao = ("Ivy", 8, 'bold')
 
 # Adicionando as páginas
-paginas = (pagina_inicial, pagina_cameras, pagina_cadastro)
+paginas = (pagina_inicial, pagina_cadastro)
 
 # Adiciona os frames nas páginas
 for frame in paginas:
@@ -136,6 +135,7 @@ def cadastra_pessoa():
     return
 
 """
+
 def conecta_camera():
     lista = utils.mostra_camera()
 
@@ -162,13 +162,13 @@ def conecta_camera():
             cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
 
         while True:
-            ret, pagina_cameras = cap.read()
+            ret, frame = cap.read()
 
             if not ret:
                 print("Sem frame ou erro na captura de video")
                 break
 
-            cv2.imshow("VIDEO", pagina_cameras)
+            cv2.imshow("VIDEO", frame)
 
             if cv2.waitKey(1) == ord('q'):
                 print("Desconectando camera IP")
@@ -187,8 +187,6 @@ def inicia_app():
     botao_parar['width'] = 160
     botao_parar['height'] = 160
     botao_parar.place(x=190*2 - 45, y=HEIGHT/2 - 80)
-
-    show_frame(pagina_cameras)
 
     """# Lista de pessoas que não chegaram
     nao_chegaram = utils.verifica_chegada_aluno()
@@ -304,6 +302,10 @@ icone_titulo_aluno = ImageTk.PhotoImage(icone_titulo_aluno)
 icone_titulo_curso = Image.open('images/icon_cursos.png')
 icone_titulo_curso = icone_titulo_curso.resize((50, 50))
 icone_titulo_curso = ImageTk.PhotoImage(icone_titulo_curso)
+
+icone_titulo_aula = Image.open('images/icon_aula.png')
+icone_titulo_aula = icone_titulo_aula.resize((50, 50))
+icone_titulo_aula = ImageTk.PhotoImage(icone_titulo_aula)
 
 icone_titulo_camera = Image.open('images/icon_camera.png')
 icone_titulo_camera = icone_titulo_camera.resize((50, 50))
@@ -1306,9 +1308,375 @@ def cursos_turmas():
 
     mostra_turmas()
 
+
+# Função de cadastro de aulas
+def aulas():
+    # ------------------------------------------------- Titulo da página ----------------------------------------------------
+    global titulo_cadastro_label
+
+    titulo_cadastro_label = Label(frame_titulo_aluno, image=icone_titulo_aula, text="Cadastro de aulas",
+                                  width=WIDTH, compound=LEFT, relief=RAISED, anchor=NW, font=fonte_titulo, bg=AZUL_ESCURO, fg=BRANCO)
+    titulo_cadastro_label.place(x=0, y=0)
+    ttk.Separator(pagina_cadastro, orient=HORIZONTAL).place(
+        x=0, y=52, width=WIDTH)
+
+    # ------------------------------------------------- Detalhes da aula ---------------------------------------------------
+
+    # Função nova aula
+    def nova_aula():
+        nome = entry_nome_aula.get()
+        dia = combobox_dia.get()
+        hora = entry_hora.get()
+        turma = combobox_turma.get()
+
+        lista = [nome, dia, hora, turma]
+
+        # Se os campos não forem preenchidos corretamente
+        for item in lista:
+            if item == "":
+                messagebox.showerror("Erro", "Preencha todos os campos")
+                return
+
+        # Cria a aula
+        utils.cria_aula(lista)
+
+        messagebox.showinfo("Sucesso", "Os dados foram inseridos com sucesso")
+
+        # Limpa os campos
+        entry_nome_aula.delete(0, END)
+        combobox_dia.set("")
+        entry_hora.delete(0, END)
+        combobox_turma.set("")
+
+        mostra_aula()
+
+    # Função carregar/atualizar curso
+    def carregar_aula():
+        try:
+            tree_itens = tree_aulas.focus()
+            tree_dicionario = tree_aulas.item(tree_itens)
+            tree_lista = tree_dicionario['values']
+
+            # Salva o id
+            valor_id = tree_lista[0]
+
+           # Limpa os campos
+            entry_nome_aula.delete(0, END)
+            entry_hora.delete(0, END)
+
+            # Insere dados nas Entrys
+            entry_nome_aula.insert(0, tree_lista[1])
+            combobox_dia.set(tree_lista[2])
+            entry_hora.insert(0, tree_lista[3])
+            combobox_turma.set(tree_lista[4])
+
+            # Atualiza
+            def atualiza():
+
+                nome = entry_nome_aula.get()
+                dia = combobox_dia.get()
+                hora = entry_hora.get()
+                turma = combobox_turma.get()
+
+                lista = [valor_id, nome, dia, hora, turma]
+
+                # Se os campos não forem preenchidos corretamente
+                for item in lista:
+                    if item == "":
+                        messagebox.showerror("Erro", "Preencha todos os campos")
+                        return
+
+                # Confirmação para apagar
+                res = messagebox.askquestion('Confirmação', 'Deseja alterar os dados desta aula?')
+
+                if res == 'yes':
+                    # Atualiza os dados da aula
+                    utils.atualiza_aula(lista)
+                else:
+                    return
+
+                messagebox.showinfo("Sucesso", "Os dados foram atualizados com sucesso")
+
+                # Limpa os campos
+                entry_nome_aula.delete(0, END)
+                combobox_dia.set("")
+                entry_hora.delete(0, END)
+                combobox_turma.set("")
+
+                # atualiza os dados da tabela
+                mostra_aula()
+
+                botao_salvar.destroy()
+
+            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text="Salvar alterações".upper(
+            ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, fg=BRANCO)
+            botao_salvar.place(x=700, y=145)
+        except IndexError:
+            messagebox.showerror("Erro", "Selecione uma aula na tabela.")
+
+    # Função apagar aula
+    def apagar_aula():
+        try:
+            tree_itens = tree_aulas.focus()
+            tree_dicionario = tree_aulas.item(tree_itens)
+            tree_lista = tree_dicionario['values']
+
+            # Salva o id
+            valor_id = tree_lista[0]
+
+            # Confirmação para apagar
+            res = messagebox.askquestion(
+                'Confirmação', 'Deseja apagar os dados desta aula?')
+
+            if res == 'yes':
+                # Apagando os dados do curso
+                utils.apaga_aula(valor_id)
+            else:
+                return
+
+            messagebox.showinfo(
+                "Sucesso", "Os dados foram apagados com sucesso")
+
+            # atualiza os dados da tabela
+            mostra_aula()
+
+        except IndexError:
+            messagebox.showerror("Erro", "Selecione uma aula na tabela.")
+
+    # Função pesquisa aula
+    def pesquisa_aula():
+
+        nome = entry_procura.get()
+
+        try:
+            dados = utils.pesquisa_aula(nome)
+
+            valor_id = dados[0]
+
+            # Limpa os campos
+            entry_procura.delete(0, END)
+            entry_nome_aula.delete(0, END)
+            entry_hora.delete(0, END)
+
+            # Inserindo dados nas entrys
+            entry_nome_aula.insert(0, dados[1])
+            combobox_dia.set(dados[2])
+            entry_hora.insert(0, dados[3])
+            combobox_turma.set(dados[4])
+
+            def atualiza():
+
+                # Dados da aula
+                nome = entry_nome_aula.get()
+                dia = combobox_dia.get()
+                hora = entry_hora.get()
+                turma = combobox_turma.get()
+
+                # Lista dos dados
+                lista = [valor_id, nome, dia, hora, turma]
+
+                # Verifica se os campos fora preenchidos
+                for item in lista:
+                    if item == "":
+                        messagebox.showerror("Erro", "Preencha os campos corretamente.")
+                        return
+
+                # Confirmação para atualizar
+                res = messagebox.askquestion('Confirmação', 'Deseja alterar os dados deste aluno?')
+
+                if res == 'yes':
+                    # Atualizando dados da aula
+                    utils.atualiza_aula(lista)
+                else:
+                    return
+
+                # Mensagem de sucesso na alteração da aula
+                messagebox.showinfo(
+                    "Sucesso", "Os dados fora alterados com sucesso.")
+
+                # Limpa os campos
+                entry_nome_aula.delete(0, END)
+                combobox_dia.set("")
+                entry_hora.delete(0, END)
+                combobox_turma.set("")
+
+                # Destruindo Labels, Entry e botão desnecessários
+                botao_salvar.destroy()
+
+                # Atualiza tabela
+                mostra_aula()
+
+            # Botão salvar alterações da aula
+            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text='Salvar alterações'.upper(
+            ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+            botao_salvar.place(x=700, y=145)
+
+        except:
+            messagebox.showerror("Erro", "Aula não encontrada.")
+
+    # Função mostra info da aula
+    def info_aula():
+        try:
+            tree_itens = tree_aulas.focus()
+            tree_dicionario = tree_aulas.item(tree_itens)
+            tree_lista = tree_dicionario['values']
+
+            # Salva o id
+            valor_id = tree_lista[0]
+
+            # Limpa os campos
+            entry_procura.delete(0, END)
+            entry_nome_aula.delete(0, END)
+            entry_hora.delete(0, END)
+
+            # Inserindo dados nas entrys
+            entry_nome_aula.insert(0, tree_lista[1])
+            combobox_dia.set(tree_lista[2])
+            entry_hora.insert(0, tree_lista[3])
+            combobox_turma.set(tree_lista[4])
+
+        except IndexError:
+            messagebox.showerror("Erro", "Selecione uma aula na tabela.")
+
+    # Label e entry do Nome da aula
+    label_nome = Label(frame_info, text="Nome *",
+                       height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+    label_nome.place(x=10, y=10)
+
+    entry_nome_aula = Entry(frame_info, width=45,
+                              justify='left', relief=SOLID)
+    entry_nome_aula.place(x=12, y=40)
+
+    # Label e entry do dia
+    label_dia = Label(frame_info, text="Dia da Semana *",
+                     height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+    label_dia.place(x=10, y=70)
+
+    # Dias da semana
+    dia_semana = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira']
+
+    combobox_dia = ttk.Combobox(frame_info, width=20, font=fonte_botao)
+    combobox_dia['values'] = dia_semana
+    combobox_dia['state'] = 'readonly'
+    combobox_dia.place(x=12, y=100)
+
+    # Label e entry da hora de inicio
+    label_hora = Label(frame_info, text="Hora de inicio *",
+                          height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+    label_hora.place(x=10, y=130)
+
+    entry_hora = Entry(frame_info, width=20,
+                          justify='left', relief=SOLID)
+    entry_hora.place(x=12, y=160)
+
+    # Pegando as Turmas
+    turmas = utils.mostra_turma()
+    turma = []
+
+    for item in turmas:
+        turma.append(item[1])
+
+    # Label e combobox do Sexo
+    label_turma = Label(frame_info, text="Turma *",
+                        height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+    label_turma.place(x=162, y=130)
+
+    combobox_turma = ttk.Combobox(frame_info, width=15, font=fonte_botao)
+    combobox_turma['values'] = turma
+    combobox_turma['state'] = 'readonly'
+    combobox_turma.place(x=165, y=160)
+
+    # Procura aula
+    label_procura_nome = Label(frame_info, text="Procurar aula [Entrar com nome]",
+                               height=1, anchor=NW, font=("Ivy, 10"), bg=AZUL_CLARO, fg=PRETO)
+    label_procura_nome.place(x=620, y=10)
+
+    entry_procura = Entry(frame_info, width=17,
+                          justify='left', relief=SOLID, font=("Ivy, 10"))
+    entry_procura.place(x=622, y=35)
+
+    # Linha de separação
+    label_linha = Label(frame_info, relief=GROOVE, text='h', width=1,
+                        height=200, anchor=NW, font=("Ivy, 1"), bg=PRETO, fg=PRETO)
+    label_linha.place(x=605, y=0)
+    label_linha = Label(frame_info, relief=GROOVE, text='h', width=1,
+                        height=200, anchor=NW, font=("Ivy, 1"), bg=BRANCO, fg=PRETO)
+    label_linha.place(x=603, y=0)
+
+    # ------------------------------------ Botões ---------------------------------
+
+    # Botão adicionar aula
+    botao_adicionar = Button(frame_info, command=nova_aula, anchor=CENTER, text='ADICIONAR', width=9,
+                             overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+    botao_adicionar.place(x=617, y=110)
+
+    # Botão alterar aula
+    botao_alterar = Button(frame_info, command=carregar_aula, anchor=CENTER, text='ALTERAR',
+                           width=9, overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
+    botao_alterar.place(x=617, y=145)
+
+    # Botão deletar aula
+    botao_deletar = Button(frame_info, command=apagar_aula, anchor=CENTER, text='DELETAR', width=9,
+                           overrelief=RIDGE, font=fonte_botao, bg=VERMELHO, foreground=BRANCO)
+    botao_deletar.place(x=617, y=180)
+
+    # Botão informações do aula
+    botao_mostrar = Button(frame_info, command=info_aula, anchor=CENTER, text='INFO', width=9,
+                           overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
+    botao_mostrar.place(x=727, y=180)
+
+    # Botão pesquisa aula
+    botao_procurar = Button(frame_info, command=pesquisa_aula, text="Pesquisar",
+                            font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
+    botao_procurar.place(x=757, y=33)
+
+    # ---------------------------------- Tabela das cameras -------------------------------------
+
+    def mostra_aula():
+        tabela_aula_label = Label(frame_info, text="Tabela de aulas",
+                                    height=1, relief="flat", anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+        tabela_aula_label.place(x=0, y=210)
+
+        lista_cabecalho = ['ID', 'Nome', 'IP', 'Usuario', 'Senha']
+
+        lista_itens = utils.mostra_aula()
+
+        global tree_aulas
+
+        tree_aulas = ttk.Treeview(
+            frame_tabela, selectmode="extended", columns=lista_cabecalho, show='headings')
+
+        # Scrollbars
+        scroll_vertical = ttk.Scrollbar(
+            frame_tabela, orient='vertical', command=tree_aulas.yview)
+        scroll_horizontal = ttk.Scrollbar(
+            frame_tabela, orient="horizontal", command=tree_aulas.xview)
+
+        tree_aulas.configure(yscrollcommand=scroll_vertical,
+                               xscrollcommand=scroll_horizontal)
+
+        tree_aulas.place(x=0, y=0, width=WIDTH - 60, height=200)
+        scroll_vertical.place(x=WIDTH - 60, y=0 + 1, height=200)
+        scroll_horizontal.place(x=0, y=200, width=WIDTH - 60)
+
+        posicao_coluna = ["nw", "nw", "nw", "nw",
+                          "nw"]
+        largura_coluna = [60, 150, 150, 70, 70]
+        cont = 0
+
+        for coluna in lista_cabecalho:
+            tree_aulas.heading(coluna, text=coluna.title(), anchor=NW)
+            tree_aulas.column(
+                coluna, width=largura_coluna[cont], anchor=posicao_coluna[cont])
+
+            cont += 1
+
+        for item in lista_itens:
+            tree_aulas.insert('', 'end', values=item)
+
+    mostra_aula()
+
 # Função de cadastro de cameras
-
-
 def cameras():
     # ------------------------------------------------- Titulo da página ----------------------------------------------------
     global titulo_cadastro_label
@@ -1677,55 +2045,34 @@ def cameras():
     mostra_camera()
 
 # Função para voltar
-
-
 def voltar():
     alunos()
     show_frame(pagina_inicial)
 
 # Função de troca de janelas
-
-
 def controle(comando_botao):
 
+    for widget in frame_info.winfo_children():
+        widget.destroy()
+
+    for widget in frame_tabela.winfo_children():
+        widget.destroy()
+
+    titulo_cadastro_label.destroy()
+
     if comando_botao == 'alunos':
-        for widget in frame_info.winfo_children():
-            widget.destroy()
-
-        for widget in frame_tabela.winfo_children():
-            widget.destroy()
-
-        titulo_cadastro_label.destroy()
         alunos()
 
     if comando_botao == 'cursos':
-        for widget in frame_info.winfo_children():
-            widget.destroy()
-
-        for widget in frame_tabela.winfo_children():
-            widget.destroy()
-
-        titulo_cadastro_label.destroy()
         cursos_turmas()
 
+    if comando_botao == 'aulas':
+        aulas()
+
     if comando_botao == 'cameras':
-        for widget in frame_info.winfo_children():
-            widget.destroy()
-
-        for widget in frame_tabela.winfo_children():
-            widget.destroy()
-
-        titulo_cadastro_label.destroy()
         cameras()
 
     if comando_botao == 'voltar':
-        for widget in frame_info.winfo_children():
-            widget.destroy()
-
-        for widget in frame_tabela.winfo_children():
-            widget.destroy()
-
-        titulo_cadastro_label.destroy()
         voltar()
 
 # ------------------------ Botões de navegação -----------------------------
@@ -1747,13 +2094,21 @@ botao_cursos = Button(frame_aluno_botoes, command=lambda: controle('cursos'), im
                       text="Cursos/Turmas", width=130, compound=LEFT, overrelief=RIDGE, font=fonte, bg=AZUL_ESCURO, fg=BRANCO)
 botao_cursos.place(x=130, y=30)
 
+icone_aula = Image.open('images/icon_aula.png')
+icone_aula = icone_aula.resize((20, 20))
+icone_aula = ImageTk.PhotoImage(icone_aula)
+
+botao_aula = Button(frame_aluno_botoes, command=lambda: controle('aulas'), image=icone_aula,
+                      text=" aula", width=100, compound=LEFT, overrelief=RIDGE, font=fonte, bg=AZUL_ESCURO, fg=BRANCO)
+botao_aula.place(x=280, y=30)
+
 icone_camera = Image.open('images/icon_camera.png')
 icone_camera = icone_camera.resize((20, 20))
 icone_camera = ImageTk.PhotoImage(icone_camera)
 
 botao_camera = Button(frame_aluno_botoes, command=lambda: controle('cameras'), image=icone_camera,
                       text="Cameras", width=100, compound=LEFT, overrelief=RIDGE, font=fonte, bg=AZUL_ESCURO, fg=BRANCO)
-botao_camera.place(x=280, y=30)
+botao_camera.place(x=400, y=30)
 
 icone_voltar = Image.open('images/icon_voltar.png')
 icone_voltar = icone_voltar.resize((20, 20))
@@ -1761,16 +2116,10 @@ icone_voltar = ImageTk.PhotoImage(icone_voltar)
 
 botao_voltar = Button(frame_aluno_botoes, command=lambda: controle('voltar'), image=icone_voltar,
                       text=" Voltar", width=100, compound=LEFT, overrelief=RIDGE, font=fonte, bg=AZUL_ESCURO, fg=BRANCO)
-botao_voltar.place(x=400, y=30)
+botao_voltar.place(x=520, y=30)
 
 ttk.Separator(pagina_cadastro, orient=HORIZONTAL).place(
     x=0, y=118, width=WIDTH)
-
-# ===================================== Método de inicialização =========================================
-
-pagina_cameras.configure(bg=AZUL_CLARO)
-
-# -------------------------- Frames da página -------------------------------
 
 # ===================================== Método de inicialização =========================================
 
