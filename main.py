@@ -1569,9 +1569,6 @@ def aulas():
             tree_dicionario = tree_aulas.item(tree_itens)
             tree_lista = tree_dicionario['values']
 
-            # Salva o id
-            valor_id = tree_lista[0]
-
             # Limpa os campos
             entry_procura.delete(0, END)
             entry_nome_aula.delete(0, END)
@@ -1787,11 +1784,13 @@ def cameras():
             entry_usuario.delete(0, END)
             entry_senha.delete(0, END)
 
+            # Desabilita o campo de senha
+            entry_senha["state"] = DISABLED
+
             # Insere dados nas Entrys
             entry_nome_camera.insert(0, tree_lista[1])
             entry_ip.insert(0, tree_lista[2])
             entry_usuario.insert(0, tree_lista[3])
-            entry_senha.insert(0, tree_lista[4])
 
             # Atualiza
             def atualiza():
@@ -1799,9 +1798,8 @@ def cameras():
                 nome = entry_nome_camera.get()
                 ip = entry_ip.get()
                 usuario = entry_usuario.get()
-                senha = entry_senha.get()
 
-                lista = [valor_id, nome, ip, usuario, senha]
+                lista = [valor_id, nome, ip, usuario]
 
                 # Se os campos não forem preenchidos corretamente
                 for item in lista:
@@ -1827,16 +1825,18 @@ def cameras():
                 entry_nome_camera.delete(0, END)
                 entry_ip.delete(0, END)
                 entry_usuario.delete(0, END)
-                entry_senha.delete(0, END)
+
+                botao_salvar.destroy()
+
+                entry_senha["state"] = NORMAL
 
                 # atualiza os dados da tabela
                 mostra_camera()
 
-                botao_salvar.destroy()
-
             botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text="Salvar alterações".upper(
             ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, fg=BRANCO)
             botao_salvar.place(x=700, y=145)
+            
         except IndexError:
             messagebox.showerror("Erro", "Selecione uma camera na tabela.")
 
@@ -1886,11 +1886,12 @@ def cameras():
             entry_usuario.delete(0, END)
             entry_senha.delete(0, END)
 
+            entry_senha["state"] = DISABLED
+
             # Inserindo dados nas entrys
             entry_nome_camera.insert(0, dados[1])
             entry_ip.insert(0, dados[2])
             entry_usuario.insert(0, dados[3])
-            entry_senha.insert(0, dados[4])
 
             def atualiza():
 
@@ -1898,10 +1899,9 @@ def cameras():
                 nome = entry_nome_camera.get()
                 ip = entry_ip.get()
                 usuario = entry_usuario.get()
-                senha = entry_senha.get()
 
                 # Lista dos dados
-                lista = [valor_id, nome, ip, usuario, senha]
+                lista = [valor_id, nome, ip, usuario]
 
                 # Verifica se os campos fora preenchidos
                 for item in lista:
@@ -1928,10 +1928,11 @@ def cameras():
                 entry_nome_camera.delete(0, END)
                 entry_ip.delete(0, END)
                 entry_usuario.delete(0, END)
-                entry_senha.delete(0, END)
 
                 # Destruindo Labels, Entry e botão desnecessários
                 botao_salvar.destroy()
+
+                entry_senha["state"] = NORMAL
 
                 # Atualiza tabela
                 mostra_camera()
@@ -1951,9 +1952,6 @@ def cameras():
             tree_dicionario = tree_cameras.item(tree_itens)
             tree_lista = tree_dicionario['values']
 
-            # Salva o id
-            valor_id = tree_lista[0]
-
             # Limpa os campos
             entry_nome_camera.delete(0, END)
             entry_ip.delete(0, END)
@@ -1964,7 +1962,7 @@ def cameras():
             entry_nome_camera.insert(0, tree_lista[1])
             entry_ip.insert(0, tree_lista[2])
             entry_usuario.insert(0, tree_lista[3])
-            entry_senha.insert(0, tree_lista[4])
+
 
         except IndexError:
             messagebox.showerror("Erro", "Selecione uma camera na tabela.")
@@ -1997,12 +1995,12 @@ def cameras():
     entry_usuario.place(x=12, y=160)
 
     # Label e combobox do Sexo
-    label_senha = Label(frame_info, text="Senha *",
-                        height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+    label_senha = Label(frame_info, text="Senha *", height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
     label_senha.place(x=157, y=130)
 
     entry_senha = Entry(frame_info, width=20,
                         justify='left', relief=SOLID)
+    entry_senha['show'] = "*"
     entry_senha.place(x=160, y=160)
 
     # Procura Aluno
@@ -2056,7 +2054,7 @@ def cameras():
                                     height=1, relief="flat", anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
         tabela_camera_label.place(x=0, y=210)
 
-        lista_cabecalho = ['ID', 'Nome', 'IP', 'Usuario', 'Senha']
+        lista_cabecalho = ['ID', 'Nome', 'IP', 'Usuario']
 
         lista_itens = utils.mostra_camera()
 
@@ -2078,9 +2076,8 @@ def cameras():
         scroll_vertical.place(x=WIDTH - 60, y=0 + 1, height=200)
         scroll_horizontal.place(x=0, y=200, width=WIDTH - 60)
 
-        posicao_coluna = ["nw", "nw", "nw", "nw",
-                          "nw"]
-        largura_coluna = [60, 150, 150, 70, 70]
+        posicao_coluna = ["nw", "nw", "nw", "nw"]
+        largura_coluna = [60, 150, 150, 70]
         cont = 0
 
         for coluna in lista_cabecalho:

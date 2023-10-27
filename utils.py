@@ -304,7 +304,7 @@ def mostra_camera():
     
     with conexao:
         cursor = conexao.cursor()
-        cursor.execute("""SELECT * FROM cameras""")
+        cursor.execute("""SELECT id, nome, ip, usuario FROM cameras""")
         results = cursor.fetchall()
 
         for linha in results:
@@ -317,7 +317,7 @@ def atualiza_camera(lista):
     conexao = sqlite3.connect("banco.db")
     with conexao:
         cursor = conexao.cursor()
-        cursor.execute(f"""UPDATE cameras SET nome="{lista[1]}", ip="{lista[2]}", usuario="{lista[3]}", senha="{lista[4]}"  WHERE id="{lista[0]}" """)
+        cursor.execute(f"""UPDATE cameras SET nome="{lista[1]}", ip="{lista[2]}", usuario="{lista[3]}"  WHERE id="{lista[0]}" """)
 
 # Deleta dados do cursos
 def apaga_camera(id):
@@ -331,7 +331,7 @@ def pesquisa_camera(ip):
     
     with conexao:
         cursor = conexao.cursor()
-        cursor.execute(f"""SELECT * FROM cameras
+        cursor.execute(f"""SELECT id, nome, ip, usuario FROM cameras
                        WHERE ip = "{ip}" """)
         
         results = cursor.fetchone()
