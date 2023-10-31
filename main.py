@@ -12,7 +12,7 @@ from tkinter import ttk
 from tkinter import filedialog as fd
 from tkcalendar import Calendar, DateEntry
 from datetime import *
-from email_utils import envia_email_alerta
+from email_utils import envia_email_alerta, envia_email_acusando_falta, envia_email_confirmando_presenca
 from PIL import Image, ImageTk
 import multiprocessing
 
@@ -67,6 +67,11 @@ show_frame(pagina_inicial)
 
 # Cria o banco de dados se não existir ainda
 db = Banco.Banco()
+
+# Variável para parar o processo de checagem de dia
+global break_variable
+
+break_variable = FALSE
 
 '''
 # Funções que podem ser úteis depois
@@ -203,58 +208,51 @@ def teste_camera():
 
 # Inicia o programa
 
+def verifica_dia_semana():
+    global break_variable
+    while True:
+        current_time = datetime.now()
+
+        # Verifica se hoje é dia de semana ou fim de semana
+        dia_semana = current_time.weekday()
+
+        # 0 = Segunda e 4 = Sexta
+        if dia_semana in [0, 1, 2, 3, 4]:
+            hora = current_time.strftime("%H:%M:%S")
+            if hora == "00:00:00":
+                utils.computa_falta()
+                print("Faltas computadas") 
+
 
 def inicia_app():
+    
+    utils.verifica_aula_mais_proxima()
 
-    current_time = datetime.now()
+    """current_time = datetime.now()
+    print(current_time.strftime("%X"))"""
 
-    # Verifica se hoje é dia de semana ou fim de semana
-    dia_semana = current_time.weekday()
+    #utils.verifica_aula_mais_proxima()
 
-    # 0 = Segunda e 4 = Sexta
-    if dia_semana in [0, 1, 2, 3, 4]:
-        hora = current_time.strftime("%H:%M:%S")
-        if hora == "00:00:00":
-            utils.computa_falta()
-            print("feito")
+    """# Lista de pessoas que não chegaram
+    nao_chegaram = utils.verifica_nao_chegada_aluno()
 
-        print("É dia da semana")
+    # Manda email para cada um na lista
+    for item in nao_chegaram:
+        ra = item[0]
+        aluno = item[1]
+        email = item[2]
+        envia_email_alerta(aluno, ra, email)
+    return"""
 
-        """
-        global botao_parar
-
-        botao_parar = Button(pagina_inicial, command=lambda: para_app(), image=parar_icone, text="Parar".upper(),compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
-        botao_parar['width'] = 160
-        botao_parar['height'] = 160
-        botao_parar.place(x=190*2 - 45, y=HEIGHT/2 - 80)
-
-        ra = teste_camera()
-        utils.presenca_aluno(ra)
-
-        # Lista de pessoas que não chegaram
-        nao_chegaram = utils.verifica_chegada_aluno()
-
-        # Manda email para cada um na lista
-        for item in nao_chegaram:
-            ra = item[0]
-            aluno = item[1]
-            email = item[2]
-            envia_email_alerta(aluno, ra, email)
-        return"""
-    else:
-        print("Hoje é fim de semana")
-
-
-def para_app():
-    global botao_parar
-
-    botao_parar.destroy()
-
+# Função para sair do app, encerrando outros processos
+def sair_app():
+    global break_variable
+    break_variable = TRUE
+    sys.exit()
 
 # ================ Pagina inicial =======================
-pagina_inicial.configure(bg=AZUL_CLARO)
 
-global botao_parar
+pagina_inicial.configure(bg=AZUL_CLARO)
 
 # Frame Titulo
 frame_titulo_inicial = Frame(
@@ -293,7 +291,7 @@ parar_icone = Image.open('images/icon_parar.png')
 parar_icone = parar_icone.resize((50, 50))
 parar_icone = ImageTk.PhotoImage(parar_icone)
 
-botao_parar = Button(pagina_inicial, command=lambda: para_app(), image=parar_icone, text="Parar".upper(),
+botao_parar = Button(pagina_inicial, image=parar_icone, text="Parar".upper(),
                      compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
 botao_parar['width'] = 160
 botao_parar['height'] = 160
@@ -305,7 +303,7 @@ saida_icone = Image.open('images/icon_saida.png')
 saida_icone = saida_icone.resize((50, 50))
 saida_icone = ImageTk.PhotoImage(saida_icone)
 
-botao_sair = Button(pagina_inicial, command=lambda: sys.exit(), image=saida_icone, text="Sair".upper(),
+botao_sair = Button(pagina_inicial, command=lambda: sair_app(), image=saida_icone, text="Sair".upper(),
                     compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
 botao_sair['width'] = 160
 botao_sair['height'] = 160
@@ -459,8 +457,8 @@ def alunos():
             aluno_foto = tree_lista[5]
             foto_string = aluno_foto
 
-            # Inserindo foto do Aluno na tela
-            aluno_foto = utils.convertToImage(aluno_foto)
+            # Abrindo imagem
+            aluno_foto = Image.open(aluno_foto)
             aluno_foto = aluno_foto.resize((130, 130))
             aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
@@ -598,7 +596,7 @@ def alunos():
             foto_string = aluno_foto
 
             # Inserindo foto do Aluno na tela
-            aluno_foto = utils.convertToImage(aluno_foto)
+            aluno_foto = Image.open(aluno_foto)
             aluno_foto = aluno_foto.resize((130, 130))
             aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
@@ -709,7 +707,7 @@ def alunos():
             foto_string = aluno_foto
 
             # Inserindo foto do Aluno na tela
-            aluno_foto = utils.convertToImage(aluno_foto)
+            aluno_foto = Image.open(aluno_foto)
             aluno_foto = aluno_foto.resize((130, 130))
             aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
@@ -790,11 +788,11 @@ def alunos():
     def escolhe_imagem():
         global aluno_foto, label_foto, foto_string
 
-        aluno_foto = utils.convertToBinaryData(fd.askopenfilename())
+        aluno_foto = fd.askopenfilename()
         foto_string = aluno_foto
 
         # Abrindo imagem
-        aluno_foto = utils.convertToImage(aluno_foto)
+        aluno_foto = Image.open(aluno_foto)
         aluno_foto = aluno_foto.resize((130, 130))
         aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
@@ -804,29 +802,29 @@ def alunos():
 
         botao_carregar['text'] = "TROCAR DE FOTO"
 
-    def tira_foto():
+    """def tira_foto():
         global aluno_foto, label_foto, foto_string
 
         foto_string = utils.recebe_foto_binario()
 
-        aluno_foto = utils.convertToImage(foto_string)
+        aluno_foto = Image.open(foto_string)
         aluno_foto = aluno_foto.resize((130, 130))
         aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
         label_foto = Label(frame_info, image=aluno_foto,
                            bg=AZUL_CLARO, fg=BRANCO)
-        label_foto.place(x=300, y=10)
+        label_foto.place(x=300, y=10)"""
 
 
-    # Botão Tira foto
+    """# Botão Tira foto
     botao_foto = Button(frame_info, command=tira_foto, text='Tirar foto'.upper(
     ), width=18, compound=CENTER, overrelief=RIDGE, anchor=CENTER, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_foto.place(x=300, y=160)
+    botao_foto.place(x=300, y=160)"""
 
     # Botão Carregar Foto
     botao_carregar = Button(frame_info, command=escolhe_imagem, text='Carregar foto'.upper(
     ), width=18, compound=CENTER, overrelief=RIDGE, anchor=CENTER, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_carregar.place(x=300, y=190)
+    botao_carregar.place(x=300, y=160)
 
     # Linha de separação
     label_linha = Label(frame_info, relief=GROOVE, text='h', width=1,
@@ -1078,7 +1076,7 @@ def cursos_turmas():
     entry_duracao.place(x=12, y=100)
 
     # Label e entry do Preço do curso
-    label_preco = Label(frame_info, text="Preço *",
+    label_preco = Label(frame_info, text="Preço Base *",
                         height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
     label_preco.place(x=10, y=130)
 
@@ -1185,7 +1183,7 @@ def cursos_turmas():
         messagebox.showinfo("Sucesso", "Os dados foram inseridos com sucesso")
 
         entry_nome_turma.delete(0, END)
-        combobox_curso.delete(0, END)
+        combobox_curso.set("")
         data_inicio.delete(0, END)
 
         # Atualiza a tabela
@@ -2211,10 +2209,10 @@ def run():
 if __name__ == "__main__":
     # Multiprocessamento
     codigo_janela = multiprocessing.Process(target=run)
-    # codigo_camera = multiprocessing.Process(target=inicia_app)
+    #codigo_dia_semana = multiprocessing.Process(target=verifica_dia_semana)
 
     codigo_janela.start()
-    # codigo_camera.start()
+    #codigo_dia_semana.start()
 
     codigo_janela.join()
-    # codigo_camera.join()
+    #codigo_dia_semana.join()

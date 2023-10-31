@@ -15,7 +15,7 @@ class Banco():
         cursor.execute("""CREATE TABLE IF NOT EXISTS aulas (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     nome TEXT NOT NULL,
-                    dia TEXT NOT NULL,
+                    dia INTEGER NOT NULL,
                     hora TEXT NOT NULL,
                     turma_id INTEGER NOT NULL,
                     FOREIGN KEY (turma_id) REFERENCES turmas (id) ON UPDATE CASCADE ON DELETE CASCADE

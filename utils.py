@@ -3,6 +3,7 @@ import base64
 import io
 import cv2 as cv
 import sqlite3
+from datetime import *
 from PIL import Image
 
 
@@ -50,6 +51,68 @@ def convertToImage(bytes):
     image = Image.open(io.BytesIO(binary_data))
     return image
 #============================== Funções de Tabelas ========================================= 
+
+def verifica_quem_recebe_email(lista):
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute(f"""SELECT ra, al.nome, email, au.hora FROM alunos al JOIN aulas au
+                        ON al.turma_id = au.turma_id WHERE presente = 0
+                        """)
+        results = cursor.fetchall()
+    
+    return results
+
+# Verifica qual a próxima aula
+def verifica_aula_mais_proxima():
+
+    # Lista das turmas a serem avisadas
+    lista = []
+
+    # Dicionário correlacionando dias com números
+    dia_semana = {0:'Segunda-feira', 1:'Terça-feira', 2:'Quarta-feira', 3:'Quinta-feira', 4:'Sexta-feira'}
+
+    # Dia e hora atuais
+    current = datetime.now()
+    current_day = int(current.strftime("%w")) - 1
+    current_time = current.strftime("%Y/%m/%d")
+
+    # Selecionando as aulas de hoje
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""SELECT id, hora, turma_id FROM aulas
+                       WHERE dia = "{dia_semana[current_day]}" """)
+        results = cursor.fetchall()
+
+    # Se não tiver aula hoje, retorna vazio
+    if results == []:
+        return results
+
+    # Se tiver aula hoje, vê se tem aula daqui a 30 min
+    for aula in results:
+        tempo = datetime.strptime(f"{current_time} {aula[1]}","%Y/%m/%d %H:%M")
+        proximo = tempo - current
+        # Se faltar menos de 30 min pra aula, adiciona o id da turma à lista
+        if proximo <= timedelta(minutes=30):
+            lista.append(results[2])
+    
+    print(lista)
+
+# Verifica qual a próxima aula
+def retorna_hora_aula():
+
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""SELECT id, hora FROM aulas""")
+        results = cursor.fetchall()
+
+    return results
+        
+
 
 #--------------------------------- Tabela cursos -------------------------------------------
 
@@ -145,7 +208,7 @@ def cria_aula(lista):
         cursor.execute(f"""INSERT INTO aulas (nome, dia, hora, turma_id)
                                     VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}", "{lista[3]}") """)
 
-# Mostra os aulas
+# Mostra as aulas
 def mostra_aula():
     lista = []
     conexao = sqlite3.connect("banco.db")
@@ -172,7 +235,7 @@ def pesquisa_aula(nome):
     
     return results
 
-# Atualiza dados do cursos
+# Atualiza dados da aula
 def atualiza_aula(lista):
     conexao = sqlite3.connect("banco.db")
     with conexao:
@@ -180,7 +243,7 @@ def atualiza_aula(lista):
         cursor.execute(f"""UPDATE aulas SET nome="{lista[1]}", dia="{lista[2]}", hora="{lista[3]}", turma_id="{lista[4]}"
                        WHERE id="{lista[0]}" """)
 
-# Deleta dados do cursos
+# Deleta dados da aula
 def apaga_aula(id):
     conexao = sqlite3.connect("banco.db")
     with conexao:
@@ -269,7 +332,7 @@ def computa_falta():
                         WHERE presente = 1
                         """)
 
-def verifica_chegada_aluno():
+def verifica_nao_chegada_aluno():
 
     conexao = sqlite3.connect("banco.db")
 
