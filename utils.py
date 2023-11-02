@@ -66,10 +66,7 @@ def verifica_quem_recebe_email(lista):
     return results
 
 # Verifica qual a próxima aula
-def verifica_aula_mais_proxima():
-
-    # Lista das turmas a serem avisadas
-    lista = []
+def verifica_aula_do_dia():
 
     # Dicionário correlacionando dias com números
     dia_semana = {0:'Segunda-feira', 1:'Terça-feira', 2:'Quarta-feira', 3:'Quinta-feira', 4:'Sexta-feira'}
@@ -88,18 +85,25 @@ def verifica_aula_mais_proxima():
         results = cursor.fetchall()
 
     # Se não tiver aula hoje, retorna vazio
-    if results == []:
-        return results
+    # Se tiver, retorna o id, hora de início e id da turma
+    return results
 
+
+def tempo_para_aula(results):
+    lista = []
+
+    current = datetime.now()
+    current_time = current.strftime("%Y/%m/%d")
+    
     # Se tiver aula hoje, vê se tem aula daqui a 30 min
     for aula in results:
         tempo = datetime.strptime(f"{current_time} {aula[1]}","%Y/%m/%d %H:%M")
         proximo = tempo - current
         # Se faltar menos de 30 min pra aula, adiciona o id da turma à lista
         if proximo <= timedelta(minutes=30):
-            lista.append(results[2])
+            lista.append(aula[2])
     
-    print(lista)
+    return lista
 
 # Verifica qual a próxima aula
 def retorna_hora_aula():
@@ -206,8 +210,8 @@ def cria_aula(lista):
         cursor = conexao.cursor()
 
         cursor.execute(f"""INSERT INTO aulas (nome, dia, hora, turma_id)
-                                    VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}", "{lista[3]}") """)
-
+                            VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}", "{lista[3]}") """)        
+        
 # Mostra as aulas
 def mostra_aula():
     lista = []
@@ -259,8 +263,9 @@ def cria_aluno(lista):
     with conexao:
         cursor = conexao.cursor()
 
-        cursor.execute(f"""INSERT INTO alunos (ra, nome, email, telefone, sexo, foto, turma_id, faltas, presente)
-                                       VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}", "{lista[3]}", "{lista[4]}", "{lista[5]}", "{lista[6]}", 0, 0 ) """)
+        cursor.execute(f"""INSERT INTO alunos (ra, nome, email, telefone, sexo, foto, turma_id, presente)
+                                       VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}", "{lista[3]}", "{lista[4]}", "{lista[5]}", "{lista[6]}", 0 ) """)
+        
 
 # Mostra os alunos
 def mostra_aluno():
@@ -295,8 +300,8 @@ def atualiza_aluno(lista):
     with conexao:
         cursor = conexao.cursor()
         cursor.execute(f"""UPDATE alunos SET ra = "{lista[0]}", nome="{lista[1]}", email="{lista[2]}", telefone="{lista[3]}", sexo="{lista[4]}",
-                       foto="{lista[5]}", turma_id="{lista[6]}", faltas="{lista[7]}" 
-                       WHERE ra="{lista[8]}" """)
+                       foto="{lista[5]}", turma_id="{lista[6]}" 
+                       WHERE ra="{lista[7]}" """)
 
 # Deleta dados do cursos
 def apaga_aluno(ra):
