@@ -57,6 +57,8 @@ for frame in paginas:
     frame.grid(row=0, column=0, sticky='nsew')
 
 # Mostra o Frame que queremos
+
+
 def show_frame(frame):
     frame.tkraise()
 
@@ -201,11 +203,14 @@ def teste_camera():
 
     return ra
 
+
 # Turmas que terão aula hoje
 global turmas_do_dia
 turmas_do_dia = []
 
 # Arruma o banco e salva as turmas que terão aula no dia
+
+
 def prepara_dia():
     global turmas_do_dia
     current_time = datetime.now()
@@ -215,16 +220,14 @@ def prepara_dia():
 
     if dia_semana in [0, 1, 2, 3, 4]:
         turmas_do_dia = utils.verifica_aula_do_dia()
-        
 
     # 0 = Segunda a 6 = domingo
     if dia_semana in [1, 2, 3, 4, 5]:
         utils.computa_falta()
-        print("Faltas computadas") 
+        print("Faltas computadas")
 
 
 def inicia_app():
-
     """# Lista de pessoas que não chegaram
     nao_chegaram = utils.verifica_nao_chegada_aluno()
 
@@ -381,6 +384,8 @@ def alunos():
             sexo = combobox_sexo.get()
             foto = foto_string
             turma = combobox_turma.get()
+
+            ra = ra.upper()
 
             lista = [ra, nome, email, telefone, sexo, foto, turma]
 
@@ -543,6 +548,8 @@ def alunos():
         global aluno_foto, label_foto, foto_string
 
         valor_ra = entry_procura.get()
+
+        valor_ra = valor_ra.upper()
 
         try:
             dados = utils.pesquisa_aluno(valor_ra)
@@ -771,7 +778,6 @@ def alunos():
         label_foto = Label(frame_info, image=aluno_foto,
                            bg=AZUL_CLARO, fg=BRANCO)
         label_foto.place(x=300, y=10)"""
-
 
     """# Botão Tira foto
     botao_foto = Button(frame_info, command=tira_foto, text='Tirar foto'.upper(
@@ -1472,6 +1478,8 @@ def aulas():
 
         nome = entry_procura.get()
 
+        nome = nome.upper()
+
         try:
             dados = utils.pesquisa_aula(nome)
 
@@ -1701,6 +1709,8 @@ def aulas():
     mostra_aula()
 
 # Função da relação de faltas
+
+
 def faltas():
     # ------------------------------------------------- Titulo da página ----------------------------------------------------
     global titulo_cadastro_label
@@ -1710,40 +1720,92 @@ def faltas():
     titulo_cadastro_label.place(x=0, y=0)
     ttk.Separator(pagina_cadastro, orient=HORIZONTAL).place(
         x=0, y=52, width=WIDTH)
+
     # ------------------------------------------------- Detalhes das faltas ---------------------------------------------------
+
+    # Pesquisa faltas do aluno pelo RA ou por aula
+    def pesquisa_falta(tipo):
+
+        valor = entry_procura_aluno.get()
+
+        valor = valor.upper()
+
+        try:
+            if tipo == "aluno":
+                dados = utils.pesquisa_falta_aluno(valor)
+            elif tipo == "aula":
+                dados = utils.pesquisa_falta_aula(valor)
+
+            mostra_falta(dados)
+        except:
+            if tipo == "aluno":
+                messagebox.showerror("Erro", "Aluno não encontrado.")
+            elif tipo == "aula":
+                messagebox.showerror("Erro", "Aula não encontrada.")
+
+    # Procura por aluno
+    label_procura_aluno = Label(frame_tabela, text="Procurar aluno [Entrar com RA]",
+                             height=1, anchor=NW, font=("Ivy, 10"), bg=AZUL_CLARO, fg=PRETO)
+    label_procura_aluno.place(x=10, y=10)
+
+    entry_procura_aluno = Entry(frame_tabela, width=17,
+                          justify='left', relief=SOLID, font=("Ivy, 10"))
+    entry_procura_aluno.place(x=12, y=35)
+
+    # Botão pesquisa aluno
+    botao_procura_aluno = Button(frame_tabela, command=lambda:pesquisa_falta("aluno"), text="Pesquisar aluno",
+                            font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
+    botao_procura_aluno.place(x=137, y=33)
+
+    # Procura por aula
+    label_procura_aula = Label(frame_tabela, text="Procurar aula [Entrar com nome]",
+                             height=1, anchor=NW, font=("Ivy, 10"), bg=AZUL_CLARO, fg=PRETO)
+    label_procura_aula.place(x=250, y=10)
+
+    entry_procura_aula = Entry(frame_tabela, width=17,
+                          justify='left', relief=SOLID, font=("Ivy, 10"))
+    entry_procura_aula.place(x=252, y=35)
+
+    # Botão pesquisa aula
+    botao_procurar_aula = Button(frame_tabela, command=lambda:pesquisa_falta("aula"), text="Pesquisar aula",
+                            font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
+    botao_procurar_aula.place(x=379, y=33)
 
     # ---------------------------------- Tabela das faltas -------------------------------------
 
-    def mostra_falta():
-        tabela_falta_label = Label(frame_info, text="Tabela de faltas",
-                                  height=1, relief="flat", anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-        tabela_falta_label.place(x=0, y=210)
+    def mostra_falta(dados):
 
-        lista_cabecalho = ['ID', 'Nome', 'Dia', 'Hora', 'ID Turma']
+        frame_info['height'] = 370
+        frame_tabela.place(x=0, y=118+380)
 
-        lista_itens = utils.mostra_falta()
+        lista_cabecalho = ['ID', 'RA', 'Nome', 'Turma', 'Aula', 'Faltas']
+
+        if dados == []:
+            lista_itens = utils.mostra_falta()
+        else:
+            lista_itens = dados
 
         global tree_faltas
 
         tree_faltas = ttk.Treeview(
-            frame_tabela, selectmode="extended", columns=lista_cabecalho, show='headings')
+            frame_info, selectmode="extended", columns=lista_cabecalho, show='headings')
 
         # Scrollbars
         scroll_vertical = ttk.Scrollbar(
-            frame_tabela, orient='vertical', command=tree_faltas.yview)
+            frame_info, orient='vertical', command=tree_faltas.yview)
         scroll_horizontal = ttk.Scrollbar(
-            frame_tabela, orient="horizontal", command=tree_faltas.xview)
+            frame_info, orient="horizontal", command=tree_faltas.xview)
 
         tree_faltas.configure(yscrollcommand=scroll_vertical,
-                             xscrollcommand=scroll_horizontal)
+                              xscrollcommand=scroll_horizontal)
 
-        tree_faltas.place(x=0, y=0, width=WIDTH - 60, height=200)
-        scroll_vertical.place(x=WIDTH - 60, y=0 + 1, height=200)
-        scroll_horizontal.place(x=0, y=200, width=WIDTH - 60)
+        tree_faltas.place(x=0, y=10, width=WIDTH - 60, height=340)
+        scroll_vertical.place(x=WIDTH - 60, y=10, height=350)
+        scroll_horizontal.place(x=0, y=350, width=WIDTH - 60)
 
         posicao_coluna = ["nw", "nw", "nw", "nw",
-                          "nw"]
-        largura_coluna = [60, 150, 150, 70, 150]
+                          "nw", "nw"]
+        largura_coluna = [40, 60, 150, 70, 150, 60]
         cont = 0
 
         for coluna in lista_cabecalho:
@@ -1756,7 +1818,7 @@ def faltas():
         for item in lista_itens:
             tree_faltas.insert('', 'end', values=item)
 
-    mostra_falta()
+    mostra_falta([])
 
 
 # Função de cadastro de cameras
@@ -2140,6 +2202,9 @@ def voltar():
 
 def controle(comando_botao):
 
+    frame_info['height'] = 230
+    frame_tabela.place(x=0, y=118+240)
+
     for widget in frame_info.winfo_children():
         widget.destroy()
 
@@ -2227,17 +2292,22 @@ alunos()
 # ===================================== Main loop =========================================
 
 # Janela principal
+
+
 def run():
     janela.mainloop()
 
 # Inicia as schedules
+
+
 def run_schedules():
     while True:
         schedule.run_pending()
+
 
 # "IF" necessário para não gerar subprocessos
 if __name__ == "__main__":
     # Multiprocessamento
     with concurrent.futures.ProcessPoolExecutor() as executor:
         codigo_janela = executor.submit(run)
-        #codigo_dia_semana = executor.submit(run_schedules)
+        # codigo_dia_semana = executor.submit(run_schedules)

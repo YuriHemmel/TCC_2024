@@ -233,7 +233,7 @@ def pesquisa_aula(nome):
     with conexao:
         cursor = conexao.cursor()
         cursor.execute(f"""SELECT * FROM aulas
-                       WHERE nome = "{nome}" """)
+                       WHERE UPPER(nome) = "{nome}" """)
         
         results = cursor.fetchone()
     
@@ -254,6 +254,77 @@ def apaga_aula(id):
         cursor = conexao.cursor()
         cursor.execute(f"""DELETE FROM aulas WHERE id="{id}" """)
 
+#--------------------------------- Tabela faltas -------------------------------------------
+
+# Função criar falta
+def cria_falta(lista):
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute(f"""INSERT INTO faltas (ra, id_aula, falta)
+                            VALUES ("{lista[0]}", "{lista[1]}", 0)""")        
+        
+# Mostra as faltas
+def mostra_falta():
+    lista = []
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute("""SELECT f.id, f.ra, al.nome, tu.nome, au.nome, f.falta FROM faltas f
+                       JOIN alunos al ON al.ra = f.ra
+                       JOIN aulas au ON au.id = f.id_aula
+                       JOIN turmas tu ON tu.id = au.turma_id
+                       """)
+        results = cursor.fetchall()
+
+        for linha in results:
+            lista.append(linha)
+    
+    return lista
+
+def pesquisa_falta_aluno(ra):
+    lista = []
+    conexao = sqlite3.connect("banco.db")
+    
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""SELECT f.id, f.ra, al.nome, tu.nome, au.nome, f.falta FROM faltas f
+                       JOIN alunos al ON al.ra = f.ra
+                       JOIN aulas au ON au.id = f.id_aula
+                       JOIN turmas tu ON tu.id = au.turma_id
+                       WHERE UPPER(f.ra) = "{ra}"
+                       """)
+        
+        results = cursor.fetchall()
+    
+        for linha in results:
+            lista.append(linha)
+
+    return lista
+
+def pesquisa_falta_aula(nome):
+    lista = []
+    conexao = sqlite3.connect("banco.db")
+
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""SELECT f.id, f.ra, al.nome, tu.nome, au.nome, f.falta FROM faltas f
+                       JOIN alunos al ON al.ra = f.ra
+                       JOIN aulas au ON au.id = f.id_aula
+                       JOIN turmas tu ON tu.id = au.turma_id
+                       WHERE UPPER(au.nome) = "{nome}"
+                       """)
+        
+        results = cursor.fetchall()
+    
+        for linha in results:
+            lista.append(linha)
+
+    return lista
+
 #--------------------------------- Tabela alunos -------------------------------------------
 
 # Função criar aluno
@@ -266,7 +337,6 @@ def cria_aluno(lista):
         cursor.execute(f"""INSERT INTO alunos (ra, nome, email, telefone, sexo, foto, turma_id, presente)
                                        VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}", "{lista[3]}", "{lista[4]}", "{lista[5]}", "{lista[6]}", 0 ) """)
         
-
 # Mostra os alunos
 def mostra_aluno():
     lista = []
@@ -282,13 +352,14 @@ def mostra_aluno():
     
     return lista
 
+# Pesquisa alunos pelo ra
 def pesquisa_aluno(ra):
     conexao = sqlite3.connect("banco.db")
     
     with conexao:
         cursor = conexao.cursor()
         cursor.execute(f"""SELECT * FROM alunos
-                       WHERE ra = "{ra}" """)
+                       WHERE UPPER(ra) = "{ra}" """)
         
         results = cursor.fetchone()
     
