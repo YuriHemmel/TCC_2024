@@ -72,5 +72,3 @@ class Banco():
         
         self.conexao.commit()
         cursor.close()
-
-Banco()

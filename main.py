@@ -400,16 +400,18 @@ def alunos():
             aulas = utils.mostra_aula()
 
             if aulas == []:
-                messagebox.showerror("Erro", "Não há aulas para a turmas deste aluno.\n Por favor crie aulas antes de cadastrar um aluno.")
+                messagebox.showerror(
+                    "Erro", "Não há aulas para a turmas deste aluno.\n Por favor crie aulas antes de cadastrar um aluno.")
                 return
             else:
                 for aula in aulas:
                     if aula[4] == turma:
                         break
                     if aula == aulas[len(aulas)-1] and aula[4] != turma:
-                        messagebox.showerror("Erro", "Não há aulas para a turmas deste aluno.\n Por favor crie aulas antes de cadastrar um aluno.")
+                        messagebox.showerror(
+                            "Erro", "Não há aulas para a turmas deste aluno.\n Por favor crie aulas antes de cadastrar um aluno.")
                         return
-                
+
             # Criando aluno
             utils.cria_aluno(lista)
 
@@ -1757,37 +1759,39 @@ def faltas():
 
     # ------------------------------------------------- Detalhes das faltas ---------------------------------------------------
 
+
+
     # Procura por aluno
     label_procura_aluno = Label(frame_tabela, text="Procurar aluno [Entrar com RA]",
-                             height=1, anchor=NW, font=("Ivy, 10"), bg=AZUL_CLARO, fg=PRETO)
+                                height=1, anchor=NW, font=("Ivy, 10"), bg=AZUL_CLARO, fg=PRETO)
     label_procura_aluno.place(x=10, y=10)
 
     entry_procura_aluno = Entry(frame_tabela, width=17,
-                          justify='left', relief=SOLID, font=("Ivy, 10"))
+                                justify='left', relief=SOLID, font=("Ivy, 10"))
     entry_procura_aluno.place(x=12, y=35)
 
     # Botão pesquisa aluno
     botao_procura_aluno = Button(frame_tabela, text="Pesquisar aluno",
-                            font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
+                                 font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
     botao_procura_aluno.place(x=137, y=33)
 
     # Procura por aula
     label_procura_aula = Label(frame_tabela, text="Procurar aula [Entrar com nome]",
-                             height=1, anchor=NW, font=("Ivy, 10"), bg=AZUL_CLARO, fg=PRETO)
+                               height=1, anchor=NW, font=("Ivy, 10"), bg=AZUL_CLARO, fg=PRETO)
     label_procura_aula.place(x=300, y=10)
 
     entry_procura_aula = Entry(frame_tabela, width=17,
-                          justify='left', relief=SOLID, font=("Ivy, 10"))
+                               justify='left', relief=SOLID, font=("Ivy, 10"))
     entry_procura_aula.place(x=302, y=35)
 
     # Botão pesquisa aula
     botao_procurar_aula = Button(frame_tabela, text="Pesquisar aula",
-                            font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
+                                 font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
     botao_procurar_aula.place(x=429, y=33)
 
     # Botão mostra tabela de faltas, sem pesquisa
     botao_procurar_aula = Button(frame_tabela, command=utils.mostra_falta, text="Cancelar procura",
-                            font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
+                                 font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
     botao_procurar_aula.place(x=600, y=33)
 
     # ---------------------------------- Tabela das faltas -------------------------------------
