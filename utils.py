@@ -329,7 +329,7 @@ def pesquisa_falta_aluno(ra):
     
     with conexao:
         cursor = conexao.cursor()
-        cursor.execute(f"""SELECT f.id, f.ra, al.nome, tu.nome, au.nome, f.falta FROM faltas f
+        cursor.execute(f"""SELECT f.id, f.ra, al.nome, au.nome, tu.nome, f.falta FROM faltas f
                        JOIN alunos al ON al.ra = f.ra
                        JOIN aulas au ON au.id = f.id_aula
                        JOIN turmas tu ON tu.nome = au.turma_id
@@ -347,7 +347,7 @@ def pesquisa_falta_aula(nome_aula):
 
     with conexao:
         cursor = conexao.cursor()
-        cursor.execute(f"""SELECT f.id, f.ra, al.nome, tu.nome, au.nome, f.falta FROM faltas f
+        cursor.execute(f"""SELECT f.id, f.ra, al.nome, au.nome, tu.nome, f.falta FROM faltas f
                        JOIN alunos al ON al.ra = f.ra
                        JOIN aulas au ON au.id = f.id_aula
                        JOIN turmas tu ON tu.nome = au.turma_id

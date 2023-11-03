@@ -240,6 +240,9 @@ def inicia_app():
     return"""
 
 
+def sair_app():
+    os._exit(0)
+
 # ========================= Schedules ================================
 
 schedule.every().day.at("00:00").do(prepara_dia)
@@ -275,7 +278,7 @@ iniciar_icone = Image.open('images/icon_iniciar.png')
 iniciar_icone = iniciar_icone.resize((50, 50))
 iniciar_icone = ImageTk.PhotoImage(iniciar_icone)
 
-botao_iniciar = Button(pagina_inicial, command=lambda: inicia_app(), image=iniciar_icone, text="Iniciar".upper(),
+botao_iniciar = Button(pagina_inicial, command=inicia_app, image=iniciar_icone, text="Iniciar".upper(),
                        compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
 botao_iniciar['width'] = 160
 botao_iniciar['height'] = 160
@@ -297,7 +300,7 @@ saida_icone = Image.open('images/icon_saida.png')
 saida_icone = saida_icone.resize((50, 50))
 saida_icone = ImageTk.PhotoImage(saida_icone)
 
-botao_sair = Button(pagina_inicial, command=lambda: os._exit(0), image=saida_icone, text="Sair".upper(),
+botao_sair = Button(pagina_inicial, command= sair_app, image=saida_icone, text="Sair".upper(),
                     compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
 botao_sair['width'] = 160
 botao_sair['height'] = 160
@@ -2333,7 +2336,11 @@ ttk.Separator(pagina_cadastro, orient=HORIZONTAL).place(
 
 # ===================================== Método de inicialização =========================================
 
+# Primeira "janela" na tela de cadastros é a de alunos
 alunos()
+
+# Ao fechar pelo "X" da janela, encerra todos os processos
+janela.protocol("WM_DELETE_WINDOW", sair_app)
 
 # ===================================== Main loop =========================================
 
@@ -2356,4 +2363,4 @@ if __name__ == "__main__":
     # Multiprocessamento
     with concurrent.futures.ProcessPoolExecutor() as executor:
         codigo_janela = executor.submit(run)
-        # codigo_dia_semana = executor.submit(run_schedules)
+        codigo_dia_semana = executor.submit(run_schedules)
