@@ -57,8 +57,8 @@ class Banco():
                     ra TEXT NOT NULL,
                     id_aula INTEGER NOT NULL,
                     falta INTEGER NOT NULL,
-                    FOREIGN KEY (id_aula) REFERENCES aulas (id) ON UPDATE CASCADE ON DELETE CASCADE,
-                    FOREIGN KEY (ra) REFERENCES alunos (ra) ON UPDATE CASCADE ON DELETE CASCADE
+                    FOREIGN KEY (id_aula) REFERENCES aulas (id) ON UPDATE CASCADE,
+                    FOREIGN KEY (ra) REFERENCES alunos (ra) ON UPDATE CASCADE
                     )""")
 
         # Tabela Câmeras

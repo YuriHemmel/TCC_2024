@@ -385,6 +385,7 @@ def alunos():
             foto = foto_string
             turma = combobox_turma.get()
 
+            # Deixa o RA em letras maiúsculas
             ra = ra.upper()
 
             lista = [ra, nome, email, telefone, sexo, foto, turma]
@@ -396,12 +397,29 @@ def alunos():
                         "Erro", "Preencha os campos corretamente.")
                     return
 
+            aulas = utils.mostra_aula()
+
+            if aulas == []:
+                messagebox.showerror("Erro", "Não há aulas para a turmas deste aluno.\n Por favor crie aulas antes de cadastrar um aluno.")
+                return
+            else:
+                for aula in aulas:
+                    if aula[4] == turma:
+                        break
+                    if aula == aulas[len(aulas)-1] and aula[4] != turma:
+                        messagebox.showerror("Erro", "Não há aulas para a turmas deste aluno.\n Por favor crie aulas antes de cadastrar um aluno.")
+                        return
+                
             # Criando aluno
             utils.cria_aluno(lista)
 
             # Mensagem de sucesso na criação do aluno
             messagebox.showinfo(
                 "Sucesso", "Os dados fora inseridos com sucesso.")
+
+            for aula in aulas:
+                if turma == aula[4]:
+                    utils.cria_falta([ra, aula[0]])
 
             entry_ra.delete(0, END)
             entry_nome_aluno.delete(0, END)
@@ -467,6 +485,8 @@ def alunos():
                 foto = foto_string
                 turma = combobox_turma.get()
 
+                ra = ra.upper()
+
                 # Lista dos dados
                 lista = [ra, nome, email, telefone,
                          sexo, foto, turma, ra_antigo]
@@ -485,6 +505,8 @@ def alunos():
                 if res == 'yes':
                     # Atualizando dados do aluno
                     utils.atualiza_aluno(lista)
+                    # Atualizando lista de faltas
+                    utils.atualiza_falta([ra, ra_antigo])
                 else:
                     return
 
@@ -532,6 +554,8 @@ def alunos():
             if res == 'yes':
                 # Apagando os dados do aluno
                 utils.apaga_aluno(valor_ra)
+                # Apagando dados de faltas do aluno
+                utils.apaga_falta_aluno(valor_ra)
             else:
                 return
 
@@ -547,9 +571,7 @@ def alunos():
     def pesquisa_aluno():
         global aluno_foto, label_foto, foto_string
 
-        valor_ra = entry_procura.get()
-
-        valor_ra = valor_ra.upper()
+        valor_ra = entry_procura.get().upper
 
         try:
             dados = utils.pesquisa_aluno(valor_ra)
@@ -594,6 +616,8 @@ def alunos():
                 foto = foto_string
                 turma = combobox_turma.get()
 
+                ra = ra.upper()
+
                 # Lista dos dados
                 lista = [ra, nome, email, telefone,
                          sexo, foto, turma, valor_ra]
@@ -612,6 +636,8 @@ def alunos():
                 if res == 'yes':
                     # Atualizando dados do aluno
                     utils.atualiza_aluno(lista)
+                    # Atualizando dados das faltas
+                    utils.atualiza_falta([ra, valor_ra])
                 else:
                     return
 
@@ -925,7 +951,7 @@ def cursos_turmas():
         entry_duracao.delete(0, END)
         entry_preco.delete(0, END)
 
-        mostra_cursos()
+        controle('cursos')
 
     # Função carregar/atualizar curso
     def carregar_curso():
@@ -981,7 +1007,7 @@ def cursos_turmas():
                 entry_preco.delete(0, END)
 
                 # atualiza os dados da tabela
-                mostra_cursos()
+                controle('cursos')
 
                 botao_salvar.destroy()
 
@@ -1015,7 +1041,7 @@ def cursos_turmas():
                 "Sucesso", "Os dados foram apagados com sucesso")
 
             # atualiza os dados da tabela
-            mostra_cursos()
+            controle('cursos')
 
         except IndexError:
             messagebox.showerror("Erro", "Selecione um curso na tabela.")
@@ -1367,6 +1393,12 @@ def aulas():
         # Cria a aula
         utils.cria_aula(lista)
 
+        """alunos = utils.mostra_aluno()
+
+        if alunos != []:
+            for aluno in alunos:
+                utils.cria_falta([aluno[0], ])"""
+
         messagebox.showinfo("Sucesso", "Os dados foram inseridos com sucesso")
 
         # Limpa os campos
@@ -1459,8 +1491,10 @@ def aulas():
                 'Confirmação', 'Deseja apagar os dados desta aula?')
 
             if res == 'yes':
-                # Apagando os dados do curso
+                # Apagando os dados da aula
                 utils.apaga_aula(valor_id)
+                # Apagando os dados das faltas dessa aula
+                utils.apaga_falta_aula(valor_id)
             else:
                 return
 
@@ -1723,26 +1757,6 @@ def faltas():
 
     # ------------------------------------------------- Detalhes das faltas ---------------------------------------------------
 
-    # Pesquisa faltas do aluno pelo RA ou por aula
-    def pesquisa_falta(tipo):
-
-        valor = entry_procura_aluno.get()
-
-        valor = valor.upper()
-
-        try:
-            if tipo == "aluno":
-                dados = utils.pesquisa_falta_aluno(valor)
-            elif tipo == "aula":
-                dados = utils.pesquisa_falta_aula(valor)
-
-            mostra_falta(dados)
-        except:
-            if tipo == "aluno":
-                messagebox.showerror("Erro", "Aluno não encontrado.")
-            elif tipo == "aula":
-                messagebox.showerror("Erro", "Aula não encontrada.")
-
     # Procura por aluno
     label_procura_aluno = Label(frame_tabela, text="Procurar aluno [Entrar com RA]",
                              height=1, anchor=NW, font=("Ivy, 10"), bg=AZUL_CLARO, fg=PRETO)
@@ -1753,39 +1767,39 @@ def faltas():
     entry_procura_aluno.place(x=12, y=35)
 
     # Botão pesquisa aluno
-    botao_procura_aluno = Button(frame_tabela, command=lambda:pesquisa_falta("aluno"), text="Pesquisar aluno",
+    botao_procura_aluno = Button(frame_tabela, text="Pesquisar aluno",
                             font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
     botao_procura_aluno.place(x=137, y=33)
 
     # Procura por aula
     label_procura_aula = Label(frame_tabela, text="Procurar aula [Entrar com nome]",
                              height=1, anchor=NW, font=("Ivy, 10"), bg=AZUL_CLARO, fg=PRETO)
-    label_procura_aula.place(x=250, y=10)
+    label_procura_aula.place(x=300, y=10)
 
     entry_procura_aula = Entry(frame_tabela, width=17,
                           justify='left', relief=SOLID, font=("Ivy, 10"))
-    entry_procura_aula.place(x=252, y=35)
+    entry_procura_aula.place(x=302, y=35)
 
     # Botão pesquisa aula
-    botao_procurar_aula = Button(frame_tabela, command=lambda:pesquisa_falta("aula"), text="Pesquisar aula",
+    botao_procurar_aula = Button(frame_tabela, text="Pesquisar aula",
                             font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
-    botao_procurar_aula.place(x=379, y=33)
+    botao_procurar_aula.place(x=429, y=33)
+
+    # Botão mostra tabela de faltas, sem pesquisa
+    botao_procurar_aula = Button(frame_tabela, command=utils.mostra_falta, text="Cancelar procura",
+                            font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
+    botao_procurar_aula.place(x=600, y=33)
 
     # ---------------------------------- Tabela das faltas -------------------------------------
 
-    def mostra_falta(dados):
+    def mostra_falta():
 
         frame_info['height'] = 370
         frame_tabela.place(x=0, y=118+380)
 
-        lista_cabecalho = ['ID', 'RA', 'Nome', 'Turma', 'Aula', 'Faltas']
+        lista_cabecalho = ['ID', 'RA', 'Nome', 'Aula', 'Turma', 'Faltas']
 
-        if dados == []:
-            lista_itens = utils.mostra_falta()
-        else:
-            lista_itens = dados
-
-        global tree_faltas
+        lista_itens = utils.mostra_falta()
 
         tree_faltas = ttk.Treeview(
             frame_info, selectmode="extended", columns=lista_cabecalho, show='headings')
@@ -1818,7 +1832,7 @@ def faltas():
         for item in lista_itens:
             tree_faltas.insert('', 'end', values=item)
 
-    mostra_falta([])
+    mostra_falta()
 
 
 # Função de cadastro de cameras
