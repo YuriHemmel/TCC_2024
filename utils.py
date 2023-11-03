@@ -198,7 +198,11 @@ def apaga_turma(id):
     conexao = sqlite3.connect("banco.db")
     with conexao:
         cursor = conexao.cursor()
+        # Apagando aulas associadas à essa turma
+        cursor.execute(f"""DELETE FROM aulas WHERE turma_id = (SELECT nome FROM turmas WHERE id = "{id}")  """)
+        # Apagando turma
         cursor.execute(f"""DELETE FROM turmas WHERE id="{id}" """)
+
 
 #--------------------------------- Tabela aulas -------------------------------------------
 
@@ -328,7 +332,7 @@ def pesquisa_falta_aluno(ra):
         cursor.execute(f"""SELECT f.id, f.ra, al.nome, tu.nome, au.nome, f.falta FROM faltas f
                        JOIN alunos al ON al.ra = f.ra
                        JOIN aulas au ON au.id = f.id_aula
-                       JOIN turmas tu ON tu.id = au.turma_id
+                       JOIN turmas tu ON tu.nome = au.turma_id
                        WHERE UPPER(f.ra) = "{ra}"
                        """)
         
@@ -346,8 +350,8 @@ def pesquisa_falta_aula(nome_aula):
         cursor.execute(f"""SELECT f.id, f.ra, al.nome, tu.nome, au.nome, f.falta FROM faltas f
                        JOIN alunos al ON al.ra = f.ra
                        JOIN aulas au ON au.id = f.id_aula
-                       JOIN turmas tu ON tu.id = au.turma_id
-                       WHERE UPPER(au.nome) = "{nome_aula}"
+                       JOIN turmas tu ON tu.nome = au.turma_id
+                       WHERE LOWER(au.nome) = "{nome_aula}"
                        """)
         
         results = cursor.fetchall()

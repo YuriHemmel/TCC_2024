@@ -1759,51 +1759,79 @@ def faltas():
 
     # ------------------------------------------------- Detalhes das faltas ---------------------------------------------------
 
+    global dados_falta
+    dados_falta = []
 
+    # Pesquisa os dados de faltas do aluno
+    def pesquisa_faltas_aluno():
+        global dados_falta
+        valor_ra = entry_procura_aluno.get().upper()
+        entry_procura_aluno.delete(0,END)
+        try:
+            dados_falta = utils.pesquisa_falta_aluno(valor_ra)
+            mostra_falta("aluno")
+        except:
+            messagebox.showerror("Erro", "Aluno não encontrado.")
+    
+    # Pesquisa os dados de faltas da aula
+    def pesquisa_faltas_aula():
+        global dados_falta
+        nome_aula = entry_procura_aula.get().lower()
+        entry_procura_aula.delete(0,END)
+        try:
+            dados_falta = utils.pesquisa_falta_aula(nome_aula)
+            mostra_falta("aula")
+        except:
+            messagebox.showerror("Erro", "Aula não encontrada.")
 
     # Procura por aluno
     label_procura_aluno = Label(frame_tabela, text="Procurar aluno [Entrar com RA]",
                                 height=1, anchor=NW, font=("Ivy, 10"), bg=AZUL_CLARO, fg=PRETO)
-    label_procura_aluno.place(x=10, y=10)
+    label_procura_aluno.place(x=40, y=10)
 
     entry_procura_aluno = Entry(frame_tabela, width=17,
                                 justify='left', relief=SOLID, font=("Ivy, 10"))
-    entry_procura_aluno.place(x=12, y=35)
+    entry_procura_aluno.place(x=42, y=35)
 
     # Botão pesquisa aluno
-    botao_procura_aluno = Button(frame_tabela, text="Pesquisar aluno",
+    botao_procura_aluno = Button(frame_tabela, command=pesquisa_faltas_aluno, text="Pesquisar Aluno",
                                  font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
-    botao_procura_aluno.place(x=137, y=33)
+    botao_procura_aluno.place(x=167, y=33)
 
     # Procura por aula
     label_procura_aula = Label(frame_tabela, text="Procurar aula [Entrar com nome]",
                                height=1, anchor=NW, font=("Ivy, 10"), bg=AZUL_CLARO, fg=PRETO)
-    label_procura_aula.place(x=300, y=10)
+    label_procura_aula.place(x=310, y=10)
 
     entry_procura_aula = Entry(frame_tabela, width=17,
                                justify='left', relief=SOLID, font=("Ivy, 10"))
-    entry_procura_aula.place(x=302, y=35)
+    entry_procura_aula.place(x=312, y=35)
 
     # Botão pesquisa aula
-    botao_procurar_aula = Button(frame_tabela, text="Pesquisar aula",
+    botao_procurar_aula = Button(frame_tabela, command=pesquisa_faltas_aula, text="Pesquisar Aula",
                                  font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
-    botao_procurar_aula.place(x=429, y=33)
+    botao_procurar_aula.place(x=439, y=33)
 
     # Botão mostra tabela de faltas, sem pesquisa
-    botao_procurar_aula = Button(frame_tabela, command=utils.mostra_falta, text="Cancelar procura",
+    botao_procurar_aula = Button(frame_tabela, command=lambda:mostra_falta(""), text="Cancelar procura",
                                  font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
-    botao_procurar_aula.place(x=600, y=33)
+    botao_procurar_aula.place(x=610, y=33)
 
     # ---------------------------------- Tabela das faltas -------------------------------------
 
-    def mostra_falta():
+    def mostra_falta(tipo):
+        global dados_falta
 
         frame_info['height'] = 370
         frame_tabela.place(x=0, y=118+380)
 
         lista_cabecalho = ['ID', 'RA', 'Nome', 'Aula', 'Turma', 'Faltas']
 
-        lista_itens = utils.mostra_falta()
+        if tipo == "":
+            lista_itens = utils.mostra_falta()
+        elif tipo == "aluno" or tipo == "aula":
+            lista_itens = dados_falta
+            dados_falta = []
 
         tree_faltas = ttk.Treeview(
             frame_info, selectmode="extended", columns=lista_cabecalho, show='headings')
@@ -1836,7 +1864,7 @@ def faltas():
         for item in lista_itens:
             tree_faltas.insert('', 'end', values=item)
 
-    mostra_falta()
+    mostra_falta("")
 
 
 # Função de cadastro de cameras
