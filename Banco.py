@@ -15,8 +15,7 @@ class Banco():
         cursor.execute("""CREATE TABLE IF NOT EXISTS cursos (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     nome TEXT NOT NULL,
-                    duracao TEXT NOT NULL,
-                    preco REAL NOT NULL
+                    duracao TEXT NOT NULL
                     )""")  
 
         # Tabela Turmas

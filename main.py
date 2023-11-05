@@ -204,40 +204,65 @@ def teste_camera():
     return ra
 
 
-# Turmas que terão aula hoje
-global turmas_do_dia
-turmas_do_dia = []
-
-# Arruma o banco e salva as turmas que terão aula no dia
+# Aulas do dia
+global aulas_dia
+aulas_dia = []
+# Arruma o banco e salva as turmas que terão aula no dia e seus respectivos horários
 
 
 def prepara_dia():
-    global turmas_do_dia
+    global aulas_dia
+
     current_time = datetime.now()
 
     # Verifica se hoje é dia de semana ou fim de semana
     dia_semana = current_time.weekday()
 
     if dia_semana in [0, 1, 2, 3, 4]:
-        turmas_do_dia = utils.verifica_aula_do_dia()
+        # Aulas do dia
+        aulas_dia = utils.verifica_aula_dia()
+
+# Computa as faltas do dia
+
+
+def computa_faltas():
+    current_time = datetime.now()
+
+    # Verifica se hoje é dia de semana ou fim de semana
+    dia_semana = current_time.weekday()
 
     # 0 = Segunda a 6 = domingo
-    if dia_semana in [1, 2, 3, 4, 5]:
-        utils.computa_falta()
+    if dia_semana in [0, 1, 2, 3, 4]:
+        utils.computa_falta(turma=aulas_dia, dia=dia_semana)
         print("Faltas computadas")
+
+# Manda mensagens para os alunos em até 40 min antes da aula
+def manda_mensagens():
+    global aulas_dia
+
+    lista_aulas = aulas_dia
+
+    while lista_aulas != []:
+        proximas_aulas = utils.tempo_para_aula(lista_aulas)
+        
+        for item in proximas_aulas:
+            # Manda email que vai comecar as aulas
+            alunos = utils.alunos_para_avisar(item[2])
+
+            for aluno in alunos:
+                ra = aluno[0]
+                nome = aluno[1]
+                email = aluno[2]
+                envia_email_alerta(nome, ra, email)
+
+            lista_aulas.remove(item)
+
+# Começa a pegar dados das câmeras
 
 
 def inicia_app():
-    """# Lista de pessoas que não chegaram
-    nao_chegaram = utils.verifica_nao_chegada_aluno()
-
-    # Manda email para cada um na lista
-    for item in nao_chegaram:
-        ra = item[0]
-        aluno = item[1]
-        email = item[2]
-        envia_email_alerta(aluno, ra, email)
-    return"""
+    #manda_mensagens()
+    return
 
 
 def sair_app():
@@ -245,7 +270,9 @@ def sair_app():
 
 # ========================= Schedules ================================
 
+schedule.every(30).minutes.do(manda_mensagens)
 schedule.every().day.at("00:00").do(prepara_dia)
+schedule.every().day.at("23:59").do(computa_faltas)
 
 # ================ Pagina inicial =======================
 
@@ -300,7 +327,7 @@ saida_icone = Image.open('images/icon_saida.png')
 saida_icone = saida_icone.resize((50, 50))
 saida_icone = ImageTk.PhotoImage(saida_icone)
 
-botao_sair = Button(pagina_inicial, command= sair_app, image=saida_icone, text="Sair".upper(),
+botao_sair = Button(pagina_inicial, command=sair_app, image=saida_icone, text="Sair".upper(),
                     compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
 botao_sair['width'] = 160
 botao_sair['height'] = 160
@@ -937,9 +964,8 @@ def cursos_turmas():
     def novo_curso():
         nome = entry_nome_curso.get()
         duracao = entry_duracao.get()
-        preco = entry_preco.get()
 
-        lista = [nome, duracao, preco]
+        lista = [nome, duracao]
 
         # Se os campos não forem preenchidos corretamente
         for item in lista:
@@ -954,7 +980,6 @@ def cursos_turmas():
 
         entry_nome_curso.delete(0, END)
         entry_duracao.delete(0, END)
-        entry_preco.delete(0, END)
 
         controle('cursos')
 
@@ -971,21 +996,18 @@ def cursos_turmas():
             # Limpa os campos
             entry_nome_curso.delete(0, END)
             entry_duracao.delete(0, END)
-            entry_preco.delete(0, END)
 
             # Insere dados nas Entrys
             entry_nome_curso.insert(0, tree_lista[1])
             entry_duracao.insert(0, tree_lista[2])
-            entry_preco.insert(0, tree_lista[3])
 
             # Atualiza
             def atualiza():
 
                 nome = entry_nome_curso.get()
                 duracao = entry_duracao.get()
-                preco = entry_preco.get()
 
-                lista = [valor_id, nome, duracao, preco]
+                lista = [valor_id, nome, duracao]
 
                 # Se os campos não forem preenchidos corretamente
                 for item in lista:
@@ -1009,7 +1031,6 @@ def cursos_turmas():
 
                 entry_nome_curso.delete(0, END)
                 entry_duracao.delete(0, END)
-                entry_preco.delete(0, END)
 
                 # atualiza os dados da tabela
                 controle('cursos')
@@ -1018,7 +1039,7 @@ def cursos_turmas():
 
             botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text="Salvar alterações".upper(
             ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, fg=BRANCO)
-            botao_salvar.place(x=235, y=130)
+            botao_salvar.place(x=105, y=130)
         except IndexError:
             messagebox.showerror("Erro", "Selecione um curso na tabela.")
 
@@ -1069,29 +1090,20 @@ def cursos_turmas():
                           justify='left', relief=SOLID)
     entry_duracao.place(x=12, y=100)
 
-    # Label e entry do Preço do curso
-    label_preco = Label(frame_info, text="Preço Base *",
-                        height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_preco.place(x=10, y=130)
-
-    entry_preco = Entry(frame_info, width=10,
-                        justify='left', relief=SOLID)
-    entry_preco.place(x=12, y=160)
-
     # Botão salvar curso
     botao_curso_adicionar = Button(frame_info, command=novo_curso, anchor=CENTER, text='ADICIONAR', width=10,
                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-    botao_curso_adicionar.place(x=107, y=160)
+    botao_curso_adicionar.place(x=20, y=160)
 
     # Botão atualizar curso
     botao_curso_alterar = Button(frame_info, command=carregar_curso, anchor=CENTER, text='ALTERAR',
                                  width=10, overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_curso_alterar.place(x=197, y=160)
+    botao_curso_alterar.place(x=130, y=160)
 
     # Botão deletar curso
     botao_curso_deletar = Button(frame_info, command=apagar_curso, anchor=CENTER, text='DELETAR', width=10,
                                  overrelief=RIDGE, font=fonte_botao, bg=VERMELHO, foreground=BRANCO)
-    botao_curso_deletar.place(x=287, y=160)
+    botao_curso_deletar.place(x=240, y=160)
 
     # Mostra Tabela Cursos
     def mostra_cursos():
@@ -1099,7 +1111,7 @@ def cursos_turmas():
                                     height=1, relief="flat", anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
         tabela_cursos_label.place(x=0, y=210)
 
-        lista_cabecalho = ['ID', 'Curso', 'Duração', 'Preço']
+        lista_cabecalho = ['ID', 'Curso', 'Duração']
 
         lista_itens = utils.mostra_curso()
 
@@ -1121,8 +1133,8 @@ def cursos_turmas():
         scroll_vertical.place(x=340, y=0, height=200)
         scroll_horizontal.place(x=0, y=200, width=340)
 
-        posicao_coluna = ["nw", "nw", "e", "e"]
-        largura_coluna = [30, 150, 80, 60]
+        posicao_coluna = ["nw", "nw", "e"]
+        largura_coluna = [30, 150, 80]
         cont = 0
 
         for coluna in lista_cabecalho:
@@ -1769,18 +1781,18 @@ def faltas():
     def pesquisa_faltas_aluno():
         global dados_falta
         valor_ra = entry_procura_aluno.get().upper()
-        entry_procura_aluno.delete(0,END)
+        entry_procura_aluno.delete(0, END)
         try:
             dados_falta = utils.pesquisa_falta_aluno(valor_ra)
             mostra_falta("aluno")
         except:
             messagebox.showerror("Erro", "Aluno não encontrado.")
-    
+
     # Pesquisa os dados de faltas da aula
     def pesquisa_faltas_aula():
         global dados_falta
         nome_aula = entry_procura_aula.get().lower()
-        entry_procura_aula.delete(0,END)
+        entry_procura_aula.delete(0, END)
         try:
             dados_falta = utils.pesquisa_falta_aula(nome_aula)
             mostra_falta("aula")
@@ -1816,7 +1828,7 @@ def faltas():
     botao_procurar_aula.place(x=439, y=33)
 
     # Botão mostra tabela de faltas, sem pesquisa
-    botao_procurar_aula = Button(frame_tabela, command=lambda:mostra_falta(""), text="Cancelar procura",
+    botao_procurar_aula = Button(frame_tabela, command=lambda: mostra_falta(""), text="Cancelar procura",
                                  font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
     botao_procurar_aula.place(x=610, y=33)
 
