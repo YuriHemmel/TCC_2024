@@ -238,8 +238,8 @@ def computa_faltas():
         utils.computa_falta(turma=aulas_dia, dia=dia_semana)
         print("Faltas computadas")
 
-
-def separa_aulas():
+# Manda mensagens para os alunos sobre as aulas
+def manda_mensagens():
     global aulas_dia
 
     aulas = utils.tempo_para_aula(aulas_dia)
@@ -270,7 +270,7 @@ def separa_aulas():
 
 def inicia_app():
     prepara_dia()
-    separa_aulas()
+    manda_mensagens()
     return
 
 
@@ -280,7 +280,7 @@ def sair_app():
 # ========================= Schedules ================================
 
 
-schedule.every(30).minutes.do(separa_aulas)
+schedule.every(30).minutes.do(manda_mensagens)
 schedule.every().day.at("00:00").do(prepara_dia)
 schedule.every().day.at("23:59").do(computa_faltas)
 
