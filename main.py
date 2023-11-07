@@ -206,7 +206,9 @@ def teste_camera():
 
 # Aulas do dia
 global aulas_dia
+
 aulas_dia = []
+
 # Arruma o banco e salva as turmas que terão aula no dia e seus respectivos horários
 
 
@@ -236,32 +238,39 @@ def computa_faltas():
         utils.computa_falta(turma=aulas_dia, dia=dia_semana)
         print("Faltas computadas")
 
-# Manda mensagens para os alunos em até 40 min antes da aula
-def manda_mensagens():
+
+def separa_aulas():
     global aulas_dia
 
-    lista_aulas = aulas_dia
+    aulas = utils.tempo_para_aula(aulas_dia)
 
-    while lista_aulas != []:
-        proximas_aulas = utils.tempo_para_aula(lista_aulas)
-        
-        for item in proximas_aulas:
-            # Manda email que vai comecar as aulas
-            alunos = utils.alunos_para_avisar(item[2])
+    for aula in aulas:
+        for turma in aulas[aula]:
+                # Pega os alunos desta aula
+                alunos = utils.alunos_para_avisar(turma[2])
 
-            for aluno in alunos:
-                ra = aluno[0]
-                nome = aluno[1]
-                email = aluno[2]
-                envia_email_alerta(nome, ra, email)
-
-            lista_aulas.remove(item)
+                # Dados de cada aluno
+                for aluno in alunos:
+                    ra = aluno[0]
+                    nome = aluno[1]
+                    email = aluno[2]
+                    
+                    if aula == 'antes':
+                        # Envia email avisando que a aula vai começar
+                        continue
+                    elif aula == 'durante':
+                        # Envia email avisando que o aluno ainda não foi identificado
+                        envia_email_alerta(nome, ra, email)
+                    elif aula == 'depois':
+                        # Envia email avisando que o aluno recebeu falta
+                        envia_email_acusando_falta(nome, ra, email)
 
 # Começa a pegar dados das câmeras
 
 
 def inicia_app():
-    #manda_mensagens()
+    prepara_dia()
+    separa_aulas()
     return
 
 
@@ -270,7 +279,8 @@ def sair_app():
 
 # ========================= Schedules ================================
 
-schedule.every(30).minutes.do(manda_mensagens)
+
+schedule.every(30).minutes.do(separa_aulas)
 schedule.every().day.at("00:00").do(prepara_dia)
 schedule.every().day.at("23:59").do(computa_faltas)
 

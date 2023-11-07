@@ -95,7 +95,10 @@ def verifica_aula_dia():
 
 
 def tempo_para_aula(aulas):
-    lista = []
+    muito_antes = []
+    antes = []
+    durante = []
+    depois = []
 
     current = datetime.now()
     dia = current.strftime("%Y/%m/%d")
@@ -104,11 +107,21 @@ def tempo_para_aula(aulas):
     for aula in aulas:
         tempo = datetime.strptime(f"{dia} {aula[1]}", "%Y/%m/%d %H:%M")
         tempo_restante = tempo - current
+        if tempo_restante > timedelta(minutes=40):
+            muito_antes.append(aula)
         # Se faltar menos de 40 min pra aula, adiciona a turma à lista
-        if tempo_restante <= timedelta(minutes=40):
-            lista.append(aula)
+        elif tempo_restante <= timedelta(minutes=40) and tempo_restante > timedelta(minutes=0):
+            antes.append(aula)
+        # Aula começou
+        elif tempo_restante >= timedelta(minutes=-40):
+            durante.append(aula)
+        # 40 minutos depois da aula
+        elif tempo_restante < timedelta(minutes=-40):
+            depois.append(aula)
 
-    return lista
+    todas_aulas = {"muito_antes": muito_antes, "antes": antes, "durante": durante, "depois": depois}
+
+    return todas_aulas
 
 # Verifica qual a próxima aula
 
