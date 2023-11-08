@@ -14,7 +14,7 @@ from tkinter import ttk
 from tkinter import filedialog as fd
 from tkcalendar import Calendar, DateEntry
 from datetime import *
-from email_utils import envia_email_alerta, envia_email_acusando_falta, envia_email_confirmando_presenca
+from email_utils import envia_email_alerta, envia_email_acusando_falta, envia_email_confirmando_presenca, envia_email_aula_comeca
 from PIL import Image, ImageTk
 
 # Tamanho da janela
@@ -257,7 +257,7 @@ def manda_mensagens():
                     
                     if aula == 'antes':
                         # Envia email avisando que a aula vai começar
-                        continue
+                        envia_email_aula_comeca(nome, ra, email)
                     elif aula == 'durante':
                         # Envia email avisando que o aluno ainda não foi identificado
                         envia_email_alerta(nome, ra, email)
@@ -280,7 +280,7 @@ def sair_app():
 # ========================= Schedules ================================
 
 
-schedule.every(30).minutes.do(manda_mensagens)
+schedule.every(40).minutes.do(manda_mensagens)
 schedule.every().day.at("00:00").do(prepara_dia)
 schedule.every().day.at("23:59").do(computa_faltas)
 
