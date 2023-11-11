@@ -39,6 +39,8 @@ def recebe_foto_binario():
             cv.imshow("Video da Webcam", frame)
             if cv.waitKey(1) & 0xFF == ord('q'):
                 break
+            if cv.waitKey(1) & 0xFF == ord('Q'):
+                break
         cv.imwrite("imagem.jpg", frame)
         bytes = convertToBinaryData("imagem.jpg")
     webcam.release()
@@ -49,112 +51,17 @@ def recebe_foto_binario():
 
 def convertToBinaryData(filename):
     file = open(filename, 'rb').read()
-    return base64.b64encode(file)
+    bytes = base64.b64encode(file)
+    return bytes
 
 
 def convertToImage(bytes):
-    binary_data = base64.b64decode(bytes)
-    image = Image.open(io.BytesIO(binary_data))
-    return image
+    string = str(bytes).strip("b'")
+    binary_data = base64.b64decode(string)
+    imagem = Image.open(io.BytesIO(binary_data))
+
+    return imagem
 # ============================== Funções de Tabelas =========================================
-
-
-def verifica_quem_recebe_email(lista):
-    conexao = sqlite3.connect("banco.db")
-
-    with conexao:
-        cursor = conexao.cursor()
-
-        cursor.execute(f"""SELECT ra, al.nome, email, au.hora FROM alunos al JOIN aulas au
-                        ON al.turma_id = au.turma_id WHERE presente = 0
-                        """)
-        results = cursor.fetchall()
-
-    return results
-
-# Verifica qual a próxima aula
-
-
-def verifica_aula_dia():
-    global dia_semana
-    # Dia e hora atuais
-    current = datetime.now()
-    current_day = current.weekday()
-
-    # Selecionando as aulas de hoje
-    conexao = sqlite3.connect("banco.db")
-    with conexao:
-        cursor = conexao.cursor()
-        cursor.execute(f"""SELECT id, hora, turma_id FROM aulas
-                       WHERE dia = "{dia_semana[current_day]}" """)
-        results = cursor.fetchall()
-
-    # Se não tiver aula hoje, retorna vazio
-    # Se tiver, retorna o id, hora de início e id da turma
-    return results
-
-
-def tempo_para_aula(aulas):
-    muito_antes = []
-    antes = []
-    durante = []
-    depois = []
-
-    current = datetime.now()
-    dia = current.strftime("%Y/%m/%d")
-
-    # Se tiver aula hoje, vê se tem aula daqui a 30 min
-    for aula in aulas:
-        tempo = datetime.strptime(f"{dia} {aula[1]}", "%Y/%m/%d %H:%M")
-        tempo_restante = tempo - current
-        if tempo_restante > timedelta(minutes=40):
-            muito_antes.append(aula)
-        # Se faltar menos de 40 min pra aula, adiciona a turma à lista
-        elif tempo_restante <= timedelta(minutes=40) and tempo_restante > timedelta(minutes=0):
-            antes.append(aula)
-        # Aula começou
-        elif tempo_restante >= timedelta(minutes=-40):
-            durante.append(aula)
-        # 40 minutos depois da aula
-        elif tempo_restante < timedelta(minutes=-40):
-            depois.append(aula)
-
-    todas_aulas = {"muito_antes": muito_antes, "antes": antes, "durante": durante, "depois": depois}
-
-    return todas_aulas
-
-# Verifica qual a próxima aula
-
-
-def alunos_para_avisar(turma):
-
-    conexao = sqlite3.connect("banco.db")
-    with conexao:
-        cursor = conexao.cursor()
-        cursor.execute(f""" SELECT ra, nome, email FROM alunos
-                            WHERE turma_id = "{turma}" 
-                            AND presente = 0
-                        """)
-
-        results = cursor.fetchall()
-
-    return results
-
-def verifica_nao_chegada_aluno():
-
-    conexao = sqlite3.connect("banco.db")
-
-    with conexao:
-        cursor = conexao.cursor()
-
-        cursor.execute(f"""
-        SELECT ra, nome, email FROM alunos
-        WHERE presente = 0
-                        """)
-
-        results = cursor.fetchall()
-
-    return results
 # --------------------------------- Tabela cursos -------------------------------------------
 
 # Função criar cursos
@@ -290,6 +197,7 @@ def mostra_aula():
     return lista
 
 
+# Pesquisa dados da aula pelo nome
 def pesquisa_aula(nome):
     conexao = sqlite3.connect("banco.db")
 
@@ -321,16 +229,56 @@ def apaga_aula(id):
         cursor = conexao.cursor()
         cursor.execute(f"""DELETE FROM aulas WHERE id="{id}" """)
 
+# Verifica as aulas do dia
+def verifica_aula_dia():
+    global dia_semana
+    # Dia e hora atuais
+    current = datetime.now()
+    current_day = current.weekday()
 
-def ultima_aula_adicionada():
+    # Selecionando as aulas de hoje
     conexao = sqlite3.connect("banco.db")
     with conexao:
         cursor = conexao.cursor()
-        cursor.execute(""" SELECT MAX(id) FROM aulas """)
+        cursor.execute(f"""SELECT id, hora, turma_id FROM aulas
+                       WHERE dia = "{dia_semana[current_day]}" """)
+        results = cursor.fetchall()
 
-        results = cursor.fetchone
-
+    # Se não tiver aula hoje, retorna vazio
+    # Se tiver, retorna o id, hora de início e id da turma
     return results
+
+# Verifica qual a próxima aula
+def tempo_para_aula(aulas):
+    muito_antes = []
+    antes = []
+    durante = []
+    depois = []
+
+    current = datetime.now()
+    dia = current.strftime("%Y/%m/%d")
+
+    # Se tiver aula hoje, vê se tem aula daqui a 30 min
+    for aula in aulas:
+        tempo = datetime.strptime(f"{dia} {aula[1]}", "%Y/%m/%d %H:%M")
+        tempo_restante = tempo - current
+        if tempo_restante > timedelta(minutes=40):
+            muito_antes.append(aula)
+        # Se faltar menos de 40 min pra aula, adiciona a turma à lista
+        elif tempo_restante <= timedelta(minutes=40) and tempo_restante > timedelta(minutes=0):
+            antes.append(aula)
+        # Aula começou
+        elif tempo_restante >= timedelta(minutes=-40):
+            durante.append(aula)
+        # 40 minutos depois da aula
+        elif tempo_restante < timedelta(minutes=-40):
+            depois.append(aula)
+
+    todas_aulas = {"muito_antes": muito_antes, "antes": antes, "durante": durante, "depois": depois}
+
+    return todas_aulas
+
+
 # --------------------------------- Tabela faltas -------------------------------------------
 
 # Função criar falta
@@ -534,6 +482,21 @@ def presenca_aluno(ra):
         cursor.execute(f"""UPDATE alunos SET presente = 1
                         WHERE ra = "{ra}"
                         """)
+
+# Verifica os alunos que não chegaram na aula, por meio da turma
+def alunos_para_avisar(turma):
+
+    conexao = sqlite3.connect("banco.db")
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f""" SELECT ra, nome, email FROM alunos
+                            WHERE turma_id = "{turma}" 
+                            AND presente = 0
+                        """)
+
+        results = cursor.fetchall()
+
+    return results
 
 # --------------------------------- Tabela cameras -------------------------------------------
 

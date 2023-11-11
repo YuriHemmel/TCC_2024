@@ -239,6 +239,8 @@ def computa_faltas():
         print("Faltas computadas")
 
 # Manda mensagens para os alunos sobre as aulas
+
+
 def manda_mensagens():
     global aulas_dia
 
@@ -246,24 +248,24 @@ def manda_mensagens():
 
     for aula in aulas:
         for turma in aulas[aula]:
-                # Pega os alunos desta aula
-                alunos = utils.alunos_para_avisar(turma[2])
+            # Pega os alunos desta aula
+            alunos = utils.alunos_para_avisar(turma[2])
 
-                # Dados de cada aluno
-                for aluno in alunos:
-                    ra = aluno[0]
-                    nome = aluno[1]
-                    email = aluno[2]
-                    
-                    if aula == 'antes':
-                        # Envia email avisando que a aula vai começar
-                        envia_email_aula_comeca(nome, ra, email)
-                    elif aula == 'durante':
-                        # Envia email avisando que o aluno ainda não foi identificado
-                        envia_email_alerta(nome, ra, email)
-                    elif aula == 'depois':
-                        # Envia email avisando que o aluno recebeu falta
-                        envia_email_acusando_falta(nome, ra, email)
+            # Dados de cada aluno
+            for aluno in alunos:
+                ra = aluno[0]
+                nome = aluno[1]
+                email = aluno[2]
+
+                if aula == 'antes':
+                    # Envia email avisando que a aula vai começar
+                    envia_email_aula_comeca(nome, ra, email)
+                elif aula == 'durante':
+                    # Envia email avisando que o aluno ainda não foi identificado
+                    envia_email_alerta(nome, ra, email)
+                elif aula == 'depois':
+                    # Envia email avisando que o aluno recebeu falta
+                    envia_email_acusando_falta(nome, ra, email)
 
 # Começa a pegar dados das câmeras
 
@@ -271,7 +273,6 @@ def manda_mensagens():
 def inicia_app():
     prepara_dia()
     manda_mensagens()
-    return
 
 
 def sair_app():
@@ -315,7 +316,7 @@ iniciar_icone = Image.open('images/icon_iniciar.png')
 iniciar_icone = iniciar_icone.resize((50, 50))
 iniciar_icone = ImageTk.PhotoImage(iniciar_icone)
 
-botao_iniciar = Button(pagina_inicial, command=inicia_app, image=iniciar_icone, text="Iniciar".upper(),
+botao_iniciar = Button(pagina_inicial, command=inicia_app, image=iniciar_icone, text="Teste".upper(),
                        compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
 botao_iniciar['width'] = 160
 botao_iniciar['height'] = 160
@@ -505,13 +506,13 @@ def alunos():
             combobox_turma.set(tree_lista[6])
 
             aluno_foto = tree_lista[5]
+
             foto_string = aluno_foto
 
-            # Abrindo imagem
-            aluno_foto = Image.open(aluno_foto)
+            aluno_foto = utils.convertToImage(aluno_foto)
             aluno_foto = aluno_foto.resize((130, 130))
             aluno_foto = ImageTk.PhotoImage(aluno_foto)
-
+            
             label_foto = Label(frame_info, image=aluno_foto,
                                bg=AZUL_CLARO, fg=BRANCO)
             label_foto.place(x=300, y=10)
@@ -639,7 +640,7 @@ def alunos():
             foto_string = aluno_foto
 
             # Inserindo foto do Aluno na tela
-            aluno_foto = Image.open(aluno_foto)
+            aluno_foto = utils.convertToImage(aluno_foto)
             aluno_foto = aluno_foto.resize((130, 130))
             aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
@@ -739,7 +740,7 @@ def alunos():
             foto_string = aluno_foto
 
             # Inserindo foto do Aluno na tela
-            aluno_foto = Image.open(aluno_foto)
+            aluno_foto = utils.convertToImage(aluno_foto)
             aluno_foto = aluno_foto.resize((130, 130))
             aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
@@ -820,11 +821,33 @@ def alunos():
     def escolhe_imagem():
         global aluno_foto, label_foto, foto_string
 
-        aluno_foto = fd.askopenfilename()
-        foto_string = aluno_foto
+        try:
+            aluno_foto = fd.askopenfilename()
 
-        # Abrindo imagem
-        aluno_foto = Image.open(aluno_foto)
+            aluno_foto = utils.convertToBinaryData(aluno_foto)
+
+            foto_string = aluno_foto
+
+            # Abrindo imagem
+            aluno_foto = utils.convertToImage(aluno_foto)
+            aluno_foto = aluno_foto.resize((130, 130))
+            aluno_foto = ImageTk.PhotoImage(aluno_foto)
+
+            label_foto = Label(frame_info, image=aluno_foto,
+                               bg=AZUL_CLARO, fg=BRANCO)
+            label_foto.place(x=300, y=10)
+
+            botao_carregar['text'] = "TROCAR DE FOTO"
+        except:
+            # Se não for selecionada nenhuma foto, apenas retorna
+            return
+
+    def tira_foto():
+        global aluno_foto, label_foto, foto_string
+
+        foto_string = utils.recebe_foto_binario()
+
+        aluno_foto = utils.convertToImage(foto_string)
         aluno_foto = aluno_foto.resize((130, 130))
         aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
@@ -832,30 +855,15 @@ def alunos():
                            bg=AZUL_CLARO, fg=BRANCO)
         label_foto.place(x=300, y=10)
 
-        botao_carregar['text'] = "TROCAR DE FOTO"
-
-    """def tira_foto():
-        global aluno_foto, label_foto, foto_string
-
-        foto_string = utils.recebe_foto_binario()
-
-        aluno_foto = Image.open(foto_string)
-        aluno_foto = aluno_foto.resize((130, 130))
-        aluno_foto = ImageTk.PhotoImage(aluno_foto)
-
-        label_foto = Label(frame_info, image=aluno_foto,
-                           bg=AZUL_CLARO, fg=BRANCO)
-        label_foto.place(x=300, y=10)"""
-
-    """# Botão Tira foto
+    # Botão Tira foto
     botao_foto = Button(frame_info, command=tira_foto, text='Tirar foto'.upper(
     ), width=18, compound=CENTER, overrelief=RIDGE, anchor=CENTER, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_foto.place(x=300, y=160)"""
+    botao_foto.place(x=300, y=160)
 
     # Botão Carregar Foto
     botao_carregar = Button(frame_info, command=escolhe_imagem, text='Carregar foto'.upper(
     ), width=18, compound=CENTER, overrelief=RIDGE, anchor=CENTER, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_carregar.place(x=300, y=160)
+    botao_carregar.place(x=300, y=200)
 
     # Linha de separação
     label_linha = Label(frame_info, relief=GROOVE, text='h', width=1,
