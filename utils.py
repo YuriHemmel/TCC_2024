@@ -12,23 +12,8 @@ global dia_semana
 dia_semana = {0: 'Segunda-feira', 1: 'Terça-feira',
               2: 'Quarta-feira', 3: 'Quinta-feira', 4: 'Sexta-feira', 5: 'Sábado'}
 
-
-def tira_foto():
-    webcam = cv.VideoCapture(0)
-
-    if webcam.isOpened():
-        validacao, frame = webcam.read()
-        while validacao:
-            validacao, frame = webcam.read()
-            cv.imshow("Video da Webcam", frame)
-            if cv.waitKey(1) & 0xFF == ord('q'):
-                break
-        cv.imwrite("imagem_atual.jpg", frame)
-    webcam.release()
-    cv.destroyAllWindows()
-
-
-def recebe_foto_binario():
+# Tira foto por meio da Webcam
+def tira_foto_binario():
     global bytes
     webcam = cv.VideoCapture(0)
 
@@ -46,13 +31,13 @@ def recebe_foto_binario():
     os.remove("imagem.jpg")
     return bytes
 
-
+# Codifica imagem em bytes
 def convertToBinaryData(filename):
     file = open(filename, 'rb').read()
     bytes = base64.b64encode(file)
     return bytes
 
-
+# Decodifica bytes em imagem
 def convertToImage(bytes):
     string = str(bytes).strip("b'")
     binary_data = base64.b64decode(string)
@@ -405,8 +390,6 @@ def computa_falta(turma, dia):
 # --------------------------------- Tabela alunos -------------------------------------------
 
 # Função criar aluno
-
-
 def cria_aluno(lista):
     conexao = sqlite3.connect("banco.db")
 
@@ -417,8 +400,6 @@ def cria_aluno(lista):
                                        VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}", "{lista[3]}", "{lista[4]}", "{lista[5]}", "{lista[6]}", 0 ) """)
 
 # Mostra os alunos
-
-
 def mostra_aluno():
     lista = []
     conexao = sqlite3.connect("banco.db")
@@ -434,8 +415,6 @@ def mostra_aluno():
     return lista
 
 # Pesquisa alunos pelo ra
-
-
 def pesquisa_aluno(ra):
     conexao = sqlite3.connect("banco.db")
 
@@ -448,9 +427,7 @@ def pesquisa_aluno(ra):
 
     return results
 
-# Atualiza dados do cursos
-
-
+# Atualiza dados do aluno
 def atualiza_aluno(lista):
     conexao = sqlite3.connect("banco.db")
     with conexao:
@@ -459,9 +436,7 @@ def atualiza_aluno(lista):
                        foto="{lista[5]}", turma_id="{lista[6]}" 
                        WHERE ra="{lista[7]}" """)
 
-# Deleta dados do cursos
-
-
+# Deleta dados do aluno
 def apaga_aluno(ra):
     conexao = sqlite3.connect("banco.db")
     with conexao:
@@ -469,8 +444,6 @@ def apaga_aluno(ra):
         cursor.execute(f"""DELETE FROM alunos WHERE ra="{ra}" """)
 
 # Conta presença parar o aluno
-
-
 def presenca_aluno(ra):
     conexao = sqlite3.connect("banco.db")
 
