@@ -175,26 +175,8 @@ def conecta_camera():
 
 '''
 
-
-def teste_camera():
-    cap = cv2.VideoCapture(0)
-
-    while True:
-        ret, frame = cap.read()
-
-        if not ret:
-            print("Sem frame ou erro na captura de video")
-            break
-
-        cv2.imshow("VIDEO", frame)
-
-        if cv2.waitKey(1) == ord('q'):
-            print("Desconectando camera IP")
-            break
-
-    cap.release()
-    cv2.destroyAllWindows()
-
+# Retorna o RA dos alunos identificados via câmera (Precisa fazer)
+def identifica_alunos():
     # Colocar Identificação facial aqui, retornando RA do aluno
     ra = "F22HFA7"
 
@@ -264,14 +246,12 @@ def manda_mensagens():
                     # Envia email avisando que o aluno recebeu falta
                     envia_email_acusando_falta(nome, ra, email)
 
-# Começa a pegar dados das câmeras
-
-
+# Função teste para apresentação
 def inicia_app():
     prepara_dia()
     manda_mensagens()
 
-
+# Fecha o aplicativo e seus subprocessos
 def sair_app():
     os._exit(0)
 
@@ -318,18 +298,6 @@ botao_iniciar = Button(pagina_inicial, command=inicia_app, image=iniciar_icone, 
 botao_iniciar['width'] = 160
 botao_iniciar['height'] = 160
 botao_iniciar.place(x=190*2 - 45, y=HEIGHT/2 - 80)
-
-parar_icone = Image.open('images/icon_parar.png')
-parar_icone = parar_icone.resize((50, 50))
-parar_icone = ImageTk.PhotoImage(parar_icone)
-
-botao_parar = Button(pagina_inicial, image=parar_icone, text="Parar".upper(),
-                     compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
-botao_parar['width'] = 160
-botao_parar['height'] = 160
-botao_parar.place(x=190*2 - 45, y=HEIGHT/2 - 80)
-
-botao_parar.destroy()
 
 saida_icone = Image.open('images/icon_saida.png')
 saida_icone = saida_icone.resize((50, 50))
@@ -391,10 +359,9 @@ icone_titulo_faltas = Image.open('images/icon_falta.png')
 icone_titulo_faltas = icone_titulo_faltas.resize((50, 50))
 icone_titulo_faltas = ImageTk.PhotoImage(icone_titulo_faltas)
 
-# ------------------------ Funções / Sub-paginas de alunos -----------------------------
+# ------------------------ Funções / Sub-paginas de cadastro -----------------------------
 
 # Função de cadastro de alunos
-
 
 def alunos():
     # Titulo da página
@@ -407,6 +374,9 @@ def alunos():
         x=0, y=52, width=WIDTH)
 
     # ------------------------------------------------- Detalhes do Aluno ---------------------------------------------------
+
+    global undo_list, botao_undo
+    undo_list = []
 
     # Função novo aluno
     def novo_aluno():
@@ -476,7 +446,7 @@ def alunos():
 
     # Carrega informações do aluno
     def carregar_aluno():
-        global aluno_foto, label_foto, foto_string
+        global aluno_foto, label_foto, foto_string, undo_list
 
         try:
             tree_itens = tree_alunos.focus()
@@ -485,6 +455,9 @@ def alunos():
 
             # Guarda RA antigo
             ra_antigo = tree_lista[0]
+
+            undo_list = [tree_lista[0], tree_lista[1], tree_lista[2], tree_lista[3],
+                         tree_lista[4], tree_lista[5], tree_lista[6]]
 
             # Limpa os campos
             entry_ra.delete(0, END)
@@ -515,7 +488,7 @@ def alunos():
             label_foto.place(x=300, y=10)
 
             def atualiza():
-
+                global botao_undo
                 # Dados do aluno
                 ra = entry_ra.get()
                 nome = entry_nome_aluno.get()
@@ -526,6 +499,8 @@ def alunos():
                 turma = combobox_turma.get()
 
                 ra = ra.upper()
+
+                undo_list.append(ra)
 
                 # Lista dos dados
                 lista = [ra, nome, email, telefone,
@@ -569,6 +544,11 @@ def alunos():
                 # Atualiza tabela
                 mostra_alunos()
 
+                # Botão desfazer alteração do aluno
+                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=9,
+                                                overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+                botao_undo.place(x=727, y=110)
+
             # Botão salvar alterações do aluno
             botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text='Salvar alterações'.upper(
             ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
@@ -579,7 +559,6 @@ def alunos():
 
     # Função apagar aluno
     def apagar_aluno():
-
         try:
             tree_itens = tree_alunos.focus()
             tree_dicionario = tree_alunos.item(tree_itens)
@@ -604,17 +583,33 @@ def alunos():
 
             mostra_alunos()
 
+            # Desfaz a ação de apagar o aluno
+            def undo_apaga():
+                utils.cria_aluno(tree_lista)
+                mostra_alunos()
+                botao_desfazer_apagar.destroy()
+
+            # Botão desfazer deleção de aluno
+            botao_desfazer_apagar = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=9,
+                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+            botao_desfazer_apagar.place(x=727, y=110)
+
         except IndexError:
             messagebox.showerror("Erro", "Selecione um aluno na tabela.")
 
     # Pesquisa informações do aluno pelo RA
     def pesquisa_aluno():
-        global aluno_foto, label_foto, foto_string
+        global aluno_foto, label_foto, foto_string, undo_list
 
-        valor_ra = entry_procura.get().upper
+        valor_ra = entry_procura.get()
+
+        valor_ra = valor_ra.upper()
 
         try:
             dados = utils.pesquisa_aluno(valor_ra)
+
+            undo_list = [dados[0], dados[1], dados[2], dados[3],
+                         dados[4], dados[5], dados[6]]
 
             # Limpa os campos
             entry_procura.delete(0, END)
@@ -646,7 +641,7 @@ def alunos():
             label_foto.place(x=300, y=10)
 
             def atualiza():
-
+                global botao_undo
                 # Dados do aluno
                 ra = entry_ra.get()
                 nome = entry_nome_aluno.get()
@@ -657,6 +652,8 @@ def alunos():
                 turma = combobox_turma.get()
 
                 ra = ra.upper()
+
+                undo_list.append(ra)
 
                 # Lista dos dados
                 lista = [ra, nome, email, telefone,
@@ -699,6 +696,11 @@ def alunos():
 
                 # Atualiza tabela
                 mostra_alunos()
+
+                # Botão desfazer alteração do aluno
+                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=9,
+                                                overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+                botao_undo.place(x=727, y=110)
 
             # Botão salvar alterações do aluno
             botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text='Salvar alterações'.upper(
@@ -839,10 +841,11 @@ def alunos():
             # Se não for selecionada nenhuma foto, apenas retorna
             return
 
+    # Função tira foto do aluno
     def tira_foto():
         global aluno_foto, label_foto, foto_string
 
-        foto_string = utils.recebe_foto_binario()
+        foto_string = utils.tira_foto_binario()
 
         aluno_foto = utils.convertToImage(foto_string)
         aluno_foto = aluno_foto.resize((130, 130))
@@ -851,6 +854,20 @@ def alunos():
         label_foto = Label(frame_info, image=aluno_foto,
                            bg=AZUL_CLARO, fg=BRANCO)
         label_foto.place(x=300, y=10)
+
+    # Desfaz a ação de atualizar o aluno
+    def undo_atualiza():
+        global undo_list, botao_undo
+        utils.atualiza_aluno(undo_list)
+        mostra_alunos()
+        botao_undo.destroy()
+
+    # Botão desfazer alteração do aluno
+    botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=9,
+                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+    botao_undo.place(x=727, y=110)
+
+    botao_undo.destroy()
 
     # Botão Tira foto
     botao_foto = Button(frame_info, command=tira_foto, text='Tirar foto'.upper(
@@ -975,6 +992,9 @@ def cursos_turmas():
 
     # -------------------- Detalhes do Curso -----------------------------------
 
+    global undo_list, botao_undo
+    undo_list = []
+
     # Função novo curso
     def novo_curso():
         nome = entry_nome_curso.get()
@@ -1000,6 +1020,7 @@ def cursos_turmas():
 
     # Função carregar/atualizar curso
     def carregar_curso():
+        global undo_list
         try:
             tree_itens = tree_cursos.focus()
             tree_dicionario = tree_cursos.item(tree_itens)
@@ -1007,6 +1028,8 @@ def cursos_turmas():
 
             # Salva o id
             valor_id = tree_lista[0]
+
+            undo_list = tree_lista
 
             # Limpa os campos
             entry_nome_curso.delete(0, END)
@@ -1051,6 +1074,11 @@ def cursos_turmas():
                 controle('cursos')
 
                 botao_salvar.destroy()
+
+                # Botão desfazer alteração do aluno
+                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=9,
+                                                overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+                botao_undo.place(x=727, y=110)
 
             botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text="Salvar alterações".upper(
             ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, fg=BRANCO)
