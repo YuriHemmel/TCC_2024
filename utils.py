@@ -14,11 +14,11 @@ dia_semana = {0: 'Segunda-feira', 1: 'Terça-feira',
 # Tira foto por meio da Webcam
 def tira_foto_binario():
     global bytes
-    cam = Camera.load_camera("192.168.1.220")
+    #cam = Camera.load_camera("192.168.1.220")
 
-    user = cam[4]
-    password = cam[3]
-    ip = cam[2]
+    user = "admin"
+    password = "arifym2023"
+    ip = "192.168.1.220"
     port = '554'
 
     url = f"rtsp://{user}:{password}@{ip}:{port}/onvif1"
@@ -30,13 +30,11 @@ def tira_foto_binario():
     if cap.isOpened():
         validacao, frame = cap.read()
         while validacao:
-            validacao, frame = webcam.read()
             cv.imshow("Video da Webcam", frame)
             if cv.waitKey(1) == ord('q') or cv.waitKey(1) == ord('Q') or cv.waitKey(1) == 27:
                 break
         cv.imwrite("imagem.jpg", frame)
-        bytes = convertToBinaryData("imagem.jpg")
-
+        
     cap.release()
     cv.destroyAllWindows()
     return bytes
