@@ -3,7 +3,6 @@ import Banco
 import schedule
 import os
 import concurrent.futures
-import cv2
 from dotenv import load_dotenv
 from tkinter import *  # Interface gráfica
 from tkinter import messagebox  # Caixa de mensagem para confirmações
