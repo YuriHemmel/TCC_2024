@@ -1,0 +1,8 @@
+opencv-python
+tkcalendar
+Pillow
+python-dotenv
+cmake
+numpy
+face-recognition==1.3.0
+schedule
