@@ -37,9 +37,7 @@ def recebe_foto_binario():
         while validacao:
             validacao, frame = webcam.read()
             cv.imshow("Video da Webcam", frame)
-            if cv.waitKey(1) & 0xFF == ord('q'):
-                break
-            if cv.waitKey(1) & 0xFF == ord('Q'):
+            if cv.waitKey(1) == ord('q') or cv.waitKey(1) == ord('Q') or cv.waitKey(1) == 27:
                 break
         cv.imwrite("imagem.jpg", frame)
         bytes = convertToBinaryData("imagem.jpg")
