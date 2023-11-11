@@ -519,7 +519,7 @@ def apaga_camera(id):
         cursor = conexao.cursor()
         cursor.execute(f"""DELETE FROM cameras WHERE id="{id}" """)
 
-
+# Pesquisa a câmera pelo ip
 def pesquisa_camera(ip):
     conexao = sqlite3.connect("banco.db")
 

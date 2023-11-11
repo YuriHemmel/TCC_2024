@@ -179,6 +179,8 @@ def conecta_camera():
 '''
 
 # Retorna o RA dos alunos identificados via câmera (Precisa fazer)
+
+
 def identifica_alunos():
     # Colocar Identificação facial aqui, retornando RA do aluno
     ra = "F22HFA7"
@@ -250,11 +252,15 @@ def manda_mensagens():
                     envia_email_acusando_falta(nome, ra, email)
 
 # Função teste para apresentação
+
+
 def inicia_app():
     prepara_dia()
     manda_mensagens()
 
 # Fecha o aplicativo e seus subprocessos
+
+
 def sair_app():
     os._exit(0)
 
@@ -365,6 +371,7 @@ icone_titulo_faltas = ImageTk.PhotoImage(icone_titulo_faltas)
 # ------------------------ Funções / Sub-paginas de cadastro -----------------------------
 
 # Função de cadastro de alunos
+
 
 def alunos():
     # Titulo da página
@@ -485,7 +492,7 @@ def alunos():
             aluno_foto = utils.convertToImage(aluno_foto)
             aluno_foto = aluno_foto.resize((130, 130))
             aluno_foto = ImageTk.PhotoImage(aluno_foto)
-            
+
             label_foto = Label(frame_info, image=aluno_foto,
                                bg=AZUL_CLARO, fg=BRANCO)
             label_foto.place(x=300, y=10)
@@ -548,9 +555,9 @@ def alunos():
                 mostra_alunos()
 
                 # Botão desfazer alteração do aluno
-                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=9,
-                                                overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-                botao_undo.place(x=727, y=110)
+                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
+                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+                botao_undo.place(x=726, y=110)
 
             # Botão salvar alterações do aluno
             botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text='Salvar alterações'.upper(
@@ -590,12 +597,12 @@ def alunos():
             def undo_apaga():
                 utils.cria_aluno(tree_lista)
                 mostra_alunos()
-                botao_desfazer_apagar.destroy()
+                botao_desfazer.destroy()
 
             # Botão desfazer deleção de aluno
-            botao_desfazer_apagar = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=9,
+            botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=9,
                                     overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-            botao_desfazer_apagar.place(x=727, y=110)
+            botao_desfazer.place(x=726, y=110)
 
         except IndexError:
             messagebox.showerror("Erro", "Selecione um aluno na tabela.")
@@ -701,9 +708,9 @@ def alunos():
                 mostra_alunos()
 
                 # Botão desfazer alteração do aluno
-                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=9,
-                                                overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-                botao_undo.place(x=727, y=110)
+                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
+                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+                botao_undo.place(x=726, y=110)
 
             # Botão salvar alterações do aluno
             botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text='Salvar alterações'.upper(
@@ -866,9 +873,9 @@ def alunos():
         botao_undo.destroy()
 
     # Botão desfazer alteração do aluno
-    botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=9,
-                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-    botao_undo.place(x=727, y=110)
+    botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
+                        overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+    botao_undo.place(x=726, y=110)
 
     botao_undo.destroy()
 
@@ -995,7 +1002,7 @@ def cursos_turmas():
 
     # -------------------- Detalhes do Curso -----------------------------------
 
-    global undo_list, botao_undo
+    global undo_list, botao_undo_curso
     undo_list = []
 
     # Função novo curso
@@ -1032,7 +1039,7 @@ def cursos_turmas():
             # Salva o id
             valor_id = tree_lista[0]
 
-            undo_list = tree_lista
+            undo_list = [tree_lista[0], tree_lista[1], tree_lista[2]]
 
             # Limpa os campos
             entry_nome_curso.delete(0, END)
@@ -1044,7 +1051,7 @@ def cursos_turmas():
 
             # Atualiza
             def atualiza():
-
+                global botao_undo_curso
                 nome = entry_nome_curso.get()
                 duracao = entry_duracao.get()
 
@@ -1074,18 +1081,20 @@ def cursos_turmas():
                 entry_duracao.delete(0, END)
 
                 # atualiza os dados da tabela
-                controle('cursos')
+                mostra_cursos()
+
+                mostra_turmas()
 
                 botao_salvar.destroy()
 
                 # Botão desfazer alteração do aluno
-                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=9,
-                                                overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-                botao_undo.place(x=727, y=110)
+                botao_undo_curso = Button(frame_info, command=undo_atualiza_curso, anchor=CENTER, text='DESFAZER', width=10,
+                                          overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+                botao_undo_curso.place(x=240, y=130)
 
             botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text="Salvar alterações".upper(
             ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, fg=BRANCO)
-            botao_salvar.place(x=105, y=130)
+            botao_salvar.place(x=190, y=130)
         except IndexError:
             messagebox.showerror("Erro", "Selecione um curso na tabela.")
 
@@ -1113,7 +1122,20 @@ def cursos_turmas():
                 "Sucesso", "Os dados foram apagados com sucesso")
 
             # atualiza os dados da tabela
-            controle('cursos')
+            mostra_cursos()
+            mostra_turmas()
+
+            # Desfaz a ação de apagar o aluno
+            def undo_apaga():
+                utils.cria_curso([tree_lista[1], tree_lista[2]])
+                mostra_cursos()
+                mostra_turmas()
+                botao_desfazer.destroy()
+
+            # Botão desfazer deleção de aluno
+            botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=10,
+                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+            botao_desfazer.place(x=240, y=130)
 
         except IndexError:
             messagebox.showerror("Erro", "Selecione um curso na tabela.")
@@ -1193,6 +1215,21 @@ def cursos_turmas():
         for item in lista_itens:
             tree_cursos.insert('', 'end', values=item)
 
+    # Desfaz a ação de atualizar o curso
+    def undo_atualiza_curso():
+        global undo_list, botao_undo_curso
+        utils.atualiza_curso(undo_list)
+        mostra_cursos()
+        mostra_turmas()
+        botao_undo_curso.destroy()
+
+    # Botão desfazer alteração do aluno
+    botao_undo_curso = Button(frame_info, command=undo_atualiza_curso, anchor=CENTER, text='DESFAZER', width=9,
+                              overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+    botao_undo_curso.place(x=190, y=130)
+
+    botao_undo_curso.destroy()
+
     mostra_cursos()
 
     # ------------------------------- Linha Separatória ---------------------------------------
@@ -1214,6 +1251,8 @@ def cursos_turmas():
     label_linha.place(x=3, y=0)
 
     # ------------------------------ Detalhes das Turmas ------------------------------------
+
+    global combobox_curso, botao_undo_turma
 
     # Função novo turma
     def nova_turma():
@@ -1243,6 +1282,7 @@ def cursos_turmas():
 
     # Função carregar/atualizar turma
     def carregar_turma():
+        global undo_list
         try:
             tree_itens = tree_turma.focus()
             tree_dicionario = tree_turma.item(tree_itens)
@@ -1250,6 +1290,8 @@ def cursos_turmas():
 
             # Salva o id
             valor_id = tree_lista[0]
+
+            undo_list = tree_lista
 
             # Limpa os campos
             entry_nome_turma.delete(0, END)
@@ -1263,7 +1305,7 @@ def cursos_turmas():
 
             # Atualiza
             def atualiza():
-
+                global botao_undo_turma
                 nome = entry_nome_turma.get()
                 curso = combobox_curso.get()
                 data = data_inicio.get_date()
@@ -1299,6 +1341,11 @@ def cursos_turmas():
 
                 botao_salvar.destroy()
 
+                # Botão desfazer alteração do aluno
+                botao_undo_turma = Button(frame_info, command=undo_atualiza_turma, anchor=CENTER, text='DESFAZER', width=10,
+                                          overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+                botao_undo_turma.place(x=687, y=130)
+
             botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text="Salvar alterações".upper(
             ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, fg=BRANCO)
             botao_salvar.place(x=637, y=130)
@@ -1330,6 +1377,17 @@ def cursos_turmas():
 
             # atualiza os dados da tabela
             mostra_turmas()
+
+            # Desfaz a ação de apagar o aluno
+            def undo_apaga():
+                utils.cria_turma([tree_lista[1], tree_lista[2], tree_lista[3]])
+                mostra_turmas()
+                botao_desfazer.destroy()
+
+            # Botão desfazer deleção de aluno
+            botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=10,
+                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+            botao_desfazer.place(x=687, y=130)
 
         except IndexError:
             messagebox.showerror("Erro", "Selecione um turma na tabela.")
@@ -1381,6 +1439,23 @@ def cursos_turmas():
     botao_turma_deletar.place(x=687, y=160)
 
     def mostra_turmas():
+        global combobox_curso
+
+        combobox_curso.destroy()
+
+        # Atualiza o combobox dos cursos
+        # Pegando os cursos
+        cursos = utils.mostra_curso()
+        curso = []
+
+        for item in cursos:
+            curso.append(item[1])
+
+        combobox_curso = ttk.Combobox(frame_info, width=20, font=fonte_botao)
+        combobox_curso['values'] = curso
+        combobox_curso['state'] = 'readonly'
+        combobox_curso.place(x=407, y=100)
+
         tabela_turma_label = Label(frame_info, text="Tabela de turmas",
                                    height=1, relief="flat", anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
         tabela_turma_label.place(x=410, y=210)
@@ -1420,6 +1495,20 @@ def cursos_turmas():
 
         for item in lista_itens:
             tree_turma.insert('', 'end', values=item)
+
+    # Desfaz a ação de atualizar o turma
+    def undo_atualiza_turma():
+        global undo_list, botao_undo_turma
+        utils.atualiza_turma(undo_list)
+        mostra_turmas()
+        botao_undo_turma.destroy()
+
+    # Botão desfazer alteração do aluno
+    botao_undo_turma = Button(frame_info, command=undo_atualiza_turma, anchor=CENTER, text='DESFAZER', width=10,
+                              overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+    botao_undo_turma.place(x=190, y=130)
+
+    botao_undo_turma.destroy()
 
     mostra_turmas()
 
@@ -1474,6 +1563,7 @@ def aulas():
 
     # Função carregar/atualizar curso
     def carregar_aula():
+        global undo_list
         try:
             tree_itens = tree_aulas.focus()
             tree_dicionario = tree_aulas.item(tree_itens)
@@ -1481,6 +1571,8 @@ def aulas():
 
             # Salva o id
             valor_id = tree_lista[0]
+
+            undo_list = tree_lista
 
            # Limpa os campos
             entry_nome_aula.delete(0, END)
@@ -1494,7 +1586,7 @@ def aulas():
 
             # Atualiza
             def atualiza():
-
+                global botao_undo
                 nome = entry_nome_aula.get()
                 dia = combobox_dia.get()
                 hora = entry_hora.get()
@@ -1530,6 +1622,11 @@ def aulas():
 
                 # atualiza os dados da tabela
                 mostra_aula()
+
+                # Botão desfazer alteração do aula
+                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
+                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+                botao_undo.place(x=726, y=110)
 
                 botao_salvar.destroy()
 
@@ -1567,11 +1664,23 @@ def aulas():
             # atualiza os dados da tabela
             mostra_aula()
 
+            # Desfaz a ação de apagar o aluno
+            def undo_apaga():
+                utils.cria_aula([tree_lista[1],tree_lista[2], tree_lista[3], tree_lista[4]])
+                mostra_aula()
+                botao_desfazer.destroy()
+
+            # Botão desfazer deleção de aluno
+            botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=9,
+                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+            botao_desfazer.place(x=726, y=110)
+
         except IndexError:
             messagebox.showerror("Erro", "Selecione uma aula na tabela.")
 
     # Função pesquisa aula
     def pesquisa_aula():
+        global undo_list
 
         nome = entry_procura.get()
 
@@ -1579,6 +1688,8 @@ def aulas():
 
         try:
             dados = utils.pesquisa_aula(nome)
+
+            undo_list = [dados[1], dados[2], dados[3], dados[4]]
 
             valor_id = dados[0]
 
@@ -1594,7 +1705,7 @@ def aulas():
             combobox_turma.set(dados[4])
 
             def atualiza():
-
+                global botao_undo
                 # Dados da aula
                 nome = entry_nome_aula.get()
                 dia = combobox_dia.get()
@@ -1636,6 +1747,11 @@ def aulas():
 
                 # Atualiza tabela
                 mostra_aula()
+
+                # Botão desfazer alteração do aula
+                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
+                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+                botao_undo.place(x=726, y=110)
 
             # Botão salvar alterações da aula
             botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text='Salvar alterações'.upper(
@@ -1758,7 +1874,6 @@ def aulas():
     botao_procurar = Button(frame_info, command=pesquisa_aula, text="Pesquisar",
                             font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
     botao_procurar.place(x=757, y=33)
-
     # ---------------------------------- Tabela das aulas -------------------------------------
 
     def mostra_aula():
@@ -1802,6 +1917,21 @@ def aulas():
 
         for item in lista_itens:
             tree_aulas.insert('', 'end', values=item)
+
+        # Desfaz a ação de atualizar o aluno
+    
+    def undo_atualiza():
+        global undo_list, botao_undo
+        utils.atualiza_aula(undo_list)
+        mostra_aula()
+        botao_undo.destroy()
+
+    # Botão desfazer alteração do aula
+    botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
+                        overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+    botao_undo.place(x=726, y=110)
+
+    botao_undo.destroy()
 
     mostra_aula()
 
@@ -1975,6 +2105,7 @@ def cameras():
 
     # Função carregar/atualizar curso
     def carregar_camera():
+        global undo_list
         try:
             tree_itens = tree_cameras.focus()
             tree_dicionario = tree_cameras.item(tree_itens)
@@ -1982,6 +2113,8 @@ def cameras():
 
             # Salva o id
             valor_id = tree_lista[0]
+
+            undo_list = tree_lista
 
             # Limpa os campos
             entry_nome_camera.delete(0, END)
@@ -1999,7 +2132,7 @@ def cameras():
 
             # Atualiza
             def atualiza():
-
+                global botao_undo
                 nome = entry_nome_camera.get()
                 ip = entry_ip.get()
                 usuario = entry_usuario.get()
@@ -2038,6 +2171,11 @@ def cameras():
                 # atualiza os dados da tabela
                 mostra_camera()
 
+                # Botão desfazer alteração do aula
+                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
+                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+                botao_undo.place(x=726, y=110)
+
             botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text="Salvar alterações".upper(
             ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, fg=BRANCO)
             botao_salvar.place(x=700, y=145)
@@ -2071,16 +2209,29 @@ def cameras():
             # atualiza os dados da tabela
             mostra_camera()
 
+            # Desfaz a ação de apagar o aluno
+            def undo_apaga():
+                utils.cria_camera([tree_lista[1], tree_lista[2], tree_lista[3], tree_lista[4]])
+                mostra_camera()
+                botao_desfazer.destroy()
+
+            # Botão desfazer deleção de aluno
+            botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=9,
+                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+            botao_desfazer.place(x=726, y=110)
+
         except IndexError:
             messagebox.showerror("Erro", "Selecione uma camera na tabela.")
 
     # Função pesquisa camera
     def pesquisa_camera():
-
+        global undo_list
         ip = entry_procura.get()
 
         try:
             dados = utils.pesquisa_camera(ip)
+
+            undo_list = dados
 
             valor_id = dados[0]
 
@@ -2099,7 +2250,7 @@ def cameras():
             entry_usuario.insert(0, dados[3])
 
             def atualiza():
-
+                global botao_undo
                 # Dados da camera
                 nome = entry_nome_camera.get()
                 ip = entry_ip.get()
@@ -2141,6 +2292,11 @@ def cameras():
 
                 # Atualiza tabela
                 mostra_camera()
+
+                # Botão desfazer alteração do aula
+                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
+                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+                botao_undo.place(x=726, y=110)
 
             # Botão salvar alterações da camera
             botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text='Salvar alterações'.upper(
@@ -2294,6 +2450,19 @@ def cameras():
 
         for item in lista_itens:
             tree_cameras.insert('', 'end', values=item)
+
+    def undo_atualiza():
+        global undo_list, botao_undo
+        utils.atualiza_camera(undo_list)
+        mostra_camera()
+        botao_undo.destroy()
+
+    # Botão desfazer alteração do aula
+    botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
+                        overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+    botao_undo.place(x=726, y=110)
+
+    botao_undo.destroy()
 
     mostra_camera()
 
