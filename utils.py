@@ -38,7 +38,7 @@ def tira_foto_binario():
     cap.release()
     cv.destroyAllWindows()
     return bytes
-'''
+
 
 # Codifica imagem em bytes
 def convertToBinaryData(filename):
