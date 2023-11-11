@@ -1,9 +1,9 @@
 import utils
 import Banco
-import cv2
-import sys
 import schedule
+import os
 import concurrent.futures
+import cv2
 from dotenv import load_dotenv
 from tkinter import *  # Interface gráfica
 from tkinter import messagebox  # Caixa de mensagem para confirmações
@@ -854,6 +854,7 @@ def alunos():
         label_foto = Label(frame_info, image=aluno_foto,
                            bg=AZUL_CLARO, fg=BRANCO)
         label_foto.place(x=300, y=10)
+
 
     # Desfaz a ação de atualizar o aluno
     def undo_atualiza():
