@@ -1,18 +1,14 @@
 import utils
-import os
-import re
 import Banco
-import tkinter as tk
-import cv2
-import sys
 import schedule
+import os
 import concurrent.futures
 from dotenv import load_dotenv
 from tkinter import *  # Interface gráfica
 from tkinter import messagebox  # Caixa de mensagem para confirmações
 from tkinter import ttk
 from tkinter import filedialog as fd
-from tkcalendar import Calendar, DateEntry
+from tkcalendar import DateEntry
 from datetime import *
 from email_utils import envia_email_alerta, envia_email_acusando_falta, envia_email_confirmando_presenca, envia_email_aula_comeca
 from PIL import Image, ImageTk
@@ -864,6 +860,7 @@ def alunos():
         label_foto = Label(frame_info, image=aluno_foto,
                            bg=AZUL_CLARO, fg=BRANCO)
         label_foto.place(x=300, y=10)
+
 
     # Desfaz a ação de atualizar o aluno
     def undo_atualiza():

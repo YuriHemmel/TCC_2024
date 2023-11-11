@@ -1,4 +1,3 @@
-import os
 import base64
 import io
 import cv2 as cv
@@ -14,33 +13,46 @@ dia_semana = {0: 'Segunda-feira', 1: 'Terça-feira',
 
 # Tira foto por meio da Webcam
 def tira_foto_binario():
-    global bytes
-    webcam = cv.VideoCapture(0)
+    global bytes_foto
+    #cam = Camera.load_camera("192.168.1.220")
 
-    if webcam.isOpened():
-        validacao, frame = webcam.read()
+#    user = "admin"
+ #   password = "arifym2023"
+  #  ip = "192.168.1.220"
+   # port = '554'
+
+    #url = f"rtsp://{user}:{password}@{ip}:{port}/onvif1"
+    camera = 0
+
+    #print('Tentando conectar com ' + url)
+    print('Tentando conectar com a camera')
+    cap = cv.VideoCapture(camera)#, cv.CAP_FFMPEG)
+
+    if cap.isOpened():
+        validacao, frame = cap.read()
         while validacao:
-            validacao, frame = webcam.read()
             cv.imshow("Video da Webcam", frame)
-            if cv.waitKey(1) == ord('q') or cv.waitKey(1) == ord('Q') or cv.waitKey(1) == 27:
+            if cv.waitKey(0) == ord('q') or cv.waitKey(0) == ord('Q') or cv.waitKey(0) == 27:
                 break
         cv.imwrite("imagem.jpg", frame)
-        bytes = convertToBinaryData("imagem.jpg")
-    webcam.release()
+        bytes_foto = convertToBinaryData("imagem.jpg")
+        
+    cap.release()
     cv.destroyAllWindows()
-    os.remove("imagem.jpg")
-    return bytes
+    return bytes_foto
+
 
 # Codifica imagem em bytes
 def convertToBinaryData(filename):
     file = open(filename, 'rb').read()
-    bytes = base64.b64encode(file)
-    return bytes
+    bytes_foto = base64.b64encode(file)
+    return bytes_foto
 
 # Decodifica bytes em imagem
-def convertToImage(bytes):
-    string = str(bytes).strip("b'")
-    binary_data = base64.b64decode(string)
+def convertToImage(bytes_foto):
+    string = str(bytes_foto).strip("b'")[:-1]
+    code_with_padding = f"{string}{'=' * (len(string) % 4)}"
+    binary_data = base64.b64decode(code_with_padding)
     imagem = Image.open(io.BytesIO(binary_data))
 
     return imagem
