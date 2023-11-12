@@ -174,6 +174,17 @@ def cria_aula(lista):
         cursor.execute(f"""INSERT INTO aulas (nome, dia, hora, turma_id)
                             VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}", "{lista[3]}") """)
 
+# Função criar aula
+def cria_aula_id(lista):
+    conexao = sqlite3.connect("banco.db")
+
+    with conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute(f"""INSERT INTO aulas (id, nome, dia, hora, turma_id)
+                            VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}", "{lista[3]}", "{lista[4]}") """)
+
+
 # Mostra as aulas
 
 
@@ -277,8 +288,6 @@ def tempo_para_aula(aulas):
 # --------------------------------- Tabela faltas -------------------------------------------
 
 # Função criar falta
-
-
 def cria_falta(lista):
     conexao = sqlite3.connect("banco.db")
 
@@ -286,12 +295,10 @@ def cria_falta(lista):
         cursor = conexao.cursor()
 
         cursor.execute(f"""INSERT INTO faltas (ra, id_aula, falta)
-                            VALUES ("{lista[0]}", "{lista[1]}", 0)""")
+                            VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}")""")
         cursor.close()
 
 # Atualiza as faltas
-
-
 def atualiza_falta(lista):
     conexao = sqlite3.connect("banco.db")
 
@@ -303,8 +310,6 @@ def atualiza_falta(lista):
         cursor.close()
 
 # Apaga faltas pelo ra do aluno
-
-
 def apaga_falta_aluno(ra):
     conexao = sqlite3.connect("banco.db")
     with conexao:
@@ -313,8 +318,6 @@ def apaga_falta_aluno(ra):
         cursor.close()
 
 # Apaga faltas pelo id da aula
-
-
 def apaga_falta_aula(id_aula):
     conexao = sqlite3.connect("banco.db")
     with conexao:
@@ -323,8 +326,6 @@ def apaga_falta_aula(id_aula):
         cursor.close()
 
 # Mostra as faltas
-
-
 def mostra_falta():
     conexao = sqlite3.connect("banco.db")
 
@@ -341,8 +342,6 @@ def mostra_falta():
     return results
 
 # Pesquisa as faltas pelo ra do aluno
-
-
 def pesquisa_falta_aluno(ra):
     conexao = sqlite3.connect("banco.db")
 
@@ -360,9 +359,38 @@ def pesquisa_falta_aluno(ra):
 
     return results
 
+# Retorna apenas os dados da falta via ra (Usado para o "Undo")
+def mostra_falta_aluno(ra):
+    conexao = sqlite3.connect("banco.db")
+
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""SELECT ra, id_aula, falta FROM faltas
+                       WHERE UPPER(ra) = "{ra}"
+                       """)
+
+        results = cursor.fetchall()
+        cursor.close()
+
+    return results
+
+# Retorna apenas os dados da falta via nome da aula (Usado para o "Undo")
+def mostra_falta_aula(nome_aula):
+    conexao = sqlite3.connect("banco.db")
+
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""SELECT f.ra, f.id_aula, f.falta FROM faltas f
+                       JOIN aulas au ON au.id = f.id_aula
+                       WHERE LOWER(au.nome) = "{nome_aula}"
+                       """)
+
+        results = cursor.fetchall()
+        cursor.close()
+
+    return results
+
 # Pesquisa as faltas pelo nome da aula
-
-
 def pesquisa_falta_aula(nome_aula):
     conexao = sqlite3.connect("banco.db")
 
@@ -380,7 +408,7 @@ def pesquisa_falta_aula(nome_aula):
 
     return results
 
-
+# Computa as faltas no final do dia
 def computa_falta(turma, dia):
     global dia_semana
     conexao = sqlite3.connect("banco.db")

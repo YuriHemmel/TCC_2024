@@ -381,8 +381,9 @@ def alunos():
 
     # ------------------------------------------------- Detalhes do Aluno ---------------------------------------------------
 
-    global undo_list, botao_undo
+    global undo_list, botao_undo, undo_falta
     undo_list = []
+    undo_falta = []
 
     # Função novo aluno
     def novo_aluno():
@@ -435,7 +436,7 @@ def alunos():
 
             for aula in aulas:
                 if turma == aula[4]:
-                    utils.cria_falta([ra, aula[0]])
+                    utils.cria_falta([ra, aula[0], 0])
 
             entry_ra.delete(0, END)
             entry_nome_aluno.delete(0, END)
@@ -494,7 +495,7 @@ def alunos():
             label_foto.place(x=300, y=10)
 
             def atualiza():
-                global botao_undo
+                global botao_undo, undo_falta
                 # Dados do aluno
                 ra = entry_ra.get()
                 nome = entry_nome_aluno.get()
@@ -507,6 +508,8 @@ def alunos():
                 ra = ra.upper()
 
                 undo_list.append(ra)
+
+                undo_falta = [ra_antigo, ra]
 
                 # Lista dos dados
                 lista = [ra, nome, email, telefone,
@@ -572,6 +575,8 @@ def alunos():
 
             valor_ra = tree_lista[0]
 
+            faltas = utils.mostra_falta_aluno(valor_ra)
+
             # Confirmação para apagar
             res = messagebox.askquestion(
                 'Confirmação', 'Deseja apagar os dados deste aluno?')
@@ -594,6 +599,10 @@ def alunos():
                 utils.cria_aluno(tree_lista)
                 mostra_alunos()
                 botao_desfazer.destroy()
+
+                for falta in faltas:
+                    utils.cria_falta([falta[0], falta[1], falta[2]])
+
 
             # Botão desfazer deleção de aluno
             botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=9,
@@ -647,7 +656,7 @@ def alunos():
             label_foto.place(x=300, y=10)
 
             def atualiza():
-                global botao_undo
+                global botao_undo, undo_falta
                 # Dados do aluno
                 ra = entry_ra.get()
                 nome = entry_nome_aluno.get()
@@ -660,6 +669,8 @@ def alunos():
                 ra = ra.upper()
 
                 undo_list.append(ra)
+
+                undo_falta = [valor_ra, ra]
 
                 # Lista dos dados
                 lista = [ra, nome, email, telefone,
@@ -864,10 +875,11 @@ def alunos():
 
     # Desfaz a ação de atualizar o aluno
     def undo_atualiza():
-        global undo_list, botao_undo
+        global undo_list, botao_undo, undo_falta
         utils.atualiza_aluno(undo_list)
         mostra_alunos()
         botao_undo.destroy()
+        utils.atualiza_falta(undo_falta)
 
     # Botão desfazer alteração do aluno
     botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
@@ -929,6 +941,7 @@ def alunos():
                            overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
     botao_mostrar.place(x=727, y=180)
 
+    # Mostra a tabela com os alunos
     def mostra_alunos():
         tabela_alunos_label = Label(frame_info, text="Tabela de alunos",
                                     height=1, relief="flat", anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
@@ -1524,6 +1537,10 @@ def aulas():
 
     # ------------------------------------------------- Detalhes da aula ---------------------------------------------------
 
+    global undo_falta
+
+    undo_falta = []
+
     # Função nova aula
     def nova_aula():
         nome = entry_nome_aula.get()
@@ -1541,12 +1558,6 @@ def aulas():
 
         # Cria a aula
         utils.cria_aula(lista)
-
-        """alunos = utils.mostra_aluno()
-
-        if alunos != []:
-            for aluno in alunos:
-                utils.cria_falta([aluno[0], ])"""
 
         messagebox.showinfo("Sucesso", "Os dados foram inseridos com sucesso")
 
@@ -1643,6 +1654,12 @@ def aulas():
             # Salva o id
             valor_id = tree_lista[0]
 
+            nome = tree_lista[1]
+
+            nome = str(nome).lower()
+
+            faltas = utils.mostra_falta_aula(nome)
+
             # Confirmação para apagar
             res = messagebox.askquestion(
                 'Confirmação', 'Deseja apagar os dados desta aula?')
@@ -1661,11 +1678,14 @@ def aulas():
             # atualiza os dados da tabela
             mostra_aula()
 
-            # Desfaz a ação de apagar o aluno
+            # Desfaz a ação de apagar a aula
             def undo_apaga():
-                utils.cria_aula([tree_lista[1],tree_lista[2], tree_lista[3], tree_lista[4]])
+                utils.cria_aula_id(tree_lista)
                 mostra_aula()
                 botao_desfazer.destroy()
+
+                for falta in faltas:
+                    utils.cria_falta([falta[0], falta[1], falta[2]])
 
             # Botão desfazer deleção de aluno
             botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=9,
