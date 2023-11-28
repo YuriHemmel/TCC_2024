@@ -864,13 +864,16 @@ def alunos():
 
         foto_string = utils.tira_foto_binario()
 
-        aluno_foto = utils.convertToImage(foto_string)
-        aluno_foto = aluno_foto.resize((130, 130))
-        aluno_foto = ImageTk.PhotoImage(aluno_foto)
+        try:
+            aluno_foto = utils.convertToImage(foto_string)
+            aluno_foto = aluno_foto.resize((130, 130))
+            aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
-        label_foto = Label(frame_info, image=aluno_foto,
-                           bg=AZUL_CLARO, fg=BRANCO)
-        label_foto.place(x=300, y=10)
+            label_foto = Label(frame_info, image=aluno_foto,
+                            bg=AZUL_CLARO, fg=BRANCO)
+            label_foto.place(x=300, y=10)
+        except:
+            messagebox.showerror('Erro', 'Não foi possível processar a foto corretamente.\nPor favor tente novamente')
 
 
     # Desfaz a ação de atualizar o aluno
@@ -2033,7 +2036,7 @@ def faltas():
         frame_info['height'] = 370
         frame_tabela.place(x=0, y=118+380)
 
-        lista_cabecalho = ['ID', 'RA', 'Nome', 'Aula', 'Turma', 'Faltas']
+        lista_cabecalho = ['ID', 'RA', 'Nome do Aluno', 'Aula', 'Turma', 'Faltas']
 
         if tipo == "":
             lista_itens = utils.mostra_falta()
@@ -2131,7 +2134,8 @@ def cameras():
             # Salva o id
             valor_id = tree_lista[0]
 
-            undo_list = tree_lista
+            dados = utils.pesquisa_camera_id(valor_id)
+            undo_list = dados
 
             # Limpa os campos
             entry_nome_camera.delete(0, END)
@@ -2139,13 +2143,11 @@ def cameras():
             entry_usuario.delete(0, END)
             entry_senha.delete(0, END)
 
-            # Desabilita o campo de senha
-            entry_senha["state"] = DISABLED
-
             # Insere dados nas Entrys
-            entry_nome_camera.insert(0, tree_lista[1])
-            entry_ip.insert(0, tree_lista[2])
-            entry_usuario.insert(0, tree_lista[3])
+            entry_nome_camera.insert(0, dados[1])
+            entry_ip.insert(0, dados[2])
+            entry_usuario.insert(0, dados[3])
+            entry_senha.insert(0, dados[4])
 
             # Atualiza
             def atualiza():
@@ -2153,8 +2155,9 @@ def cameras():
                 nome = entry_nome_camera.get()
                 ip = entry_ip.get()
                 usuario = entry_usuario.get()
+                senha = entry_senha.get()
 
-                lista = [valor_id, nome, ip, usuario]
+                lista = [valor_id, nome, ip, usuario, senha]
 
                 # Se os campos não forem preenchidos corretamente
                 for item in lista:
@@ -2180,10 +2183,9 @@ def cameras():
                 entry_nome_camera.delete(0, END)
                 entry_ip.delete(0, END)
                 entry_usuario.delete(0, END)
+                entry_senha.delete(0, END)
 
                 botao_salvar.destroy()
-
-                entry_senha["state"] = NORMAL
 
                 # atualiza os dados da tabela
                 mostra_camera()
@@ -2210,6 +2212,8 @@ def cameras():
             # Salva o id
             valor_id = tree_lista[0]
 
+            dados = utils.pesquisa_camera_id(valor_id)
+
             # Confirmação para apagar
             res = messagebox.askquestion(
                 'Confirmação', 'Deseja apagar os dados desta camera?')
@@ -2228,12 +2232,12 @@ def cameras():
 
             # Desfaz a ação de apagar o aluno
             def undo_apaga():
-                utils.cria_camera([tree_lista[1], tree_lista[2], tree_lista[3], tree_lista[4]])
+                utils.cria_camera([dados[1], dados[2], dados[3], dados[4]])
                 mostra_camera()
                 botao_desfazer.destroy()
 
             # Botão desfazer deleção de aluno
-            botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=9,
+            botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=10,
                                     overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
             botao_desfazer.place(x=726, y=110)
 
@@ -2259,8 +2263,6 @@ def cameras():
             entry_usuario.delete(0, END)
             entry_senha.delete(0, END)
 
-            entry_senha["state"] = DISABLED
-
             # Inserindo dados nas entrys
             entry_nome_camera.insert(0, dados[1])
             entry_ip.insert(0, dados[2])
@@ -2272,9 +2274,10 @@ def cameras():
                 nome = entry_nome_camera.get()
                 ip = entry_ip.get()
                 usuario = entry_usuario.get()
+                senha = entry_senha.get()
 
                 # Lista dos dados
-                lista = [valor_id, nome, ip, usuario]
+                lista = [valor_id, nome, ip, usuario, senha]
 
                 # Verifica se os campos fora preenchidos
                 for item in lista:
@@ -2301,11 +2304,10 @@ def cameras():
                 entry_nome_camera.delete(0, END)
                 entry_ip.delete(0, END)
                 entry_usuario.delete(0, END)
+                entry_senha.delete(0, END)
 
                 # Destruindo Labels, Entry e botão desnecessários
                 botao_salvar.destroy()
-
-                entry_senha["state"] = NORMAL
 
                 # Atualiza tabela
                 mostra_camera()

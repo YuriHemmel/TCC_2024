@@ -1,3 +1,4 @@
+import os
 import base64
 import io
 import cv2 as cv
@@ -16,27 +17,28 @@ def tira_foto_binario():
     global bytes_foto
     #cam = Camera.load_camera("192.168.1.220")
 
-#    user = "admin"
- #   password = "arifym2023"
-  #  ip = "192.168.1.220"
-   # port = '554'
+    #user = "admin"
+    #password = "arifym2023"
+    #ip = "192.168.1.220"
+    #port = '554'
 
     #url = f"rtsp://{user}:{password}@{ip}:{port}/onvif1"
     camera = 0
 
     #print('Tentando conectar com ' + url)
-    print('Tentando conectar com a camera')
+    print('Conectando com a camera...')
     cap = cv.VideoCapture(camera)#, cv.CAP_FFMPEG)
 
     if cap.isOpened():
         validacao, frame = cap.read()
         while validacao:
+            validacao, frame = cap.read()
             cv.imshow("Video da Webcam", frame)
             if cv.waitKey(0) == ord('q') or cv.waitKey(0) == ord('Q') or cv.waitKey(0) == 27:
                 break
         cv.imwrite("imagem.jpg", frame)
         bytes_foto = convertToBinaryData("imagem.jpg")
-        
+        os.remove("imagem.jpg")
     cap.release()
     cv.destroyAllWindows()
     return bytes_foto
@@ -532,7 +534,7 @@ def mostra_camera():
 
     with conexao:
         cursor = conexao.cursor()
-        cursor.execute("""SELECT id, nome, ip, usuario FROM cameras""")
+        cursor.execute("""SELECT id, nome, ip, usuario, senha FROM cameras""")
         results = cursor.fetchall()
 
         for linha in results:
@@ -548,7 +550,7 @@ def atualiza_camera(lista):
     with conexao:
         cursor = conexao.cursor()
         cursor.execute(
-            f"""UPDATE cameras SET nome="{lista[1]}", ip="{lista[2]}", usuario="{lista[3]}"  WHERE id="{lista[0]}" """)
+            f"""UPDATE cameras SET nome="{lista[1]}", ip="{lista[2]}", usuario="{lista[3]}", senha="{lista[4]}"  WHERE id="{lista[0]}" """)
 
 # Deleta dados do cursos
 
@@ -565,8 +567,21 @@ def pesquisa_camera(ip):
 
     with conexao:
         cursor = conexao.cursor()
-        cursor.execute(f"""SELECT id, nome, ip, usuario FROM cameras
+        cursor.execute(f"""SELECT id, nome, ip, usuario, senha FROM cameras
                        WHERE ip = "{ip}" """)
+
+        results = cursor.fetchone()
+
+    return results
+
+# Pesquisa a câmera pelo id
+def pesquisa_camera_id(id):
+    conexao = sqlite3.connect("banco.db")
+
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""SELECT id, nome, ip, usuario, senha FROM cameras
+                       WHERE id = "{id}" """)
 
         results = cursor.fetchone()
 
