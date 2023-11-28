@@ -34,7 +34,8 @@ def tira_foto_binario():
         while validacao:
             validacao, frame = cap.read()
             cv.imshow("Video da Webcam", frame)
-            if cv.waitKey(0) == ord('q') or cv.waitKey(0) == ord('Q') or cv.waitKey(0) == 27:
+            key = cv.waitKey(5)
+            if key == ord('q') or key == ord('Q') or key == 27: # ESC
                 break
         cv.imwrite("imagem.jpg", frame)
         bytes_foto = convertToBinaryData("imagem.jpg")
@@ -58,6 +59,30 @@ def convertToImage(bytes_foto):
     imagem = Image.open(io.BytesIO(binary_data))
 
     return imagem
+
+def mostra_video_camera(lista):
+    nome = str(lista[1]).lower()
+    if nome == "Webcam".lower():
+        webcam = cv.VideoCapture(0)
+    else:
+        ip = lista[2]
+        user = lista[3]
+        password = lista[4]
+
+        url = f"rtsp://{user}:{password}@{ip}:554/onvif1"
+
+        webcam = cv.VideoCapture(url, cv.CAP_FFMPEG)
+
+    if webcam.isOpened():
+        validacao, frame = webcam.read()
+        while validacao:
+            validacao, frame = webcam.read()
+            cv.imshow(f"Video da {lista[1]}", frame)
+            key = cv.waitKey(5)
+            if key == ord('q') or key == ord('Q') or key == 27: # ESC
+                break
+    webcam.release()
+    cv.destroyAllWindows()
 # ============================== Funções de Tabelas =========================================
 # --------------------------------- Tabela cursos -------------------------------------------
 

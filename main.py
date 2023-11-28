@@ -2191,7 +2191,7 @@ def cameras():
                 mostra_camera()
 
                 # Botão desfazer alteração do aula
-                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
+                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=9,
                                     overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
                 botao_undo.place(x=726, y=110)
 
@@ -2237,7 +2237,7 @@ def cameras():
                 botao_desfazer.destroy()
 
             # Botão desfazer deleção de aluno
-            botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=10,
+            botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=9,
                                     overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
             botao_desfazer.place(x=726, y=110)
 
@@ -2346,6 +2346,22 @@ def cameras():
         except IndexError:
             messagebox.showerror("Erro", "Selecione uma camera na tabela.")
 
+    def mostra_imagem():
+        try:
+            tree_itens = tree_cameras.focus()
+            tree_dicionario = tree_cameras.item(tree_itens)
+            tree_lista = tree_dicionario['values']
+
+            # Salva o id
+            valor_id = tree_lista[0]
+
+            dados = utils.pesquisa_camera_id(valor_id)
+
+            utils.mostra_video_camera(dados)
+
+        except IndexError:
+            messagebox.showerror("Erro", "Selecione uma camera na tabela.")
+
     # Label e entry do Nome da camera
     label_nome = Label(frame_info, text="Nome *",
                        height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
@@ -2427,6 +2443,12 @@ def cameras():
                             font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
     botao_procurar.place(x=757, y=33)
 
+    # Botão mostra visão da camera
+    botao_imagem = Button(frame_info, command=mostra_imagem, anchor=CENTER, text='Mostrar Vídeo', width=13,
+                             overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
+    botao_imagem.place(x=665, y=75)
+
+
     # ---------------------------------- Tabela das cameras -------------------------------------
 
     def mostra_camera():
@@ -2477,7 +2499,7 @@ def cameras():
         botao_undo.destroy()
 
     # Botão desfazer alteração do aula
-    botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
+    botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=9,
                         overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
     botao_undo.place(x=726, y=110)
 
