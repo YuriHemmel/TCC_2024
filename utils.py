@@ -263,18 +263,15 @@ def apaga_aula(id):
         cursor.execute(f"""DELETE FROM aulas WHERE id="{id}" """)
 
 # Verifica as aulas do dia
-def verifica_aula_dia():
+def verifica_aula_dia(dia):
     global dia_semana
-    # Dia e hora atuais
-    current = datetime.now()
-    current_day = current.weekday()
 
     # Selecionando as aulas de hoje
     conexao = sqlite3.connect("banco.db")
     with conexao:
         cursor = conexao.cursor()
         cursor.execute(f"""SELECT id, hora, turma_id FROM aulas
-                       WHERE dia = "{dia_semana[current_day]}" """)
+                       WHERE dia = "{dia_semana[dia]}" """)
         results = cursor.fetchall()
 
     # Se não tiver aula hoje, retorna vazio

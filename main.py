@@ -202,7 +202,7 @@ def prepara_dia():
 
     if dia_semana in [0, 1, 2, 3, 4]:
         # Aulas do dia
-        aulas_dia = utils.verifica_aula_dia()
+        aulas_dia = utils.verifica_aula_dia(dia_semana)
 
 # Computa as faltas do dia
 
