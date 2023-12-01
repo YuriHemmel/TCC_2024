@@ -417,18 +417,13 @@ def alunos():
 
             aulas = utils.mostra_aula()
 
-            if aulas == []:
-                messagebox.showerror(
-                    "Erro", "Não há aulas para a turmas deste aluno.\n Por favor crie aulas antes de cadastrar um aluno.")
-                return
-            else:
-                for aula in aulas:
-                    if aula[4] == turma:
-                        break
-                    if aula == aulas[len(aulas)-1] and aula[4] != turma:
-                        messagebox.showerror(
-                            "Erro", "Não há aulas para a turmas deste aluno.\n Por favor crie aulas antes de cadastrar um aluno.")
-                        return
+            for aula in aulas:
+                if aula[4] == turma:
+                    break
+                if aula == aulas[len(aulas)-1] and aula[4] != turma:
+                    messagebox.showerror(
+                        "Erro", "Não há aulas para a turmas deste aluno.\n Por favor crie aulas antes de cadastrar um aluno.")
+                    return
 
             # Criando aluno
             utils.cria_aluno(lista)
@@ -456,7 +451,7 @@ def alunos():
 
     # Carrega informações do aluno
     def carregar_aluno():
-        global aluno_foto, label_foto, foto_string, undo_list
+        global botao_undo, aluno_foto, label_foto, foto_string, undo_list
 
         try:
             tree_itens = tree_alunos.focus()
@@ -496,6 +491,8 @@ def alunos():
             label_foto = Label(frame_info, image=aluno_foto,
                                bg=AZUL_CLARO, fg=BRANCO)
             label_foto.place(x=300, y=10)
+
+            botao_undo.destroy()
 
             def atualiza():
                 global botao_undo, undo_falta
@@ -1564,6 +1561,11 @@ def aulas():
 
         # Cria a aula
         utils.cria_aula(lista)
+
+        alunos = utils.mostra_aluno_da_turma(turma)
+        for aluno in alunos:
+            falta = [aluno[0], utils.ultima_aula_criada(), 0]
+            utils.cria_falta(falta)
 
         messagebox.showinfo("Sucesso", "Os dados foram inseridos com sucesso")
 

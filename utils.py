@@ -300,6 +300,17 @@ def tempo_para_aula(aulas):
 
     return todas_aulas
 
+#Verifica última aula criada
+def ultima_aula_criada():
+    conexao = sqlite3.connect("banco.db")
+
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute("""SELECT MAX(id) FROM aulas """)
+
+        results = cursor.fetchone()
+
+    return results[0]
 
 # --------------------------------- Tabela faltas -------------------------------------------
 
@@ -470,6 +481,22 @@ def mostra_aluno():
 
     return lista
 
+# Pesquisa os alunos com base na turma
+def mostra_aluno_da_turma(turma):
+    lista = []
+    conexao = sqlite3.connect("banco.db")
+
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""SELECT * FROM alunos
+                       WHERE turma_id = "{turma}" """)
+        results = cursor.fetchall()
+
+        for linha in results:
+            lista.append(linha)
+
+    return lista
+
 # Pesquisa alunos pelo ra
 def pesquisa_aluno(ra):
     conexao = sqlite3.connect("banco.db")
@@ -524,6 +551,7 @@ def alunos_para_avisar(turma):
         results = cursor.fetchall()
 
     return results
+
 
 # --------------------------------- Tabela cameras -------------------------------------------
 
