@@ -215,7 +215,9 @@ def computa_faltas():
 
     # 0 = Segunda a 6 = domingo
     if dia_semana in [0, 1, 2, 3, 4]:
-        utils.computa_falta(turma=aulas_dia, dia=dia_semana)
+        for turma in aulas_dia:
+            # Turma é segundo elemento do "aulas_dia"
+            utils.computa_falta(turma=turma[2], dia=dia_semana)
         print("Faltas computadas")
 
 # Manda mensagens para os alunos sobre as aulas
@@ -252,7 +254,8 @@ def manda_mensagens():
 
 def inicia_app():
     prepara_dia()
-    manda_mensagens()
+    #manda_mensagens()
+    computa_faltas()
 
 # Fecha o aplicativo e seus subprocessos
 

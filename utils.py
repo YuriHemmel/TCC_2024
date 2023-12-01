@@ -15,27 +15,17 @@ dia_semana = {0: 'Segunda-feira', 1: 'Terça-feira',
 # Tira foto por meio da Webcam
 def tira_foto_binario():
     global bytes_foto
-    #cam = Camera.load_camera("192.168.1.220")
 
-    #user = "admin"
-    #password = "arifym2023"
-    #ip = "192.168.1.220"
-    #port = '554'
-
-    #url = f"rtsp://{user}:{password}@{ip}:{port}/onvif1"
-    camera = 0
-
-    #print('Tentando conectar com ' + url)
     print('Conectando com a camera...')
-    cap = cv.VideoCapture(camera)#, cv.CAP_FFMPEG)
+    cap = cv.VideoCapture(0)#, cv.CAP_FFMPEG)
 
     if cap.isOpened():
         validacao, frame = cap.read()
         while validacao:
             validacao, frame = cap.read()
             cv.imshow("Video da Webcam", frame)
-            key = cv.waitKey(5)
-            if key == ord('q') or key == ord('Q') or key == 27: # ESC
+            key = cv.waitKey(1)
+            if key == ord('q') or key == ord('Q') or key == 27: # 27 == ESC
                 break
         cv.imwrite("imagem.jpg", frame)
         bytes_foto = convertToBinaryData("imagem.jpg")
@@ -61,7 +51,9 @@ def convertToImage(bytes_foto):
     return imagem
 
 def mostra_video_camera(lista):
+
     nome = str(lista[1]).lower()
+    
     if nome == "Webcam".lower():
         webcam = cv.VideoCapture(0)
     else:
@@ -78,7 +70,7 @@ def mostra_video_camera(lista):
         while validacao:
             validacao, frame = webcam.read()
             cv.imshow(f"Video da {lista[1]}", frame)
-            key = cv.waitKey(5)
+            key = cv.waitKey(1)
             if key == ord('q') or key == ord('Q') or key == 27: # ESC
                 break
     webcam.release()
