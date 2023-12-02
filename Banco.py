@@ -14,14 +14,14 @@ class Banco():
         # Tabela Cursos
         cursor.execute("""CREATE TABLE IF NOT EXISTS cursos (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    nome TEXT NOT NULL,
+                    nome TEXT UNIQUE NOT NULL,
                     duracao TEXT NOT NULL
                     )""")  
 
         # Tabela Turmas
         cursor.execute("""CREATE TABLE IF NOT EXISTS turmas (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    nome TEXT NOT NULL,
+                    nome TEXT UNIQUE NOT NULL,
                     curso_id INTEGER NOT NULL,
                     data_inicio DATE NOT NULL,
                     FOREIGN KEY (curso_id) REFERENCES cursos (id) ON UPDATE CASCADE ON DELETE CASCADE

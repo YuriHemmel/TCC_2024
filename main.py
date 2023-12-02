@@ -909,26 +909,29 @@ def cursos_turmas():
 
     # Função novo curso
     def novo_curso():
-        nome = entry_nome_curso.get()
-        duracao = entry_duracao.get()
+        try:
+            nome = entry_nome_curso.get()
+            duracao = entry_duracao.get()
 
-        lista = [nome, duracao]
+            lista = [nome, duracao]
 
-        # Se os campos não forem preenchidos corretamente
-        for item in lista:
-            if item == "":
-                messagebox.showerror("Erro", "Preencha todos os campos")
-                return
+            # Se os campos não forem preenchidos corretamente
+            for item in lista:
+                if item == "":
+                    messagebox.showerror("Erro", "Preencha todos os campos")
+                    return
 
-        # Cria o Curso
-        utils.cria_curso(lista)
+            # Cria o Curso
+            utils.cria_curso(lista)
 
-        messagebox.showinfo("Sucesso", "Os dados foram inseridos com sucesso")
+            messagebox.showinfo("Sucesso", "Os dados foram inseridos com sucesso")
 
-        entry_nome_curso.delete(0, END)
-        entry_duracao.delete(0, END)
+            entry_nome_curso.delete(0, END)
+            entry_duracao.delete(0, END)
 
-        controle('cursos')
+            controle('cursos')
+        except:
+            messagebox.showerror("Erro", "Curso já cadastrado")
 
     # Função carregar/atualizar curso
     def carregar_curso():
@@ -1158,29 +1161,32 @@ def cursos_turmas():
 
     # Função novo turma
     def nova_turma():
-        nome = entry_nome_turma.get()
-        curso = combobox_curso.get()
-        data = data_inicio.get_date()
+        try:
+            nome = entry_nome_turma.get()
+            curso = combobox_curso.get()
+            data = data_inicio.get_date()
 
-        lista = [nome, curso, data]
+            lista = [nome, curso, data]
 
-        # Se os campos não forem preenchidos corretamente
-        for item in lista:
-            if item == "":
-                messagebox.showerror("Erro", "Preencha todos os campos")
-                return
+            # Se os campos não forem preenchidos corretamente
+            for item in lista:
+                if item == "":
+                    messagebox.showerror("Erro", "Preencha todos os campos")
+                    return
 
-        # Cria o turma
-        utils.cria_turma(lista)
+            # Cria o turma
+            utils.cria_turma(lista)
 
-        messagebox.showinfo("Sucesso", "Os dados foram inseridos com sucesso")
+            messagebox.showinfo("Sucesso", "Os dados foram inseridos com sucesso")
 
-        entry_nome_turma.delete(0, END)
-        combobox_curso.set("")
-        data_inicio.delete(0, END)
+            entry_nome_turma.delete(0, END)
+            combobox_curso.set("")
+            data_inicio.delete(0, END)
 
-        # Atualiza a tabela
-        mostra_turmas()
+            # Atualiza a tabela
+            mostra_turmas()
+        except:
+            messagebox.showerror("Erro", "Turma já cadastrada")
 
     # Função carregar/atualizar turma
     def carregar_turma():
