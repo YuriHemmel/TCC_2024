@@ -1,28 +1,58 @@
 import cv2
-import face_recognition as fr
+import face_recognition
+import os
+import numpy as np
 
-# Coleta imagens do banco
-imagem_banco = fr.load_image_file('testesFuncionalidades/rodrigo_lombardi_1.jpeg')
-imagem_banco = cv2.cvtColor(imagem_banco, cv2.COLOR_BGR2RGB)
-#imagem_entrada = fr.load_image_file('testesFuncionalidades/rodrigo_lombardi_2.jpeg')
-#imagem_entrada = cv2.cvtColor(imagem_entrada, cv2.COLOR_BGR2RGB)
-imagem_entrada = fr.load_image_file('testesFuncionalidades/oscar_isaac.jpeg')
-imagem_entrada = cv2.cvtColor(imagem_entrada, cv2.COLOR_BGR2RGB)
+path = 'imagensAlunos'
+imagens = []
+classnames = []
+minhaLista = os.listdir(path)
+print(minhaLista)
 
-# desenha o retangulo em volta da cara do individuo
-face_location_imagem_banco = fr.face_locations(imagem_banco)[0]
-face_location_imagem_entrada = fr.face_locations(imagem_entrada)[0]
-cv2.rectangle(imagem_banco, (face_location_imagem_banco[3], face_location_imagem_banco[0]), (face_location_imagem_banco[1], face_location_imagem_banco[2]), (0, 255, 0), 2)
-cv2.rectangle(imagem_entrada, (face_location_imagem_entrada[3], face_location_imagem_entrada[0]), (face_location_imagem_entrada[1], face_location_imagem_entrada[2]), (0, 255,0), 2)
+for aluno in minhaLista:
+    current_image = cv2.imread(f'{path}/{aluno}')
+    imagens.append(current_image)
+    classnames.append(os.path.splitext(aluno)[0])
 
-# traduz para matriz a imagem para realizar a comparação
-face_encoding_imagem_banco = fr.face_encodings(imagem_banco)[0]
-face_encoding_imagem_entrada = fr.face_encodings(imagem_entrada)[0]
+print(classnames)
 
-# compara as faces de cada individuo com a imagem entrada, diz a distancia entre elas e calcula a precisão de ser a mesma pessoa
-mesma_pessoa = fr.compare_faces([face_encoding_imagem_banco], face_encoding_imagem_entrada, 0.5)[0]
-distancia = fr.face_distance([face_encoding_imagem_banco], face_encoding_imagem_entrada)[0]
-precisao = (1 - abs(distancia)) * 100
+def find_encodings(images):
+    encode_list = []
+    for img in images:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        encode = face_recognition.face_encodings(img)[0]
+        encode_list.append(encode)
 
-# faz um print do resultado
-print(f" Comparação : {mesma_pessoa}, distancia entre imagens: {distancia}, precisão: {precisao:.2f}%")
+    return encode_list
+
+encode_list_known = find_encodings(imagens)
+print('Encoding Complete')
+
+cap = cv2.VideoCapture(0)
+
+while True:
+    success, img = cap.read()
+    imgS = cv2.resize(img, (0, 0), None, 0.25, 0.25)
+    imgS = cv2.cvtColor(imgS, cv2.COLOR_BGR2RGB)
+
+    facesCurrentFrame = face_recognition.face_locations(imgS)
+    encodesCurrentFrame = face_recognition.face_encodings(imgS, facesCurrentFrame)
+
+    for encodeFace, faceLoc in zip(encodesCurrentFrame, facesCurrentFrame):
+        matches = face_recognition.compare_faces(encode_list_known, encodeFace)
+        face_distance = face_recognition.face_distance(encode_list_known, encodeFace)
+        print(face_distance)
+        matchIndex = np.argmin(face_distance)
+
+        if matches[matchIndex]:
+            name = classnames[matchIndex].upper()
+            print(name)
+            y1, x2, y2, x1 = faceLoc
+            y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4  
+            cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv2.rectangle(img, (x1, y2 - 35), (x2, y2), (0, 255, 0), cv2.FILLED)
+            cv2.putText(img, name, (x1 + 6, y2 + 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
+
+    
+    cv2.imshow('Webcam', img)
+    cv2.waitKey(1)
