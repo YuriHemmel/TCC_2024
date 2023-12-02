@@ -5,6 +5,7 @@ import cv2 as cv
 import sqlite3
 from datetime import *
 from PIL import Image
+import numpy 
 
 global dia_semana
 
@@ -52,6 +53,15 @@ def convertToImage(bytes_foto):
 
     return imagem
 
+
+def recupera_imagem_aluno(bytes_foto):
+    string = str(bytes_foto).strip("b'")[:-1]
+    code_with_padding = f"{string}{'=' * (len(string) % 4)}"
+    binary_data = base64.b64decode(code_with_padding)
+    img = numpy.fromstring(binary_data, numpy.uint8)
+    return img
+
+
 def mostra_video_camera(lista):
 
     nome = str(lista[1]).lower()
@@ -79,23 +89,36 @@ def mostra_video_camera(lista):
     cv.destroyAllWindows()
 
 # Preenche a pasta imagensAlunos com fotos dos alunos que devem comparecer no dia
-def adiciona_fotos_alunos(aulas_dia):
+def adiciona_fotos_alunos(aulas_dia, dia):
     if aulas_dia == []:
+        print("Não há aula para esse dia")
         return
     
-    for aula in aulas_dia:
-        pass
-#    turma_id = aulas_dia[2]
     conexao = sqlite3.connect("banco.db")
-'''
-    with conexao:
-        cursor = conexao.cursor()
+    for aula in aulas_dia:
+        print(aula[2])
+    
+        with conexao:
+            cursor = conexao.cursor()
 
-        cursor.execute(
-            f"""
-                SELECT foto from alunos where 
-            """
-        )'''
+            cursor.execute(
+                f"""
+                     select al.ra, al.foto from alunos al left join aulas au on al.turma_id = au.turma_id 
+                     where au.turma_id = "{aula[2]}" AND au.dia = "{dia_semana[dia]}"; 
+                """
+            )
+
+            fotos = cursor.fetchall()
+            path = 'imagensAlunos'
+            for foto in fotos:
+                ra = foto[0]
+                path_foto = f"{path}/{ra}.jpeg"
+                print(path_foto)
+
+                img = recupera_imagem_aluno(foto[1])
+                img = cv.imdecode(img, cv.IMREAD_COLOR)
+                cv.imwrite(path_foto, img)
+#                aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
 # ============================== Funções de Tabelas =========================================
 # --------------------------------- Tabela cursos -------------------------------------------
