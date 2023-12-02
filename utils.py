@@ -274,7 +274,7 @@ def pesquisa_aula(nome):
     with conexao:
         cursor = conexao.cursor()
         cursor.execute(f"""SELECT * FROM aulas
-                       WHERE UPPER(nome) = "{nome}" """)
+                       WHERE LOWER(nome) = "{nome}" """)
 
         results = cursor.fetchone()
 

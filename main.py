@@ -9,6 +9,8 @@ from tkinter import messagebox  # Caixa de mensagem para confirmações
 from tkinter import ttk
 from tkinter import filedialog as fd
 from tkcalendar import DateEntry
+from tktimepicker import SpinTimePickerModern
+from tktimepicker import constants
 from datetime import *
 from email_utils import envia_email_alerta, envia_email_acusando_falta, envia_email_confirmando_presenca, envia_email_aula_comeca
 from PIL import Image, ImageTk
@@ -107,7 +109,7 @@ def computa_faltas():
     current_time = datetime.now()
 
     # Verifica se hoje é dia de semana ou fim de semana
-    #dia_semana = current_time.weekday()
+    # dia_semana = current_time.weekday()
     dia_semana = 4
 
     # 0 = Segunda a 6 = domingo
@@ -152,7 +154,7 @@ def manda_mensagens():
 def inicia_app():
     prepara_dia()
     manda_mensagens()
-    #computa_faltas()
+    # computa_faltas()
 
 # Fecha o aplicativo e seus subprocessos
 
@@ -492,7 +494,6 @@ def alunos():
                 for falta in faltas:
                     utils.cria_falta([falta[0], falta[1], falta[2]])
 
-
             # Botão desfazer deleção de aluno
             botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=9,
                                     overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
@@ -759,13 +760,14 @@ def alunos():
             aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
             label_foto = Label(frame_info, image=aluno_foto,
-                            bg=AZUL_CLARO, fg=BRANCO)
+                               bg=AZUL_CLARO, fg=BRANCO)
             label_foto.place(x=300, y=10)
         except:
-            messagebox.showerror('Erro', 'Não foi possível processar a foto corretamente.\nPor favor tente novamente')
-
+            messagebox.showerror(
+                'Erro', 'Não foi possível processar a foto corretamente.\nPor favor tente novamente')
 
     # Desfaz a ação de atualizar o aluno
+
     def undo_atualiza():
         global undo_list, botao_undo, undo_falta
         utils.atualiza_aluno(undo_list)
@@ -924,7 +926,8 @@ def cursos_turmas():
             # Cria o Curso
             utils.cria_curso(lista)
 
-            messagebox.showinfo("Sucesso", "Os dados foram inseridos com sucesso")
+            messagebox.showinfo(
+                "Sucesso", "Os dados foram inseridos com sucesso")
 
             entry_nome_curso.delete(0, END)
             entry_duracao.delete(0, END)
@@ -1177,7 +1180,8 @@ def cursos_turmas():
             # Cria o turma
             utils.cria_turma(lista)
 
-            messagebox.showinfo("Sucesso", "Os dados foram inseridos com sucesso")
+            messagebox.showinfo(
+                "Sucesso", "Os dados foram inseridos com sucesso")
 
             entry_nome_turma.delete(0, END)
             combobox_curso.set("")
@@ -1441,9 +1445,11 @@ def aulas():
 
     # Função nova aula
     def nova_aula():
+        valor_hora = entry_hora.time()
+
         nome = entry_nome_aula.get()
         dia = combobox_dia.get()
-        hora = entry_hora.get()
+        hora = f"{valor_hora[0]}:{valor_hora[1]}"
         turma = combobox_turma.get()
 
         lista = [nome, dia, hora, turma]
@@ -1467,7 +1473,8 @@ def aulas():
         # Limpa os campos
         entry_nome_aula.delete(0, END)
         combobox_dia.set("")
-        entry_hora.delete(0, END)
+        entry_hora.set24Hrs(0)
+        entry_hora.setMins(0)
         combobox_turma.set("")
 
         mostra_aula()
@@ -1487,20 +1494,30 @@ def aulas():
 
            # Limpa os campos
             entry_nome_aula.delete(0, END)
-            entry_hora.delete(0, END)
+            entry_hora.set24Hrs(0)
+            entry_hora.setMins(0)
+
+            hora = tree_lista[3].split(":")
+
+            minuto = hora[1]
+            hora = hora[0]
 
             # Insere dados nas Entrys
             entry_nome_aula.insert(0, tree_lista[1])
             combobox_dia.set(tree_lista[2])
-            entry_hora.insert(0, tree_lista[3])
+            entry_hora.set24Hrs(hora)
+            entry_hora.setMins(minuto)
             combobox_turma.set(tree_lista[4])
 
             # Atualiza
             def atualiza():
                 global botao_undo
+
+                valor_hora = entry_hora.time()
+
                 nome = entry_nome_aula.get()
                 dia = combobox_dia.get()
-                hora = entry_hora.get()
+                hora = f"{valor_hora[0]}:{valor_hora[1]}"
                 turma = combobox_turma.get()
 
                 lista = [valor_id, nome, dia, hora, turma]
@@ -1528,7 +1545,8 @@ def aulas():
                 # Limpa os campos
                 entry_nome_aula.delete(0, END)
                 combobox_dia.set("")
-                entry_hora.delete(0, END)
+                entry_hora.set24Hrs(0)
+                entry_hora.setMins(0)
                 combobox_turma.set("")
 
                 # atualiza os dados da tabela
@@ -1604,7 +1622,7 @@ def aulas():
 
         nome = entry_procura.get()
 
-        nome = nome.upper()
+        nome = nome.lower()
 
         try:
             dados = utils.pesquisa_aula(nome)
@@ -1616,20 +1634,30 @@ def aulas():
             # Limpa os campos
             entry_procura.delete(0, END)
             entry_nome_aula.delete(0, END)
-            entry_hora.delete(0, END)
+            entry_hora.set24Hrs(0)
+            entry_hora.setMins(0)
+
+            hora = dados[3].split(":")
+
+            minuto = hora[1]
+            hora = hora[0]
 
             # Inserindo dados nas entrys
             entry_nome_aula.insert(0, dados[1])
             combobox_dia.set(dados[2])
-            entry_hora.insert(0, dados[3])
+            entry_hora.set24Hrs(hora)
+            entry_hora.setMins(minuto)
             combobox_turma.set(dados[4])
 
             def atualiza():
                 global botao_undo
+
+                valor_hora = entry_hora.time()
+
                 # Dados da aula
                 nome = entry_nome_aula.get()
                 dia = combobox_dia.get()
-                hora = entry_hora.get()
+                hora = f"{valor_hora[0]}:{valor_hora[1]}"
                 turma = combobox_turma.get()
 
                 # Lista dos dados
@@ -1659,7 +1687,8 @@ def aulas():
                 # Limpa os campos
                 entry_nome_aula.delete(0, END)
                 combobox_dia.set("")
-                entry_hora.delete(0, END)
+                entry_hora.set24Hrs(0)
+                entry_hora.setMins(0)
                 combobox_turma.set("")
 
                 # Destruindo Labels, Entry e botão desnecessários
@@ -1691,12 +1720,17 @@ def aulas():
             # Limpa os campos
             entry_procura.delete(0, END)
             entry_nome_aula.delete(0, END)
-            entry_hora.delete(0, END)
+
+            hora = tree_lista[3].split(":")
+
+            minuto = hora[1]
+            hora = hora[0]
 
             # Inserindo dados nas entrys
             entry_nome_aula.insert(0, tree_lista[1])
             combobox_dia.set(tree_lista[2])
-            entry_hora.insert(0, tree_lista[3])
+            entry_hora.set24Hrs(hora)
+            entry_hora.setMins(minuto)
             combobox_turma.set(tree_lista[4])
 
         except IndexError:
@@ -1730,9 +1764,12 @@ def aulas():
                        height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
     label_hora.place(x=10, y=130)
 
-    entry_hora = Entry(frame_info, width=20,
-                       justify='left', relief=SOLID)
-    entry_hora.place(x=12, y=160)
+    entry_hora = SpinTimePickerModern(frame_info)
+    entry_hora.addAll(constants.HOURS24)
+    entry_hora.configureAll(bg=AZUL_CLARO, height=1, fg=BRANCO, font=fonte_titulo, hoverbg=AZUL_CLARO,
+                            hovercolor=AZUL_ESCURO, clickedbg=AZUL_ESCURO, clickedcolor=BRANCO)
+    entry_hora.configure_separator(bg=AZUL_CLARO, fg=BRANCO)
+    entry_hora.place(x=12, y=155)
 
     # Pegando as Turmas
     turmas = utils.mostra_turma()
@@ -1839,7 +1876,7 @@ def aulas():
             tree_aulas.insert('', 'end', values=item)
 
         # Desfaz a ação de atualizar o aluno
-    
+
     def undo_atualiza():
         global undo_list, botao_undo
         utils.atualiza_aula(undo_list)
@@ -1936,7 +1973,8 @@ def faltas():
         frame_info['height'] = 370
         frame_tabela.place(x=0, y=118+380)
 
-        lista_cabecalho = ['ID', 'RA', 'Nome do Aluno', 'Aula', 'Turma', 'Faltas']
+        lista_cabecalho = ['ID', 'RA',
+                           'Nome do Aluno', 'Aula', 'Turma', 'Faltas']
 
         if tipo == "":
             lista_itens = utils.mostra_falta()
@@ -2347,9 +2385,8 @@ def cameras():
 
     # Botão mostra visão da camera
     botao_imagem = Button(frame_info, command=mostra_imagem, anchor=CENTER, text='Mostrar Vídeo', width=13,
-                             overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
+                          overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
     botao_imagem.place(x=665, y=75)
-
 
     # ---------------------------------- Tabela das cameras -------------------------------------
 
