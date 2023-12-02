@@ -2161,6 +2161,7 @@ def cameras():
             entry_nome_camera.insert(0, dados[1])
             entry_ip.insert(0, dados[2])
             entry_usuario.insert(0, dados[3])
+            entry_senha.insert(0, dados[4])
 
             def atualiza():
                 global botao_undo
@@ -2236,6 +2237,7 @@ def cameras():
             entry_nome_camera.insert(0, tree_lista[1])
             entry_ip.insert(0, tree_lista[2])
             entry_usuario.insert(0, tree_lista[3])
+            entry_senha.insert(0, tree_lista[4])
 
         except IndexError:
             messagebox.showerror("Erro", "Selecione uma camera na tabela.")
