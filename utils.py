@@ -84,7 +84,7 @@ def adiciona_fotos_alunos(aulas_dia):
         return
     
     for aula in aulas_dia:
-        print(aula[2])
+        pass
 #    turma_id = aulas_dia[2]
     conexao = sqlite3.connect("banco.db")
 '''
@@ -290,7 +290,6 @@ def verifica_aula_dia(dia):
 
     # Se não tiver aula hoje, retorna vazio
     # Se tiver, retorna o id, hora de início e id da turma
-    print(results)
     return results
 
 # Verifica qual a próxima aula
@@ -470,12 +469,13 @@ def computa_falta(turma, dia):
         for ra in ra_alunos:
             update_faltas(ra, dia, turma, conexao)
 
-        cursor = conexao.cursor()    
+        cursor = conexao.cursor()
         cursor.execute(f"""UPDATE alunos SET
                         presente = 0
                         WHERE presente = 1
                         """)
         cursor.close()
+    
 
 # Adiciona à lista ra_alunos cada aluno daquela turma
 def append_alunos(turma, ra_alunos, conexao):
@@ -486,15 +486,17 @@ def append_alunos(turma, ra_alunos, conexao):
         for elemento in (cursor.fetchall()):
             ra_alunos.append(elemento[0])
     
-    cursor.close()
+        cursor.close()
 
 # Atualiza o quadro de faltas de cada aula
 def update_faltas(ra, dia, turma, conexao):
     cursor = conexao.cursor()
     with conexao:
-        cursor.execute(f"""select distinct f.id_aula from faltas f left join alunos a, aulas au on f.ra = a.ra where a.turma_id = "{turma}" AND au.dia = "{dia_semana[dia]}" """)
+        cursor.execute(f"""SELECT f.id FROM faltas f
+                       JOIN alunos al ON f.ra = al.ra
+                       JOIN aulas au ON f.id_aula = au.id
+                       WHERE al.turma_id = "{turma}" AND au.dia like "{dia_semana[dia]}" """)
         id_aulas = cursor.fetchall()
-
         for id_aula in id_aulas:
             cursor.execute(f"""UPDATE faltas SET falta = falta + 1 WHERE ra = "{ra}"
                                 AND id_aula = "{id_aula[0]}"

@@ -65,114 +65,6 @@ show_frame(pagina_inicial)
 # Cria o banco de dados se não existir ainda
 db = Banco.Banco()
 
-'''
-# Funções que podem ser úteis depois
-def cadastra_pessoa():
-    # Padrões de regex para cada campo ser validado
-    PATTERN_RA = "^[A-z0-9]{7}$"
-    PATTERN_NOME = "^(?=^.{2,60}$)^[A-ZÀÁÂĖÈÉÊÌÍÒÓÔÕÙÚÛÇ][a-zàáâãèéêìíóôõùúç]+(?:[ ](?:das?|dos?|de|e|[A-ZÀÁÂĖÈÉÊÌÍÒÓÔÕÙÚÛÇ][a-zàáâãèéêìíóôõùúç]+))*$"
-    PATTERN_EMAIL = "^[a-z0-9.]+@aluno\.unip\.br$"
-
-    dados = [pagina_cadastro_pessoa_id.get(), pagina_cadastro_pessoa_nome.get(),
-             pagina_cadastro_pessoa_email.get()]
-
-    # Verifica se os campos estão vazios
-    for d in dados:
-        if d.strip() == "":
-            pagina_cadastro_pessoa_label.config(
-                text="Por favor, preencha os\ncampos corretamente.")
-            return
-
-    # Valida os campos com regex -> RA/ID, nome e email
-    ra_valido = re.match(PATTERN_RA, dados[0])
-    if ra_valido is None:
-        pagina_cadastro_pessoa_label.config(
-            text="ID inválido!\nPor favor, preencha o\ncampo de ID corretamente.")
-        return
-
-    nome_valido = re.match(PATTERN_NOME, dados[1])
-    if nome_valido is None:
-        pagina_cadastro_pessoa_label.config(
-            text="Nome inválido!\nPor favor, preencha o\ncampo de nome corretamente.")
-        return
-
-    email_valido = re.match(PATTERN_EMAIL, dados[2])
-    if email_valido is None:
-        pagina_cadastro_pessoa_label.config(
-            text="Email inválido!\nPor favor, preencha o\ncampo de email corretamente.")
-        return
-
-    if pagina_cadastro_pessoa_curso.get() == "Selecione um curso":
-        pagina_cadastro_pessoa_label.config(
-            text="Por favor, selecione um curso\nválido!")
-        return
-
-    # Tira foto em analise, vai falhar
-    fotoBin = utils.recebe_foto_binario()
-
-    # Verifica se os dados inseridos pertencem à uma pessoa já registrada
-    try:
-        pessoa = Pes.Pessoa(dados[0], dados[1], dados[2], 0, fotoBin,
-                            utils.retorna_curso_id(pagina_cadastro_pessoa_curso.get()), 0)
-        pessoa.insert_pessoa()
-    except:  # Exception as e:
-        # print(e)
-        pagina_cadastro_pessoa_label.config(
-            text="Pessoa já cadastrada\nanteriomente.")
-        return
-
-    # Cadastro bem sucedido
-    pagina_cadastro_pessoa_label.config(text="Pessoa registrada com sucesso.")
-    lista_pessoa.insert(0, f"RA: {dados[0]}     Nome: {dados[1]}")
-
-    pagina_cadastro_pessoa_nome.delete(0, END)
-    pagina_cadastro_pessoa_id.delete(0, END)
-    pagina_cadastro_pessoa_email.delete(0, END)
-
-    return
-
-def conecta_camera():
-    lista = utils.mostra_camera()
-
-    if lista == []:
-        messagebox.showinfo('Erro', 'Nenhuma câmera cadastrada')
-        return
-
-    for cam in lista:
-
-        if cam[1].upper() == "WEBCAM" or cam[1].upper() == "CAMERA TESTE":
-            cap = cv2.VideoCapture(0)
-
-        else:
-            ip = cam[2]
-            usuario = cam[3]
-            senha = cam[4]
-
-            porta = '554'
-
-            url = f"rtsp://{usuario}:{senha}@{ip}:{porta}/onvif1"
-
-            print('Tentando conectar com ' + url)
-
-            cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
-
-        while True:
-            ret, frame = cap.read()
-
-            if not ret:
-                print("Sem frame ou erro na captura de video")
-                break
-
-            cv2.imshow("VIDEO", frame)
-
-            if cv2.waitKey(1) == ord('q'):
-                print("Desconectando camera IP")
-                break
-
-        cap.release()
-        cv2.destroyAllWindows()
-
-'''
 
 # Retorna o RA dos alunos identificados via câmera (Precisa fazer)
 
@@ -204,7 +96,7 @@ def prepara_dia():
     if dia_semana in [0, 1, 2, 3, 4]:
         # Aulas do dia
         aulas_dia = utils.verifica_aula_dia(dia_semana)
-        print(aulas_dia)
+
         utils.adiciona_fotos_alunos(aulas_dia)
 
 
@@ -220,7 +112,7 @@ def computa_faltas():
 
     # 0 = Segunda a 6 = domingo
     if dia_semana in [0, 1, 2, 3, 4]:
-        # Turma é segundo elemento do "aulas_dia"
+        # Turma é Terceiro elemento do "aulas_dia"
         for aula in aulas_dia:
             utils.computa_falta(aula[2], dia_semana)
         print("Faltas computadas")
