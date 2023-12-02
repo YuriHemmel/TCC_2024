@@ -321,6 +321,7 @@ def tempo_para_aula(aulas):
     antes = []
     durante = []
     depois = []
+    muito_depois = []
 
     current = datetime.now()
     dia = current.strftime("%Y/%m/%d")
@@ -335,13 +336,15 @@ def tempo_para_aula(aulas):
         elif tempo_restante <= timedelta(minutes=40) and tempo_restante > timedelta(minutes=0):
             antes.append(aula)
         # Aula começou
-        elif tempo_restante >= timedelta(minutes=-40):
+        elif tempo_restante >= timedelta(minutes=-40) and tempo_restante < timedelta(minutes=0):
             durante.append(aula)
         # 40 minutos depois da aula
-        elif tempo_restante < timedelta(minutes=-40):
+        elif tempo_restante < timedelta(minutes=-40) and tempo_restante >= timedelta(minutes=-80):
             depois.append(aula)
+        elif tempo_restante < timedelta(minutes=-40) and tempo_restante >= timedelta(minutes=-80):
+            muito_depois.append(aula)
 
-    todas_aulas = {"muito_antes": muito_antes, "antes": antes, "durante": durante, "depois": depois}
+    todas_aulas = {"muito_antes": muito_antes, "antes": antes, "durante": durante, "depois": depois, "muito_depois":muito_depois}
 
     return todas_aulas
 

@@ -151,8 +151,8 @@ def manda_mensagens():
 
 def inicia_app():
     prepara_dia()
-    #manda_mensagens()
-    computa_faltas()
+    manda_mensagens()
+    #computa_faltas()
 
 # Fecha o aplicativo e seus subprocessos
 
