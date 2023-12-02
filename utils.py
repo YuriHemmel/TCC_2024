@@ -461,25 +461,46 @@ def pesquisa_falta_aula(nome_aula):
 # Computa as faltas no final do dia
 def computa_falta(turma, dia):
     global dia_semana
+
     conexao = sqlite3.connect("banco.db")
-
+    ra_alunos = []
     with conexao:
-        cursor = conexao.cursor()
-
-        cursor.execute(f"""SELECT ra FROM alunos WHERE turma_id = "{turma}" AND presente = 0""")
-        result = cursor.fetchall()
+        append_alunos(turma, ra_alunos, conexao)
         
-        for r in result:
-            cursor.execute(f"""UPDATE faltas SET
-                            falta = falta + 1
-                            WHERE ra = "{r[0]}"
-                            AND id_aula = (SELECT id FROM aulas WHERE dia = "{dia_semana[dia]}")
-                            """)
+        for ra in ra_alunos:
+            update_faltas(ra, dia, turma, conexao)
 
+        cursor = conexao.cursor()    
         cursor.execute(f"""UPDATE alunos SET
                         presente = 0
                         WHERE presente = 1
                         """)
+        cursor.close()
+
+# Adiciona à lista ra_alunos cada aluno daquela turma
+def append_alunos(turma, ra_alunos, conexao):
+    cursor = conexao.cursor()
+
+    with conexao:
+        cursor.execute(f"""SELECT ra FROM alunos WHERE turma_id = "{turma}" AND presente = 0""")
+        for elemento in (cursor.fetchall()):
+            ra_alunos.append(elemento[0])
+    
+    cursor.close()
+
+# Atualiza o quadro de faltas de cada aula
+def update_faltas(ra, dia, turma, conexao):
+    cursor = conexao.cursor()
+    with conexao:
+        cursor.execute(f"""select distinct f.id_aula from faltas f left join alunos a, aulas au on f.ra = a.ra where a.turma_id = "{turma}" AND au.dia = "{dia_semana[dia]}" """)
+        id_aulas = cursor.fetchall()
+
+        for id_aula in id_aulas:
+            cursor.execute(f"""UPDATE faltas SET falta = falta + 1 WHERE ra = "{ra}"
+                                AND id_aula = "{id_aula[0]}"
+                                """)
+    cursor.close()
+
 
 # --------------------------------- Tabela alunos -------------------------------------------
 
