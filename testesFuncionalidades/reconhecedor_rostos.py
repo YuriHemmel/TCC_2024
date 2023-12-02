@@ -4,11 +4,11 @@ import os
 import numpy as np
 
 path = 'imagensAlunos'
-imagens = []
+imagens = list()
 classnames = []
+presentes = []
 minhaLista = os.listdir(path)
 print(minhaLista)
-
 for aluno in minhaLista:
     current_image = cv2.imread(f'{path}/{aluno}')
     imagens.append(current_image)
@@ -16,10 +16,20 @@ for aluno in minhaLista:
 
 print(classnames)
 
+print(len(imagens))
+#print(imagens)
+
+def update_imagens(imagens, item):
+    i = classnames.index(item)
+    imagens = list(imagens)
+    imagens.pop(i)
+    print('ta aqui')
+    return imagens
+
 def find_encodings(images):
     encode_list = []
-    for img in images:
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    for img_index in range(0, len(images)):
+        img = cv2.cvtColor(images[img_index], cv2.COLOR_BGR2RGB)
         encode = face_recognition.face_encodings(img)[0]
         encode_list.append(encode)
 
@@ -30,7 +40,7 @@ print('Encoding Complete')
 
 cap = cv2.VideoCapture(0)
 
-while True:
+while len(classnames) > 0:
     success, img = cap.read()
     imgS = cv2.resize(img, (0, 0), None, 0.25, 0.25)
     imgS = cv2.cvtColor(imgS, cv2.COLOR_BGR2RGB)
@@ -47,12 +57,23 @@ while True:
         if matches[matchIndex]:
             name = classnames[matchIndex].upper()
             print(name)
+
+            if name is not None and name != "" and name not in presentes:
+                presentes.append(name)
+                classnames.remove(name)
+                os.remove(f'imagensAlunos/{name}.jpeg')
+                encode_list_known = find_encodings(imagens)
+                '''
             y1, x2, y2, x1 = faceLoc
             y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4  
             cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
             cv2.rectangle(img, (x1, y2 - 35), (x2, y2), (0, 255, 0), cv2.FILLED)
-            cv2.putText(img, name, (x1 + 6, y2 + 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
+            cv2.putText(img, name, (x1 + 6, y2 + 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)'''
 
     
     cv2.imshow('Webcam', img)
-    cv2.waitKey(1)
+    key = cv2.waitKey(1)
+    if key == ord('q') or key == ord('Q') or key == 27: # 27 == ESC
+        print(presentes)
+ 
+print(presentes)
