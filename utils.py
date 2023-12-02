@@ -12,6 +12,8 @@ global dia_semana
 dia_semana = {0: 'Segunda-feira', 1: 'Terça-feira',
               2: 'Quarta-feira', 3: 'Quinta-feira', 4: 'Sexta-feira', 5: 'Sábado'}
 
+
+# --------------------------------- Métodos Imagens -------------------------------------------
 # Tira foto por meio da Webcam
 def tira_foto_binario():
     global bytes_foto
@@ -75,6 +77,26 @@ def mostra_video_camera(lista):
                 break
     webcam.release()
     cv.destroyAllWindows()
+
+# Preenche a pasta imagensAlunos com fotos dos alunos que devem comparecer no dia
+def adiciona_fotos_alunos(aulas_dia):
+    if aulas_dia == []:
+        return
+    
+    for aula in aulas_dia:
+        print(aula[2])
+#    turma_id = aulas_dia[2]
+    conexao = sqlite3.connect("banco.db")
+'''
+    with conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute(
+            f"""
+                SELECT foto from alunos where 
+            """
+        )'''
+
 # ============================== Funções de Tabelas =========================================
 # --------------------------------- Tabela cursos -------------------------------------------
 
