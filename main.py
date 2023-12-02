@@ -417,14 +417,6 @@ def alunos():
 
             aulas = utils.mostra_aula()
 
-            for aula in aulas:
-                if aula[4] == turma:
-                    break
-                if aula == aulas[len(aulas)-1] and aula[4] != turma:
-                    messagebox.showerror(
-                        "Erro", "Não há aulas para a turmas deste aluno.\n Por favor crie aulas antes de cadastrar um aluno.")
-                    return
-
             # Criando aluno
             utils.cria_aluno(lista)
 
