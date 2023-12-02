@@ -268,6 +268,7 @@ def verifica_aula_dia(dia):
 
     # Se não tiver aula hoje, retorna vazio
     # Se tiver, retorna o id, hora de início e id da turma
+    print(results)
     return results
 
 # Verifica qual a próxima aula
@@ -443,11 +444,15 @@ def computa_falta(turma, dia):
     with conexao:
         cursor = conexao.cursor()
 
-        cursor.execute(f"""UPDATE faltas SET
-                        falta = falta + 1
-                        WHERE ra = (SELECT ra FROM alunos WHERE turma_id in {turma} AND presente = 0)
-                        AND id_aula = (SELECT id FROM aulas WHERE dia = "{dia_semana[dia]}")
-                        """)
+        cursor.execute(f"""SELECT ra FROM alunos WHERE turma_id = "{turma}" AND presente = 0""")
+        result = cursor.fetchall()
+        
+        for r in result:
+            cursor.execute(f"""UPDATE faltas SET
+                            falta = falta + 1
+                            WHERE ra = "{r[0]}"
+                            AND id_aula = (SELECT id FROM aulas WHERE dia = "{dia_semana[dia]}")
+                            """)
 
         cursor.execute(f"""UPDATE alunos SET
                         presente = 0
