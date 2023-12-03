@@ -60,9 +60,9 @@ def inicia_reconhecimento():
         
         cv2.imshow('Webcam', img)
         key = cv2.waitKey(1)
-        if key == ord('q') or key == ord('Q') or key == 27: # 27 == ESC
+        if key == ord('p'): 
             print(presentes)
-        if key == ord('p'):
+        if key == ord('q') or key == ord('Q') or key == 27: # 27 == ESC
             cap.release()
             cv2.destroyAllWindows()
             break
