@@ -14,6 +14,7 @@ from tktimepicker import constants
 from datetime import *
 from email_utils import envia_email_alerta, envia_email_acusando_falta, envia_email_confirmando_presenca, envia_email_aula_comeca
 from PIL import Image, ImageTk
+from reconhecedor_rostos import inicia_reconhecimento
 
 # Tamanho da janela
 WIDTH = 850
@@ -99,6 +100,7 @@ def prepara_dia():
         # Aulas do dia
         aulas_dia = utils.verifica_aula_dia(dia_semana)
         utils.adiciona_fotos_alunos(aulas_dia, dia_semana)
+        inicia_reconhecimento()
         print("Preparação de aulas do dia concluida")
 
 
@@ -154,7 +156,7 @@ def manda_mensagens():
 def inicia_app():
     prepara_dia()
     manda_mensagens()
-    # computa_faltas()
+    computa_faltas()
 
 # Fecha o aplicativo e seus subprocessos
 
