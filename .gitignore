@@ -1,6 +1,5 @@
 __pycache__
 env
 .env
-*banco.db*
 .vscode
 multi.py
