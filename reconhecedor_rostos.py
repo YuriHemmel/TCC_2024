@@ -21,14 +21,11 @@ def inicia_reconhecimento():
     classnames = []
     presentes = []
     minhaLista = os.listdir(path)
-    print(minhaLista)
     for aluno in minhaLista:
         current_image = cv2.imread(f'{path}/{aluno}')
         imagens.append(current_image)
         classnames.append(os.path.splitext(aluno)[0])
 
-    print('RA dos Alunos', classnames)
-    print('Numero de Alunos', len(imagens))
 
     encode_list_known = find_encodings(imagens)
     print('Encoding Completo')

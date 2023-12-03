@@ -6,6 +6,7 @@ import sqlite3
 from datetime import *
 from PIL import Image
 import numpy 
+from email_utils import envia_email_confirmando_presenca
 
 global dia_semana
 
@@ -612,6 +613,12 @@ def presenca_aluno(ra):
         cursor.execute(f"""UPDATE alunos SET presente = 1
                         WHERE ra = "{ra}"
                         """)
+        
+        cursor.execute(f"""SELECT nome, email FROM alunos WHERE ra = "{ra}" """)
+
+        results = cursor.fetchone()
+
+    envia_email_confirmando_presenca(results[0], ra, results[1])
 
 # Verifica os alunos que não chegaram na aula, por meio da turma
 def alunos_para_avisar(turma):

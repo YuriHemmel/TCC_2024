@@ -20,7 +20,7 @@ def envia_email_acusando_falta(aluno, ID, destinatario):
 # Envia um email para o aluno avisando que a aula irá começar
 def envia_email_aula_comeca(aluno, ID, destinatario):
     assunto_email = "Sua aula irá começar!"
-    mensagem_email = f"Caro(a) {aluno}, de RA: {ID}:\n\nInformamos que sua aula irá começar dentro de 40 minutos! Caso sua presença não seja detectada em sala de aula, será atribuída falta para este dia letivo. Se você está presente em sala, contate o professor responsável."
+    mensagem_email = f"C aro(a) {aluno}, de RA: {ID}:\n\nInformamos que sua aula irá começar dentro de 40 minutos! Caso sua presença não seja detectada em sala de aula, será atribuída falta para este dia letivo. Se você está presente em sala, contate o professor responsável."
 
     enviar_email(destinatario, assunto_email, mensagem_email)
 

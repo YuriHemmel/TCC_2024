@@ -12,7 +12,7 @@ from tkcalendar import DateEntry
 from tktimepicker import SpinTimePickerModern
 from tktimepicker import constants
 from datetime import *
-from email_utils import envia_email_alerta, envia_email_acusando_falta, envia_email_confirmando_presenca, envia_email_aula_comeca
+from email_utils import envia_email_alerta, envia_email_acusando_falta, envia_email_aula_comeca
 from PIL import Image, ImageTk
 from reconhecedor_rostos import inicia_reconhecimento
 
@@ -67,16 +67,6 @@ show_frame(pagina_inicial)
 
 # Cria o banco de dados se não existir ainda
 db = Banco.Banco()
-
-
-# Retorna o RA dos alunos identificados via câmera (Precisa fazer)
-
-
-def identifica_alunos():
-    # Colocar Identificação facial aqui, retornando RA do aluno
-    ra = "F22HFA7"
-
-    return ra
 
 
 # Aulas do dia
@@ -156,7 +146,7 @@ def manda_mensagens():
 def inicia_app():
     prepara_dia()
     manda_mensagens()
-    computa_faltas()
+    #computa_faltas()
 
 # Fecha o aplicativo e seus subprocessos
 
@@ -1433,7 +1423,7 @@ def aulas():
     # ------------------------------------------------- Titulo da página ----------------------------------------------------
     global titulo_cadastro_label
 
-    titulo_cadastro_label = Label(frame_titulo_aluno, image=icone_titulo_aula, text="Cadastro de aulas",
+    titulo_cadastro_label = Label(frame_titulo_aluno, image=icone_titulo_aula, text="Cadastro de Aulas",
                                   width=WIDTH, compound=LEFT, relief=RAISED, anchor=NW, font=fonte_titulo, bg=AZUL_ESCURO, fg=BRANCO)
     titulo_cadastro_label.place(x=0, y=0)
     ttk.Separator(pagina_cadastro, orient=HORIZONTAL).place(
@@ -2513,7 +2503,7 @@ icone_aula = icone_aula.resize((20, 20))
 icone_aula = ImageTk.PhotoImage(icone_aula)
 
 botao_aula = Button(frame_aluno_botoes, command=lambda: controle('aulas'), image=icone_aula,
-                    text=" aula", width=100, compound=LEFT, overrelief=RIDGE, font=fonte, bg=AZUL_ESCURO, fg=BRANCO)
+                    text=" Aula", width=100, compound=LEFT, overrelief=RIDGE, font=fonte, bg=AZUL_ESCURO, fg=BRANCO)
 botao_aula.place(x=280, y=30)
 
 icone_faltas = Image.open('images/icon_falta.png')
