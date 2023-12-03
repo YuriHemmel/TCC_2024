@@ -522,7 +522,7 @@ def update_faltas(ra, dia, turma, conexao):
         cursor.execute(f"""SELECT f.id FROM faltas f
                        JOIN alunos al ON f.ra = al.ra
                        JOIN aulas au ON f.id_aula = au.id
-                       WHERE al.turma_id = "{turma}" AND au.dia like "{dia_semana[dia]}" """)
+                       WHERE al.turma_id = "{turma}" AND au.dia = "{dia_semana[dia]}" """)
         id_aulas = cursor.fetchall()
         for id_aula in id_aulas:
             cursor.execute(f"""UPDATE faltas SET falta = falta + 1 WHERE ra = "{ra}"
