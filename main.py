@@ -84,14 +84,16 @@ def prepara_dia():
 
     # Verifica se hoje é dia de semana ou fim de semana
     dia_semana = current_time.weekday()
-    dia_semana = 4
 
     if dia_semana in [0, 1, 2, 3, 4]:
         # Aulas do dia
         aulas_dia = utils.verifica_aula_dia(dia_semana)
         utils.adiciona_fotos_alunos(aulas_dia, dia_semana)
-        inicia_reconhecimento()
-        print("Preparação de aulas do dia concluida")
+        if (os.listdir('imagensAlunos') == []):
+            print('Não há nenhum aluno ou aula para este dia letivo.')
+        else:
+            inicia_reconhecimento()
+            print("Preparação de aulas do dia concluida")
 
 
 # Computa as faltas do dia
@@ -101,9 +103,8 @@ def computa_faltas():
     current_time = datetime.now()
 
     # Verifica se hoje é dia de semana ou fim de semana
-    # dia_semana = current_time.weekday()
-    dia_semana = 4
-
+    dia_semana = current_time.weekday()
+    
     # 0 = Segunda a 6 = domingo
     if dia_semana in [0, 1, 2, 3, 4]:
         # Turma é Terceiro elemento do "aulas_dia"

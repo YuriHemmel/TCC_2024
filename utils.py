@@ -496,12 +496,14 @@ def reseta_presenca_dia():
                         """)
 
     # Remove fotos da pasta imagensAlunos/
-    print('Limpando as imagens de alunos do dia28')
     path = 'imagensAlunos'
     imagens = os.listdir(path)
+
+    if imagens != []:
+        print('Limpando as imagens de alunos do dia')
     
-    for imagem in imagens:
-        os.remove(f'{path}/{imagem}')
+        for imagem in imagens:
+            os.remove(f'{path}/{imagem}')
 
 # Computa as faltas no final do dia
 def computa_falta(turma, dia):
