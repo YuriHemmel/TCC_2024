@@ -1,0 +1,1 @@
+ python -u "c:\Users\djall\OneDrive\Área de Trabalho\projects\unip\TCC_2023\main.py" 
