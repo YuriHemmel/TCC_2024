@@ -484,6 +484,18 @@ def pesquisa_falta_aula(nome_aula):
 
     return results
 
+
+def reseta_presenca_dia():
+    conexao = sqlite3.connect("banco.db")
+
+    with conexao:
+        cursor = conexao.cursor()
+        cursor.execute(f"""UPDATE alunos SET
+                        presente = 0
+                        WHERE presente = 1
+                        """)
+
+
 # Computa as faltas no final do dia
 def computa_falta(turma, dia):
     global dia_semana
@@ -497,10 +509,6 @@ def computa_falta(turma, dia):
             update_faltas(ra, dia, turma, conexao)
 
         cursor = conexao.cursor()
-        cursor.execute(f"""UPDATE alunos SET
-                        presente = 0
-                        WHERE presente = 1
-                        """)
         cursor.close()
     
 
@@ -523,10 +531,10 @@ def update_faltas(ra, dia, turma, conexao):
                        JOIN alunos al ON f.ra = al.ra
                        JOIN aulas au ON f.id_aula = au.id
                        WHERE al.turma_id = "{turma}" AND au.dia = "{dia_semana[dia]}" """)
-        id_aulas = cursor.fetchall()
-        for id_aula in id_aulas:
+        id = cursor.fetchall()
+        for id_aula in id:
             cursor.execute(f"""UPDATE faltas SET falta = falta + 1 WHERE ra = "{ra}"
-                                AND id_aula = "{id_aula[0]}"
+                                AND id = "{id_aula[0]}"
                                 """)
     cursor.close()
 
@@ -606,17 +614,11 @@ def apaga_aluno(ra):
 # Conta presença parar o aluno
 def presenca_aluno(ra):
     conexao = sqlite3.connect("banco.db")
-
+    cursor = conexao.cursor()
     with conexao:
-        cursor = conexao.cursor()
-
-        cursor.execute(f"""UPDATE alunos SET presente = 1
-                        WHERE ra = "{ra}"
-                        """)
-        
         cursor.execute(f"""SELECT nome, email FROM alunos WHERE ra = "{ra}" """)
-
         results = cursor.fetchone()
+        cursor.execute(f"""UPDATE alunos SET presente = 1 WHERE ra = "{ra}" """)
 
     envia_email_confirmando_presenca(results[0], ra, results[1])
 

@@ -109,6 +109,7 @@ def computa_faltas():
         # Turma é Terceiro elemento do "aulas_dia"
         for aula in aulas_dia:
             utils.computa_falta(aula[2], dia_semana)
+        utils.reseta_presenca_dia()
         print("Faltas computadas")
 
 # Manda mensagens para os alunos sobre as aulas
