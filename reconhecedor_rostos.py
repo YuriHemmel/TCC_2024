@@ -47,7 +47,7 @@ def inicia_reconhecimento():
             matchIndex = np.argmin(face_distance)
 
             if matches[matchIndex]:
-                name = classnames[matchIndex].upper()
+                name = str(classnames[matchIndex]).upper().strip()
                 print(name)
 
                 if name is not None and name != "" and name not in presentes:

@@ -523,10 +523,10 @@ def update_faltas(ra, dia, turma, conexao):
                        JOIN alunos al ON f.ra = al.ra
                        JOIN aulas au ON f.id_aula = au.id
                        WHERE al.turma_id = "{turma}" AND au.dia = "{dia_semana[dia]}" """)
-        id_aulas = cursor.fetchall()
-        for id_aula in id_aulas:
+        ids = cursor.fetchall()
+        for id in ids:
             cursor.execute(f"""UPDATE faltas SET falta = falta + 1 WHERE ra = "{ra}"
-                                AND id_aula = "{id_aula[0]}"
+                                AND id = "{id[0]}"
                                 """)
     cursor.close()
 
@@ -605,18 +605,20 @@ def apaga_aluno(ra):
 
 # Conta presença parar o aluno
 def presenca_aluno(ra):
+
     conexao = sqlite3.connect("banco.db")
 
     with conexao:
         cursor = conexao.cursor()
 
         cursor.execute(f"""UPDATE alunos SET presente = 1
-                        WHERE ra = "{ra}"
+                        WHERE ra like "{ra}"
                         """)
         
         cursor.execute(f"""SELECT nome, email FROM alunos WHERE ra = "{ra}" """)
 
         results = cursor.fetchone()
+        cursor.close()
 
     envia_email_confirmando_presenca(results[0], ra, results[1])
 
