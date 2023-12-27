@@ -3,6 +3,7 @@
 import cv2
 import os
 
+'''
 os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;0"
 
 user = "admin"
@@ -34,3 +35,6 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
+'''
+
+print(os.listdir('imagensAlunos'))
