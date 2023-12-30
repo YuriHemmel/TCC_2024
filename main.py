@@ -25,8 +25,8 @@ AZUL_CLARO = "#71BAFF"
 AZUL_ESCURO = "#1C85FF"
 PRETO = "#000000"
 BRANCO = "#FFFFFF"
-VERDE = "#68C177"
-VERMELHO = "#FF373E"
+VERDE = "#66C475"
+VERMELHO = "#FF5961"
 
 # Lê as variáveis de ambiente presentes no arquivo .env
 load_dotenv()
@@ -104,7 +104,7 @@ def computa_faltas():
 
     # Verifica se hoje é dia de semana ou fim de semana
     dia_semana = current_time.weekday()
-    
+
     # 0 = Segunda a 6 = domingo
     if dia_semana in [0, 1, 2, 3, 4]:
         # Turma é Terceiro elemento do "aulas_dia"
@@ -439,14 +439,14 @@ def alunos():
                 mostra_alunos()
 
                 # Botão desfazer alteração do aluno
-                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
+                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10, height=2,
                                     overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-                botao_undo.place(x=726, y=110)
+                botao_undo.place(x=726, y=70)
 
             # Botão salvar alterações do aluno
-            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text='Salvar alterações'.upper(
-            ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-            botao_salvar.place(x=700, y=145)
+            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text='SALVAR\nALTERAÇÕES', width=10, height=2,
+                                  overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+            botao_salvar.place(x=726, y=125)
 
         except IndexError:
             messagebox.showerror("Erro", "Selecione um aluno na tabela.")
@@ -489,9 +489,9 @@ def alunos():
                     utils.cria_falta([falta[0], falta[1], falta[2]])
 
             # Botão desfazer deleção de aluno
-            botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=9,
+            botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=10, height=2,
                                     overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-            botao_desfazer.place(x=726, y=110)
+            botao_desfazer.place(x=726, y=70)
 
         except IndexError:
             messagebox.showerror("Erro", "Selecione um aluno na tabela.")
@@ -599,14 +599,14 @@ def alunos():
                 mostra_alunos()
 
                 # Botão desfazer alteração do aluno
-                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
+                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10, height=2,
                                     overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-                botao_undo.place(x=726, y=110)
+                botao_undo.place(x=726, y=70)
 
             # Botão salvar alterações do aluno
-            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text='Salvar alterações'.upper(
-            ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-            botao_salvar.place(x=700, y=145)
+            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text='SALVAR\nALTERAÇÕES', width=10, height=2,
+                                  overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+            botao_salvar.place(x=726, y=125)
 
         except:
             messagebox.showerror("Erro", "Aluno não encontrado.")
@@ -772,9 +772,12 @@ def alunos():
     # Botão desfazer alteração do aluno
     botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
                         overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-    botao_undo.place(x=726, y=110)
+    botao_undo.place(x=726, y=70)
 
     botao_undo.destroy()
+
+    canvas_rect = Canvas(frame_info, width=130, height=130, background=AZUL_CLARO)
+    canvas_rect.place(x=300,y=10)
 
     # Botão Tira foto
     botao_foto = Button(frame_info, command=tira_foto, text='Tirar foto'.upper(
@@ -803,29 +806,29 @@ def alunos():
                           justify='left', relief=SOLID, font=("Ivy, 10"))
     entry_procura.place(x=622, y=35)
 
-    botao_procurar = Button(frame_info, command=pesquisa_aluno, text="Pesquisar",
+    botao_procurar = Button(frame_info, command=pesquisa_aluno, text="PESQUISAR",
                             font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
     botao_procurar.place(x=757, y=33)
 
     # ------------------------------------ Botões ---------------------------------
 
     # Botão adicionar aluno
-    botao_adicionar = Button(frame_info, command=novo_aluno, anchor=CENTER, text='ADICIONAR', width=9,
+    botao_adicionar = Button(frame_info, command=novo_aluno, anchor=CENTER, text='ADICIONAR', width=10, height=2,
                              overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-    botao_adicionar.place(x=617, y=110)
+    botao_adicionar.place(x=617, y=70)
 
     # Botão alterar aluno
-    botao_alterar = Button(frame_info, command=carregar_aluno, anchor=CENTER, text='ALTERAR',
-                           width=9, overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_alterar.place(x=617, y=145)
+    botao_alterar = Button(frame_info, command=carregar_aluno, anchor=CENTER, text='ALTERAR', width=10, height=2,
+                           overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
+    botao_alterar.place(x=617, y=125)
 
     # Botão deletar aluno
-    botao_deletar = Button(frame_info, command=apagar_aluno, anchor=CENTER, text='DELETAR', width=9,
+    botao_deletar = Button(frame_info, command=apagar_aluno, anchor=CENTER, text='DELETAR', width=10, height=2,
                            overrelief=RIDGE, font=fonte_botao, bg=VERMELHO, foreground=BRANCO)
     botao_deletar.place(x=617, y=180)
 
     # Botão informações do aluno
-    botao_mostrar = Button(frame_info, command=info_aluno, anchor=CENTER, text='INFO', width=9,
+    botao_mostrar = Button(frame_info, command=info_aluno, anchor=CENTER, text='INFO', width=10, height=2,
                            overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
     botao_mostrar.place(x=727, y=180)
 
@@ -1547,15 +1550,15 @@ def aulas():
                 mostra_aula()
 
                 # Botão desfazer alteração do aula
-                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
+                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10, height=3,
                                     overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-                botao_undo.place(x=726, y=110)
+                botao_undo.place(x=712, y=85)
 
                 botao_salvar.destroy()
 
-            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text="Salvar alterações".upper(
-            ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, fg=BRANCO)
-            botao_salvar.place(x=700, y=145)
+            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text="Salvar\nalterações".upper(
+            ), overrelief=RIDGE, width=10, height=3, font=fonte_botao, bg=VERDE, fg=BRANCO)
+            botao_salvar.place(x=712, y=160)
         except IndexError:
             messagebox.showerror("Erro", "Selecione uma aula na tabela.")
 
@@ -1603,9 +1606,9 @@ def aulas():
                     utils.cria_falta([falta[0], falta[1], falta[2]])
 
             # Botão desfazer deleção de aluno
-            botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=9,
+            botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=10, height=3,
                                     overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-            botao_desfazer.place(x=726, y=110)
+            botao_desfazer.place(x=712, y=85)
 
         except IndexError:
             messagebox.showerror("Erro", "Selecione uma aula na tabela.")
@@ -1692,14 +1695,14 @@ def aulas():
                 mostra_aula()
 
                 # Botão desfazer alteração do aula
-                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
+                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10, height=3,
                                     overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-                botao_undo.place(x=726, y=110)
+                botao_undo.place(x=712, y=85)
 
             # Botão salvar alterações da aula
             botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text='Salvar alterações'.upper(
-            ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-            botao_salvar.place(x=700, y=145)
+            ), overrelief=RIDGE, width=10, height=3, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+            botao_salvar.place(x=712, y=160)
 
         except:
             messagebox.showerror("Erro", "Aula não encontrada.")
@@ -1763,7 +1766,7 @@ def aulas():
     entry_hora.configureAll(bg=AZUL_CLARO, height=1, fg=BRANCO, font=fonte_titulo, hoverbg=AZUL_CLARO,
                             hovercolor=AZUL_ESCURO, clickedbg=AZUL_ESCURO, clickedcolor=BRANCO)
     entry_hora.configure_separator(bg=AZUL_CLARO, fg=BRANCO)
-    entry_hora.place(x=12, y=155)
+    entry_hora.place(x=27, y=155)
 
     # Pegando as Turmas
     turmas = utils.mostra_turma()
@@ -1784,47 +1787,47 @@ def aulas():
 
     # Procura aula
     label_procura_nome = Label(frame_info, text="Procurar aula [Entrar com nome]",
-                               height=1, anchor=NW, font=("Ivy, 10"), bg=AZUL_CLARO, fg=PRETO)
-    label_procura_nome.place(x=620, y=10)
+                               height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+    label_procura_nome.place(x=445, y=10)
 
-    entry_procura = Entry(frame_info, width=17,
-                          justify='left', relief=SOLID, font=("Ivy, 10"))
-    entry_procura.place(x=622, y=35)
+    entry_procura = Entry(frame_info, width=27,
+                          justify='left', relief=SOLID, font=fonte)
+    entry_procura.place(x=447, y=35)
 
     # Linha de separação
     label_linha = Label(frame_info, relief=GROOVE, text='h', width=1,
                         height=200, anchor=NW, font=("Ivy, 1"), bg=PRETO, fg=PRETO)
-    label_linha.place(x=605, y=0)
+    label_linha.place(x=355, y=0)
     label_linha = Label(frame_info, relief=GROOVE, text='h', width=1,
                         height=200, anchor=NW, font=("Ivy, 1"), bg=BRANCO, fg=PRETO)
-    label_linha.place(x=603, y=0)
+    label_linha.place(x=353, y=0)
 
     # ------------------------------------ Botões ---------------------------------
 
     # Botão adicionar aula
-    botao_adicionar = Button(frame_info, command=nova_aula, anchor=CENTER, text='ADICIONAR', width=9,
+    botao_adicionar = Button(frame_info, command=nova_aula, anchor=CENTER, text='ADICIONAR', width=10, height=3,
                              overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-    botao_adicionar.place(x=617, y=110)
+    botao_adicionar.place(x=402, y=85)
 
     # Botão alterar aula
-    botao_alterar = Button(frame_info, command=carregar_aula, anchor=CENTER, text='ALTERAR',
-                           width=9, overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_alterar.place(x=617, y=145)
+    botao_alterar = Button(frame_info, command=carregar_aula, anchor=CENTER, text='ALTERAR', width=10, height=3,
+                           overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
+    botao_alterar.place(x=402, y=160)
 
     # Botão deletar aula
-    botao_deletar = Button(frame_info, command=apagar_aula, anchor=CENTER, text='DELETAR', width=9,
+    botao_deletar = Button(frame_info, command=apagar_aula, anchor=CENTER, text='DELETAR', width=10, height=3,
                            overrelief=RIDGE, font=fonte_botao, bg=VERMELHO, foreground=BRANCO)
-    botao_deletar.place(x=617, y=180)
+    botao_deletar.place(x=557, y=85)
 
     # Botão informações do aula
-    botao_mostrar = Button(frame_info, command=info_aula, anchor=CENTER, text='INFO', width=9,
+    botao_mostrar = Button(frame_info, command=info_aula, anchor=CENTER, text='INFO', width=10, height=3,
                            overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_mostrar.place(x=727, y=180)
+    botao_mostrar.place(x=557, y=160)
 
     # Botão pesquisa aula
-    botao_procurar = Button(frame_info, command=pesquisa_aula, text="Pesquisar",
+    botao_procurar = Button(frame_info, command=pesquisa_aula, text="Pesquisar".upper(), width=10,
                             font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
-    botao_procurar.place(x=757, y=33)
+    botao_procurar.place(x=682, y=33)
     # ---------------------------------- Tabela das aulas -------------------------------------
 
     def mostra_aula():
@@ -1878,9 +1881,9 @@ def aulas():
         botao_undo.destroy()
 
     # Botão desfazer alteração do aula
-    botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
+    botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10, height=3,
                         overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-    botao_undo.place(x=726, y=110)
+    botao_undo.place(x=712, y=85)
 
     botao_undo.destroy()
 
@@ -2123,13 +2126,13 @@ def cameras():
                 mostra_camera()
 
                 # Botão desfazer alteração do aula
-                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=9,
+                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10, height=3,
                                     overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-                botao_undo.place(x=726, y=110)
+                botao_undo.place(x=732, y=85)
 
-            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text="Salvar alterações".upper(
-            ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, fg=BRANCO)
-            botao_salvar.place(x=700, y=145)
+            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text="SALVAR\nALTERAÇÕES", width=10, height=3,
+                                  overrelief=RIDGE, font=fonte_botao, bg=VERDE, fg=BRANCO)
+            botao_salvar.place(x=612, y=160)
 
         except IndexError:
             messagebox.showerror("Erro", "Selecione uma camera na tabela.")
@@ -2169,9 +2172,9 @@ def cameras():
                 botao_desfazer.destroy()
 
             # Botão desfazer deleção de aluno
-            botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=9,
+            botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=10, height=3,
                                     overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-            botao_desfazer.place(x=726, y=110)
+            botao_desfazer.place(x=732, y=85)
 
         except IndexError:
             messagebox.showerror("Erro", "Selecione uma camera na tabela.")
@@ -2246,14 +2249,14 @@ def cameras():
                 mostra_camera()
 
                 # Botão desfazer alteração do aula
-                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
+                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10, height=3,
                                     overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-                botao_undo.place(x=726, y=110)
+                botao_undo.place(x=732, y=85)
 
             # Botão salvar alterações da camera
-            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text='Salvar alterações'.upper(
-            ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-            botao_salvar.place(x=700, y=145)
+            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text='SALVAR\nALTERAÇÕES', width=10, height=3,
+                                  overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
+            botao_salvar.place(x=612, y=160)
 
         except:
             messagebox.showerror("Erro", "Camera não encontrada.")
@@ -2335,52 +2338,52 @@ def cameras():
 
     # Procura Aluno
     label_procura_nome = Label(frame_info, text="Procurar camera [Entrar com ip]",
-                               height=1, anchor=NW, font=("Ivy, 10"), bg=AZUL_CLARO, fg=PRETO)
-    label_procura_nome.place(x=620, y=10)
+                               height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
+    label_procura_nome.place(x=445, y=10)
 
-    entry_procura = Entry(frame_info, width=17,
-                          justify='left', relief=SOLID, font=("Ivy, 10"))
-    entry_procura.place(x=622, y=35)
+    entry_procura = Entry(frame_info, width=27,
+                          justify='left', relief=SOLID, font=fonte)
+    entry_procura.place(x=447, y=35)
 
     # Linha de separação
     label_linha = Label(frame_info, relief=GROOVE, text='h', width=1,
                         height=200, anchor=NW, font=("Ivy, 1"), bg=PRETO, fg=PRETO)
-    label_linha.place(x=605, y=0)
+    label_linha.place(x=355, y=0)
     label_linha = Label(frame_info, relief=GROOVE, text='h', width=1,
                         height=200, anchor=NW, font=("Ivy, 1"), bg=BRANCO, fg=PRETO)
-    label_linha.place(x=603, y=0)
+    label_linha.place(x=353, y=0)
 
     # ------------------------------------ Botões ---------------------------------
 
     # Botão adicionar camera
-    botao_adicionar = Button(frame_info, command=nova_camera, anchor=CENTER, text='ADICIONAR', width=9,
+    botao_adicionar = Button(frame_info, command=nova_camera, anchor=CENTER, text='ADICIONAR', width=10, height=3,
                              overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-    botao_adicionar.place(x=617, y=110)
+    botao_adicionar.place(x=372, y=85)
 
     # Botão alterar camera
-    botao_alterar = Button(frame_info, command=carregar_camera, anchor=CENTER, text='ALTERAR',
-                           width=9, overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_alterar.place(x=617, y=145)
+    botao_alterar = Button(frame_info, command=carregar_camera, anchor=CENTER, text='ALTERAR', width=10, height=3,
+                           overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
+    botao_alterar.place(x=372, y=160)
 
     # Botão deletar camera
-    botao_deletar = Button(frame_info, command=apagar_camera, anchor=CENTER, text='DELETAR', width=9,
+    botao_deletar = Button(frame_info, command=apagar_camera, anchor=CENTER, text='DELETAR', width=10, height=3,
                            overrelief=RIDGE, font=fonte_botao, bg=VERMELHO, foreground=BRANCO)
-    botao_deletar.place(x=617, y=180)
+    botao_deletar.place(x=492, y=85)
 
     # Botão informações do camera
-    botao_mostrar = Button(frame_info, command=info_camera, anchor=CENTER, text='INFO', width=9,
+    botao_mostrar = Button(frame_info, command=info_camera, anchor=CENTER, text='INFO', width=10, height=3,
                            overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_mostrar.place(x=727, y=180)
+    botao_mostrar.place(x=492, y=160)
 
     # Botão pesquisa camera
-    botao_procurar = Button(frame_info, command=pesquisa_camera, text="Pesquisar",
+    botao_procurar = Button(frame_info, command=pesquisa_camera, text="PESQUISAR",
                             font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
-    botao_procurar.place(x=757, y=33)
+    botao_procurar.place(x=682, y=33)
 
     # Botão mostra visão da camera
-    botao_imagem = Button(frame_info, command=mostra_imagem, anchor=CENTER, text='Mostrar Vídeo', width=13,
+    botao_imagem = Button(frame_info, command=mostra_imagem, anchor=CENTER, text='MOSTRAR\nVÍDEO', width=10, height=3,
                           overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_imagem.place(x=665, y=75)
+    botao_imagem.place(x=612, y=85)
 
     # ---------------------------------- Tabela das cameras -------------------------------------
 
@@ -2432,9 +2435,9 @@ def cameras():
         botao_undo.destroy()
 
     # Botão desfazer alteração do aula
-    botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=9,
+    botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
                         overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-    botao_undo.place(x=726, y=110)
+    botao_undo.place(x=732, y=85)
 
     botao_undo.destroy()
 
