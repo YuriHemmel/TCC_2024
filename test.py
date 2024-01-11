@@ -35,6 +35,20 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
-'''
+
 
 print(os.listdir('imagensAlunos'))
+'''
+
+'''
+tabview = CTkTabview(master=app)
+tabview.pack(padx=20, pady=20)
+
+tabview.add("Alunos")
+tabview.add("Aulas")
+tabview.add("Câmeras")
+
+btn = CTkButton(master=tabview.tab("Alunos"), text="Clica ali", corner_radius=32, fg_color=("#DB3E39", "#821D1A"),
+                border_color="#FFCC70", border_width=2)
+btn.place(relx=0.5, rely=0.5, anchor="center")
+'''

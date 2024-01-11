@@ -22,7 +22,7 @@ HEIGHT = 620
 
 # Cores
 AZUL_CLARO = "#71BAFF"
-AZUL_ESCURO = "#1C85FF"
+AZUL_ESCURO = "#075EBD"
 PRETO = "#000000"
 BRANCO = "#FFFFFF"
 VERDE = "#66C475"
@@ -112,10 +112,8 @@ def computa_faltas():
             utils.computa_falta(aula[2], dia_semana)
         utils.reseta_presenca_dia()
         print("Faltas computadas")
-
+    
 # Manda mensagens para os alunos sobre as aulas
-
-
 def manda_mensagens():
     global aulas_dia
 
@@ -146,8 +144,14 @@ def manda_mensagens():
 
 
 def inicia_app():
+
     prepara_dia()
-    manda_mensagens()
+    
+    #manda_mensagens()
+
+    # Confere presença do aluno
+    utils.confere_presenca()
+    
     computa_faltas()
 
 # Fecha o aplicativo e seus subprocessos
