@@ -3,4 +3,3 @@ env
 .env
 .vscode
 banco.db
-main_test.py
