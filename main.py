@@ -892,6 +892,7 @@ def cursos_turmas():
     titulo_cadastro_label = Label(frame_titulo_aluno, image=icone_titulo_curso, text="Cadastro de Cursos e Turmas",
                                   width=WIDTH, compound=LEFT, relief=RAISED, anchor=NW, font=fonte_titulo, bg=AZUL_ESCURO, fg=BRANCO)
     titulo_cadastro_label.place(x=0, y=0)
+    
     ttk.Separator(pagina_cadastro, orient=HORIZONTAL).place(
         x=0, y=52, width=WIDTH)
 
