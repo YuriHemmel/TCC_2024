@@ -187,8 +187,6 @@ def show_frame(frame):
     frame.tkraise()
 
 # Troca informações do Título
-
-
 def troca_titulo(texto, nome_img):
 
     img = CTkImage(light_image=Image.open(f"images/icon_{nome_img}.png"),
@@ -196,6 +194,7 @@ def troca_titulo(texto, nome_img):
                    size=(40, 40))
 
     label_titulo.configure(text=texto, image=img)
+
 
 # ================================================== Cabeçalho ========================================================
 # --------------------------------------------------- Imagens --------------------------------------------------------
@@ -2632,4 +2631,17 @@ janela.protocol("WM_DELETE_WINDOW", sair)
 show_frame(pagina_inicial)
 
 # Main loop
-janela.mainloop()
+def run():
+    janela.mainloop()
+
+# Inicia as schedules
+def run_schedules():
+    while True:
+        schedule.run_pending()
+
+# "IF" necessário para não gerar subprocessos
+if __name__ == "__main__":
+    # Multiprocessamento
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        codigo_janela = executor.submit(run)
+        codigo_dia_semana = executor.submit(run_schedules)
