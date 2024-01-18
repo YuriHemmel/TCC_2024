@@ -2448,9 +2448,8 @@ def cameras():
 
     mostra_camera()
 
+
 # Função para voltar
-
-
 def voltar():
     alunos()
     show_frame(pagina_inicial)

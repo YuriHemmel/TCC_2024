@@ -51,10 +51,8 @@ def convertToImage(bytes_foto):
     string = str(bytes_foto).strip("b'")[:-1]
     code_with_padding = f"{string}{'=' * (len(string) % 4)}"
     binary_data = base64.b64decode(code_with_padding)
-    imagem = CTkImage(light_image=Image.open(io.BytesIO(binary_data)),
-                dark_image=Image.open(io.BytesIO(binary_data)),
-                size=(130, 130))
-
+    imagem = Image.open(io.BytesIO(binary_data))
+    
     return imagem
 
 
