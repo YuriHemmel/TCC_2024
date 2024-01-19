@@ -23,7 +23,6 @@ WIDTH = 1050
 HEIGHT = 620
 
 # Cores
-AMARELO = '#FFEE70'
 AZUL_CLARO = "#075EBD"
 AZUL_ESCURO = "#023D71"
 PRETO = "#000000"
@@ -269,8 +268,8 @@ btn_sair.grid(row=5, column=1, sticky="ew")
 # --------------------------------------------------- Imagens --------------------------------------------------------
 
 # Imagem da aba de Alunos
-img_alunos = CTkImage(light_image=Image.open("images/icon_aluno_2.png"),
-                      dark_image=Image.open("images/icon_aluno_2.png"),
+img_alunos = CTkImage(light_image=Image.open("images/icon_aluno.png"),
+                      dark_image=Image.open("images/icon_aluno.png"),
                       size=(25, 25))
 
 # Imagem da aba de Cursos e Turmas
@@ -553,12 +552,12 @@ def alunos():
 
                 # Botão desfazer alteração do aluno
                 botao_undo = CTkButton(pagina_cadastro, command=undo_atualiza, anchor=CENTER, text='DESFAZER',
-                                       font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                       font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
                 botao_undo.grid(row=2, column=6, sticky='ew')
 
             # Botão salvar alterações do aluno
             botao_salvar = CTkButton(pagina_cadastro, command=atualiza, anchor=CENTER, text='SALVAR\nALTERAÇÕES',
-                                     font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=AMARELO, border_width=2, corner_radius=58)
+                                     font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=58)
             botao_salvar.grid(row=4, column=6, sticky='ew')
 
         except IndexError:
@@ -603,7 +602,7 @@ def alunos():
 
             # Botão desfazer deleção de aluno
             botao_desfazer = CTkButton(pagina_cadastro, command=undo_apaga, anchor=CENTER, text='DESFAZER',
-                                       font=FONTE_BOTAO, fg_color='transparent', border_color=AMARELO, border_width=2, corner_radius=32)
+                                       font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
             botao_desfazer.grid(row=2, column=6, sticky='ew')
 
         except IndexError:
@@ -713,12 +712,12 @@ def alunos():
 
                 # Botão desfazer alteração do aluno
                 botao_undo = CTkButton(pagina_cadastro, command=undo_atualiza, anchor=CENTER, text='DESFAZER', font=FONTE_BOTAO,
-                                       fg_color='transparent', border_color=AMARELO, border_width=2, corner_radius=32)
+                                       fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
                 botao_undo.grid(row=2, column=6, sticky='ew')
 
             # Botão salvar alterações do aluno
             botao_salvar = CTkButton(pagina_cadastro, command=atualiza, anchor=CENTER, text='SALVAR\nALTERAÇÕES',
-                                     font=FONTE_BOTAO, fg_color='transparent', border_color=AMARELO, border_width=2, corner_radius=58)
+                                     font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=58)
             botao_salvar.grid(row=4, column=6, sticky='ew')
 
         except:
@@ -881,7 +880,7 @@ def alunos():
 
     # Botão desfazer alteração do aluno
     botao_undo = CTkButton(pagina_cadastro, command=undo_atualiza,
-                           anchor=CENTER, text='DESFAZER', font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                           anchor=CENTER, text='DESFAZER', font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
     botao_undo.grid(row=2, column=5, sticky='ew')
 
     botao_undo.destroy()
@@ -892,12 +891,12 @@ def alunos():
 
     # Botão Tira foto
     botao_foto = CTkButton(pagina_cadastro, command=tira_foto, text='Tirar foto'.upper(
-    ), anchor=CENTER, font=FONTE_BOTAO, fg_color='transparent', border_color=AMARELO, border_width=2, corner_radius=45)
+    ), anchor=CENTER, font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=45)
     botao_foto.grid(row=5, column=2, sticky='ew', padx=5, pady=(5, 0))
 
     # Botão Carregar Foto
     botao_carregar = CTkButton(pagina_cadastro, command=escolhe_imagem, text='Carregar\nfoto'.upper(
-    ), anchor=CENTER, font=FONTE_BOTAO, fg_color='transparent', border_color=AMARELO, border_width=2, corner_radius=58)
+    ), anchor=CENTER, font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=58)
     botao_carregar.grid(row=6, column=2, sticky='ew', padx=5, pady=(5, 0))
 
     linha_separacao = CTkFrame(
@@ -914,29 +913,29 @@ def alunos():
     entry_procura.grid(row=1, column=5, sticky='ew', padx=(10, 5), pady=5)
 
     botao_procurar = CTkButton(pagina_cadastro, command=pesquisa_aluno, text="", image=img_pesquisa,
-                               font=FONTE_BOTAO, fg_color='transparent', border_color=AMARELO, border_width=2, corner_radius=32)
+                               font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
     botao_procurar.grid(row=1, column=6, sticky='ew', padx=5)
 
     # ------------------------------------ Botões ---------------------------------
 
     # Botão adicionar aluno
     botao_adicionar = CTkButton(pagina_cadastro, command=novo_aluno, anchor=CENTER, text='ADICIONAR',
-                                font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
     botao_adicionar.grid(row=2, column=5, sticky='ew', padx=5, pady=(10, 0))
 
     # Botão alterar aluno
     botao_alterar = CTkButton(pagina_cadastro, command=carregar_aluno, anchor=CENTER, text='ALTERAR',
-                              font=FONTE_BOTAO, fg_color=AZUL_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                              font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
     botao_alterar.grid(row=4, column=5, sticky='ew', padx=5)
 
     # Botão deletar aluno
     botao_deletar = CTkButton(pagina_cadastro, command=apagar_aluno, anchor=CENTER, text='DELETAR',
-                              font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                              font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
     botao_deletar.grid(row=6, column=5, sticky='ew', padx=5)
 
     # Botão informações do aluno
     botao_mostrar = CTkButton(pagina_cadastro, command=info_aluno, anchor=CENTER, text='INFO',
-                              font=FONTE_BOTAO, fg_color='transparent', border_color=AMARELO, border_width=2, corner_radius=32)
+                              font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
     botao_mostrar.grid(row=6, column=6, sticky='ew', padx=5)
 
     # Mostra a tabela com os alunos
@@ -1106,12 +1105,12 @@ def cursos_turmas():
 
                 # Botão desfazer alteração do aluno
                 botao_undo_curso = CTkButton(pagina_cadastro, command=undo_atualiza_curso, anchor=CENTER, text='DESFAZER',
-                                             font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                             font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
                 botao_undo_curso.grid(
                     row=4, column=2, sticky='ew', padx=5, pady=(10, 5))
 
             botao_salvar = CTkButton(pagina_cadastro, command=atualiza, anchor=CENTER, text="Salvar\nalterações".upper(
-            ), font=FONTE_BOTAO, fg_color=VERDE, hover=VERDE_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+            ), font=FONTE_BOTAO, fg_color=VERDE, hover=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
             botao_salvar.grid(row=4, column=1, sticky='ew',
                               padx=5, pady=(10, 5))
         except IndexError:
@@ -1153,7 +1152,7 @@ def cursos_turmas():
 
             # Botão desfazer deleção de aluno
             botao_desfazer = CTkButton(pagina_cadastro, command=undo_apaga, anchor=CENTER, text='DESFAZER',
-                                       font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                       font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
             botao_desfazer.grid(
                 row=4, column=2, sticky='ew', padx=5, pady=(10, 5))
 
@@ -1181,19 +1180,19 @@ def cursos_turmas():
 
     # Botão salvar curso
     botao_curso_adicionar = CTkButton(pagina_cadastro, command=novo_curso, anchor=CENTER, text='ADICIONAR',
-                                      font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                      font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
     botao_curso_adicionar.grid(
         row=5, column=0, sticky='ew', padx=(10, 5), pady=(10, 5))
 
     # Botão atualizar curso
     botao_curso_alterar = CTkButton(pagina_cadastro, command=carregar_curso, anchor=CENTER, text='ALTERAR',
-                                    font=FONTE_BOTAO, fg_color='transparent', border_color=AMARELO, border_width=2, corner_radius=32)
+                                    font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
     botao_curso_alterar.grid(
         row=5, column=1, sticky='ew', padx=5, pady=(10, 5))
 
     # Botão deletar curso
     botao_curso_deletar = CTkButton(pagina_cadastro, command=apagar_curso, anchor=CENTER, text='DELETAR',
-                                    font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                    font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
     botao_curso_deletar.grid(
         row=5, column=2, sticky='ew', padx=5, pady=(10, 5))
 
@@ -1251,7 +1250,7 @@ def cursos_turmas():
 
     # Botão desfazer alteração do aluno
     botao_undo_curso = CTkButton(pagina_cadastro, command=undo_atualiza_curso, anchor=CENTER, text='DESFAZER',
-                                 font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                 font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
     botao_undo_curso.grid(row=4, column=2, sticky='ew', padx=10, pady=10)
 
     botao_undo_curso.destroy()
@@ -1361,12 +1360,12 @@ def cursos_turmas():
 
                 # Botão desfazer alteração do aluno
                 botao_undo_turma = CTkButton(pagina_cadastro, command=undo_atualiza_turma, anchor=CENTER, text='DESFAZER',
-                                             font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                             font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
                 botao_undo_turma.grid(
                     row=4, column=7, sticky='ew', padx=(0, 5), pady=(10, 5))
 
             botao_salvar = CTkButton(pagina_cadastro, command=atualiza, anchor=CENTER, text="Salvar\nalterações".upper(
-            ), font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+            ), font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
             botao_salvar.grid(row=4, column=6, sticky='ew',
                               padx=(10, 5), pady=(10, 5))
         except IndexError:
@@ -1406,7 +1405,7 @@ def cursos_turmas():
 
             # Botão desfazer deleção de aluno
             botao_desfazer = CTkButton(pagina_cadastro, command=undo_atualiza_turma, anchor=CENTER, text='DESFAZER',
-                                       font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                       font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
             botao_desfazer.grid(row=4, column=7, sticky='ew',
                                 padx=(0, 5), pady=(10, 5))
 
@@ -1447,19 +1446,19 @@ def cursos_turmas():
 
     # Botão adicionar turma
     botao_turma_adicionar = CTkButton(pagina_cadastro, command=nova_turma, anchor=CENTER, text='ADICIONAR',
-                                      font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                      font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
     botao_turma_adicionar.grid(
         row=5, column=5, sticky='ew', padx=(0, 5), pady=(10, 5))
 
     # Botão alterar turma
     botao_turma_alterar = CTkButton(pagina_cadastro, command=carregar_turma, anchor=CENTER, text='ALTERAR',
-                                    font=FONTE_BOTAO, fg_color='transparent', border_color=AMARELO, border_width=2, corner_radius=32)
+                                    font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
     botao_turma_alterar.grid(
         row=5, column=6, sticky='ew', padx=(0, 5), pady=(10, 5))
 
     # Botão deletar turma
     botao_turma_deletar = CTkButton(pagina_cadastro, command=apagar_turma, anchor=CENTER, text='DELETAR',
-                                    font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                    font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
     botao_turma_deletar.grid(
         row=5, column=7, sticky='ew', padx=(0, 5), pady=(10, 5))
 
@@ -1530,7 +1529,7 @@ def cursos_turmas():
 
     # Botão desfazer alteração do aluno
     botao_undo_turma = CTkButton(pagina_cadastro, command=undo_atualiza_turma, anchor=CENTER, text='DESFAZER',
-                                 font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                 font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
     botao_undo_turma.grid(row=4, column=7, sticky='ew',
                           padx=(0, 5), pady=(10, 5))
 
@@ -1671,13 +1670,13 @@ def aulas():
 
                 # Botão desfazer alteração do aula
                 botao_undo = CTkButton(pagina_cadastro, command=undo_atualiza, anchor=CENTER, text='DESFAZER', font=FONTE_BOTAO,
-                                       fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                       fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
                 botao_undo.grid(row=3, column=5, sticky='ew', padx=10, pady=5)
 
                 botao_salvar.destroy()
 
             botao_salvar = CTkButton(pagina_cadastro, command=atualiza, anchor=CENTER, text="Salvar\nalterações".upper(
-            ), font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+            ), font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
             botao_salvar.grid(row=2, column=5, sticky='ew',
                               padx=10, pady=(10, 5))
         except IndexError:
@@ -1728,7 +1727,7 @@ def aulas():
 
             # Botão desfazer deleção de aluno
             botao_desfazer = CTkButton(pagina_cadastro, command=undo_apaga, anchor=CENTER, text='DESFAZER',
-                                       font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                       font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
             botao_desfazer.grid(row=3, column=5, sticky='ew', padx=10, pady=5)
 
         except IndexError:
@@ -1817,12 +1816,12 @@ def aulas():
 
                 # Botão desfazer alteração do aula
                 botao_undo = CTkButton(pagina_cadastro, command=undo_atualiza, anchor=CENTER, text='DESFAZER',
-                                       font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                       font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
                 botao_undo.grid(row=3, column=5, sticky='ew', padx=10, pady=5)
 
             # Botão salvar alterações da aula
             botao_salvar = CTkButton(pagina_cadastro, command=atualiza, anchor=CENTER, text='Salvar\nalterações'.upper(
-            ), font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+            ), font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
             botao_salvar.grid(row=2, column=5, sticky='ew',
                               padx=10, pady=(10, 5))
 
@@ -1932,27 +1931,27 @@ def aulas():
 
     # Botão adicionar aula
     botao_adicionar = CTkButton(pagina_cadastro, command=nova_aula, anchor=CENTER, text='ADICIONAR',
-                                font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
     botao_adicionar.grid(row=2, column=4, sticky='ew', padx=10, pady=(10, 5))
 
     # Botão alterar aula
     botao_alterar = CTkButton(pagina_cadastro, command=carregar_aula, anchor=CENTER, text='ALTERAR',
-                              font=FONTE_BOTAO, fg_color='transparent', border_color=AMARELO, border_width=2, corner_radius=32)
+                              font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
     botao_alterar.grid(row=3, column=4, sticky='ew', padx=10, pady=5)
 
     # Botão deletar aula
     botao_deletar = CTkButton(pagina_cadastro, command=apagar_aula, anchor=CENTER, text='DELETAR',
-                              font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                              font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
     botao_deletar.grid(row=4, column=4, sticky='ew', padx=10, pady=(5, 10))
 
     # Botão informações do aula
     botao_mostrar = CTkButton(pagina_cadastro, command=info_aula, anchor=CENTER, text='INFO',
-                              font=FONTE_BOTAO, fg_color='transparent', border_color=AMARELO, border_width=2, corner_radius=32)
+                              font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
     botao_mostrar.grid(row=4, column=5, sticky='ew', padx=10, pady=(5, 10))
 
     # Botão pesquisa aula
     botao_procurar = CTkButton(pagina_cadastro, command=pesquisa_aula, text="", image=img_pesquisa,
-                               font=FONTE_BOTAO, fg_color='transparent', border_color=AMARELO, border_width=2, corner_radius=32)
+                               font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
     botao_procurar.grid(row=1, column=6, sticky='ew', padx=(0, 5), pady=(0, 5))
     # ---------------------------------- Tabela das aulas -------------------------------------
 
@@ -2009,7 +2008,7 @@ def aulas():
 
     # Botão desfazer alteração do aula
     botao_undo = CTkButton(pagina_cadastro, command=undo_atualiza, anchor=CENTER, text='DESFAZER',
-                           font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                           font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
     botao_undo.grid(row=3, column=5, sticky='ew', padx=20, pady=10)
 
     botao_undo.destroy()
@@ -2073,7 +2072,7 @@ def faltas():
 
     # Botão pesquisa aluno
     botao_procura_aluno = CTkButton(pagina_cadastro, command=pesquisa_faltas_aluno, text="", image=img_pesquisa,
-                                    font=FONTE_BOTAO, fg_color='transparent', border_color=AMARELO, border_width=2, corner_radius=32)
+                                    font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
     botao_procura_aluno.grid(
         row=1, column=1, sticky='ew', padx=(0, 5), pady=(0, 5))
 
@@ -2090,13 +2089,13 @@ def faltas():
 
     # Botão pesquisa aula
     botao_procurar_aula = CTkButton(pagina_cadastro, command=pesquisa_faltas_aula, text="", image=img_pesquisa,
-                                    font=FONTE_BOTAO, fg_color='transparent', border_color=AMARELO, border_width=2, corner_radius=32)
+                                    font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
     botao_procurar_aula.grid(
         row=1, column=4, sticky='ew', padx=(0, 5), pady=(0, 5))
 
     # Botão mostra tabela de faltas, sem pesquisa
     botao_procurar_aula = CTkButton(pagina_cadastro, command=lambda: mostra_falta(""), text="CANCELAR\nPROCURA",
-                                    font=FONTE_BOTAO, fg_color='transparent', border_color=AMARELO, border_width=2, corner_radius=32)
+                                    font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
     botao_procurar_aula.grid(
         row=1, column=6, sticky='ew', padx=15, pady=(0, 5))
 
@@ -2267,11 +2266,11 @@ def cameras():
 
                 # Botão desfazer alteração do aula
                 botao_undo = CTkButton(pagina_cadastro, command=undo_atualiza, anchor=CENTER, text='DESFAZER',
-                                        font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                        font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
                 botao_undo.grid(row=3, column=5, sticky='ew', padx=(0,5), pady=(0,5))
 
             botao_salvar = Button(pagina_cadastro, command=atualiza, anchor=CENTER, text="SALVAR\nALTERAÇÕES",
-                                        font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                        font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
             botao_salvar.grid(row=3, column=4, sticky='ew', padx=(0,5), pady=(0,5))
 
         except IndexError:
@@ -2313,7 +2312,7 @@ def cameras():
 
             # Botão desfazer deleção de aluno
             botao_desfazer = CTkButton(pagina_cadastro, command=undo_apaga, anchor=CENTER, text='DESFAZER',
-                                        font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                        font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
             botao_desfazer.grid(row=3, column=5, sticky='ew', padx=(0,5), pady=(0,5))
 
         except IndexError:
@@ -2390,12 +2389,12 @@ def cameras():
 
                 # Botão desfazer alteração do aula
                 botao_undo = CTkButton(pagina_cadastro, command=undo_atualiza, anchor=CENTER, text='DESFAZER',
-                                        font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                        font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
                 botao_undo.grid(row=3, column=5, sticky='ew', padx=(0,5), pady=(0,5))
 
             # Botão salvar alterações da camera
             botao_salvar = CTkButton(pagina_cadastro, command=atualiza, anchor=CENTER, text='SALVAR\nALTERAÇÕES',
-                                        font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                                        font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
             botao_salvar.grid(row=3, column=4, sticky='ew', padx=(0,5), pady=(0,5))
 
         except:
@@ -2488,32 +2487,32 @@ def cameras():
 
     # Botão adicionar camera
     botao_adicionar = CTkButton(pagina_cadastro, command=nova_camera, anchor=CENTER, text='ADICIONAR',
-                            font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                            font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
     botao_adicionar.grid(row=2, column=3, sticky='ew', padx=(10,5), pady=(10,5))
 
     # Botão alterar camera
     botao_alterar = CTkButton(pagina_cadastro, command=carregar_camera, anchor=CENTER, text='ALTERAR',
-                            font=FONTE_BOTAO, fg_color='transparent', border_color=AMARELO, border_width=2, corner_radius=32)
+                            font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
     botao_alterar.grid(row=2, column=4, sticky='ew', padx=(0,5), pady=(10,5))
 
     # Botão deletar camera
     botao_deletar = CTkButton(pagina_cadastro, command=apagar_camera, anchor=CENTER, text='DELETAR',
-                            font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                            font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
     botao_deletar.grid(row=2, column=5, sticky='ew', padx=(0,5), pady=(10,5))
 
     # Botão informações do camera
     botao_mostrar = CTkButton(pagina_cadastro, command=info_camera, anchor=CENTER, text='INFO',
-                            font=FONTE_BOTAO, fg_color='transparent', border_color=AMARELO, border_width=2, corner_radius=32)
+                            font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
     botao_mostrar.grid(row=2, column=6, sticky='ew', padx=(0,5), pady=(10,5))
 
     # Botão pesquisa camera
     botao_procurar = CTkButton(pagina_cadastro, command=pesquisa_camera, text="", image=img_pesquisa,
-                            font=FONTE_BOTAO, fg_color='transparent', border_color=AMARELO, border_width=2, corner_radius=32)
+                            font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
     botao_procurar.grid(row=1, column=4, sticky='ew', padx=10, pady=(0,5))
 
     # Botão mostra visão da camera
     botao_imagem = CTkButton(pagina_cadastro, command=mostra_imagem, anchor=CENTER, text='MOSTRAR\nVÍDEO',
-                            font=FONTE_BOTAO, fg_color='transparent', border_color=AMARELO, border_width=2, corner_radius=32)
+                            font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
     botao_imagem.grid(row=3, column=3, sticky='ew', padx=(10,5), pady=(0,5))
 
     # ---------------------------------- Tabela das cameras -------------------------------------
@@ -2566,7 +2565,7 @@ def cameras():
 
     # Botão desfazer alteração do aula
     botao_undo = CTkButton(pagina_cadastro, command=undo_atualiza, anchor=CENTER, text='DESFAZER',
-                        font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=AMARELO, border_width=2, corner_radius=32)
+                        font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
     botao_undo.grid(row=3, column=4, sticky='ew', padx=(0,5), pady=(0,5))
 
     botao_undo.destroy()
