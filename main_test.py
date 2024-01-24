@@ -157,7 +157,7 @@ def inicia_app():
 
     prepara_dia()
 
-    # manda_mensagens()
+    manda_mensagens()
 
     # Confere presença do aluno
     utils.confere_presenca()
@@ -1011,7 +1011,7 @@ def cursos_turmas():
     frame_tabela.grid_rowconfigure(0, weight=0)
     frame_tabela.grid_rowconfigure(1, weight=0)
     frame_tabela.grid_rowconfigure(3, weight=1)
-
+    
     # -------------------- Detalhes do Curso -----------------------------------
 
     global undo_list, botao_undo_curso

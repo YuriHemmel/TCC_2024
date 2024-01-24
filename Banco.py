@@ -69,14 +69,13 @@ class Banco():
                      senha TEXT NOT NULL
                      )""")
         
-        # Tabela Câmeras
+        # Tabela de Presença
         cursor.execute("""CREATE TABLE IF NOT EXISTS presenca (
                      id INTEGER PRIMARY KEY AUTOINCREMENT,
                      ra TEXT NOT NULL,
-                     nome TEXT NOT NULL,
                      hora_entrada TEXT,
                      hora_saida TEXT,
-                     FOREIGN KEY (ra) REFERENCES alunos (ra) ON UPDATE CASCADE
+                     FOREIGN KEY (ra) REFERENCES alunos (ra) ON UPDATE CASCADE ON DELETE CASCADE
                      )""")
         
         self.conexao.commit()

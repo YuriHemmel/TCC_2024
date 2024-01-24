@@ -33,9 +33,9 @@ def envia_email_alerta(aluno, ID, destinatario):
 
 
 # Envia um email de confirmação para o aluno, informando que ele está presente em sala
-def envia_email_confirmando_presenca(aluno, ID, destinatario):
+def envia_email_confirmando_presenca(aluno, ID, destinatario, hora_chegada):
     assunto_email = "Confirmação: Sua presença foi confirmada!"
-    mensagem_email = f"Caro(a) {aluno}, de RA: {ID}:\n\nInformamos que sua presença em sala de aula foi confirmada e foi contabilizada em nosso sistema!"
+    mensagem_email = f"Caro(a) {aluno}, de RA: {ID}:\n\nInformamos que sua presença em sala de aula foi confirmada no horário \"{hora_chegada}\", e contabilizada em nosso sistema!"
 
     enviar_email(destinatario, assunto_email, mensagem_email)
 

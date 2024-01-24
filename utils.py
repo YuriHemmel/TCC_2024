@@ -115,13 +115,8 @@ def adiciona_fotos_alunos(aulas_dia, dia):
             for foto in fotos:
                 ra = foto[0]
 
-                # Pega o nome do aluno que terá aula no dia com base no ra
-                cursor.execute(f"""SELECT nome FROM alunos WHERE ra like '{ra}' """)
-
-                nome = cursor.fetchone()[0]
-                
-                # Adiciona o aluno na tabela presenca
-                cursor.execute(f"""INSERT INTO presenca (ra, nome) VALUES ('{ra}', '{nome}')""")
+                # Adiciona os alunos na tabela de presença do dia
+                cursor.execute(f"""INSERT INTO presenca (ra) VALUES ("{ra}") """)
 
                 path_foto = f"{path}/{ra}.jpeg"
                 print(path_foto)
@@ -658,6 +653,8 @@ def apaga_aluno(ra):
 # Conta presença parar o aluno
 def presenca_aluno(ra):
 
+    h_entrada = hora_chegada(ra)
+
     conexao = sqlite3.connect("banco.db")
     cursor = conexao.cursor()
     with conexao:
@@ -665,15 +662,20 @@ def presenca_aluno(ra):
         results = cursor.fetchone()
         cursor.execute(f"""UPDATE alunos SET presente = 1 WHERE ra = "{ra}" """)
 
-    envia_email_confirmando_presenca(results[0], ra, results[1])
+    envia_email_confirmando_presenca(results[0], ra, results[1], h_entrada)
 
 def hora_chegada(ra):
+    
+    h_entrada = datetime.now().strftime("%H:%M")
+    
     conexao = sqlite3.connect("banco.db")
     cursor = conexao.cursor()
     with conexao:
-        cursor.execute(f"""SELECT nome, email FROM alunos WHERE ra = "{ra}" """)
-        results = cursor.fetchone()
-        cursor.execute(f"""UPDATE alunos SET presente = 1 WHERE ra = "{ra}" """)
+        cursor.execute(f"""UPDATE presenca SET hora_entrada = "{h_entrada}" WHERE ra = "{ra}" """)
+        cursor.close()
+        conexao.commit()
+
+    return h_entrada
 
 # Verifica os alunos que não chegaram na aula, por meio da turma
 def alunos_para_avisar(turma):
