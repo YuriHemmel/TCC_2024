@@ -546,9 +546,9 @@ def confere_presenca():
                 entrada = datetime.strptime(f"{aluno[2]}", "%H:%M")
                 saida = datetime.strptime(f"{aluno[3]}", "%H:%M")
                 tempo_aula = saida - entrada
-                if tempo_aula < timedelta(minutes=2):
+                if tempo_aula < timedelta(minutes=37):
                     cursor.execute(f"""UPDATE alunos SET presente = 0 WHERE ra = '{aluno[1]}' """)
-                elif tempo_aula >= timedelta(minutes=2):
+                elif tempo_aula >= timedelta(minutes=37):
                     cursor.execute(f"""UPDATE alunos SET presente = 1 WHERE ra = '{aluno[1]}' """)
 
         cursor.close()
