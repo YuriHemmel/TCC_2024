@@ -50,12 +50,12 @@ def inicia_reconhecimento():
                 name = str(classnames[matchIndex]).upper().strip()
                 print(name)
 
-                if name is not None and name != "" and name not in presentes:
+                if name is not None and name != "":
                     presentes.append(name)
                     presenca_aluno(name)
                 
             if (len(presentes) == len(imagens)):
-                print('Todos os alunos estão presentes')
+                #print('Todos os alunos estão presentes')
                 break
         
         cv2.imshow('Webcam', img)

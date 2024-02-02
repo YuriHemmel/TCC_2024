@@ -969,17 +969,9 @@ def alunos():
         tree_alunos.configure(yscrollcommand=scroll_vertical.set,
                               xscrollcommand=scroll_horizontal.set)
 
-        posicao_coluna = ["nw", "nw", "nw", "center",
-                          "center", "center", "center"]
-        largura_coluna = [60, 150, 150, 100, 60, 70, 60]
-        cont = 0
-
         for coluna in lista_cabecalho:
             tree_alunos.heading(coluna, text=coluna.title(), anchor=NW)
-            tree_alunos.column(
-                coluna, width=largura_coluna[cont], anchor=posicao_coluna[cont])
-
-            cont += 1
+            tree_alunos.column(coluna)
 
         for item in lista_itens:
             tree_alunos.insert('', 'end', values=item)
@@ -1226,16 +1218,9 @@ def cursos_turmas():
         tree_cursos.configure(yscrollcommand=scroll_vertical,
                               xscrollcommand=scroll_horizontal)
 
-        posicao_coluna = ["nw", "nw", "e"]
-        largura_coluna = [30, 150, 80]
-        cont = 0
-
         for coluna in lista_cabecalho:
             tree_cursos.heading(coluna, text=coluna.title(), anchor=NW)
-            tree_cursos.column(
-                coluna, width=largura_coluna[cont], anchor=posicao_coluna[cont])
-
-            cont += 1
+            tree_cursos.column(coluna)
 
         for item in lista_itens:
             tree_cursos.insert('', 'end', values=item)
@@ -1506,16 +1491,9 @@ def cursos_turmas():
         tree_turma.configure(yscrollcommand=scroll_vertical,
                              xscrollcommand=scroll_horizontal)
 
-        posicao_coluna = ["nw", "nw", "e", "e"]
-        largura_coluna = [30, 130, 150, 80]
-        cont = 0
-
         for coluna in lista_cabecalho:
             tree_turma.heading(coluna, text=coluna.title(), anchor=NW)
-            tree_turma.column(
-                coluna, width=largura_coluna[cont], anchor=posicao_coluna[cont])
-
-            cont += 1
+            tree_turma.column(coluna)
 
         for item in lista_itens:
             tree_turma.insert('', 'end', values=item)
@@ -1983,17 +1961,9 @@ def aulas():
         tree_aulas.configure(yscrollcommand=scroll_vertical,
                              xscrollcommand=scroll_horizontal)
 
-        posicao_coluna = ["nw", "nw", "nw", "nw",
-                          "nw"]
-        largura_coluna = [60, 150, 150, 70, 150]
-        cont = 0
-
         for coluna in lista_cabecalho:
             tree_aulas.heading(coluna, text=coluna.title(), anchor=NW)
-            tree_aulas.column(
-                coluna, width=largura_coluna[cont], anchor=posicao_coluna[cont])
-
-            cont += 1
+            tree_aulas.column(coluna)
 
         for item in lista_itens:
             tree_aulas.insert('', 'end', values=item)
@@ -2130,17 +2100,9 @@ def faltas():
         tree_faltas.configure(yscrollcommand=scroll_vertical,
                               xscrollcommand=scroll_horizontal)
 
-        posicao_coluna = ["nw", "nw", "nw", "nw",
-                          "nw", "nw"]
-        largura_coluna = [40, 60, 150, 70, 150, 60]
-        cont = 0
-
         for coluna in lista_cabecalho:
             tree_faltas.heading(coluna, text=coluna.title(), anchor=NW)
-            tree_faltas.column(
-                coluna, width=largura_coluna[cont], anchor=posicao_coluna[cont])
-
-            cont += 1
+            tree_faltas.column(coluna)
 
         for item in lista_itens:
             tree_faltas.insert('', 'end', values=item)
@@ -2543,16 +2505,9 @@ def cameras():
         tree_cameras.configure(yscrollcommand=scroll_vertical,
                                xscrollcommand=scroll_horizontal)
 
-        posicao_coluna = ["nw", "nw", "nw", "nw"]
-        largura_coluna = [60, 150, 150, 70]
-        cont = 0
-
         for coluna in lista_cabecalho:
             tree_cameras.heading(coluna, text=coluna.title(), anchor=NW)
-            tree_cameras.column(
-                coluna, width=largura_coluna[cont], anchor=posicao_coluna[cont])
-
-            cont += 1
+            tree_cameras.column(coluna)
 
         for item in lista_itens:
             tree_cameras.insert('', 'end', values=item)
@@ -2577,7 +2532,7 @@ def cameras():
 
 def direciona_cadastro():
     # Mostra aba de cadastro de aluno
-    alunos()
+    controle('alunos')
 
     # Direciona para a página de cadastro
     show_frame(frame_abas)

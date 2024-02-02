@@ -499,6 +499,7 @@ def reseta_presenca_dia():
                         presente = 0
                         WHERE presente = 1
                         """)
+        cursor.execute("""DELETE FROM presenca""")
 
     # Remove fotos da pasta imagensAlunos/
     path = 'imagensAlunos'
@@ -540,16 +541,17 @@ def confere_presenca():
 
         for aluno in results:
             if aluno[3] == None:
-                cursor.execute(f"""UPDATE alunos SET presente = 1 WHERE ra = '{aluno[1]}' """)
+                cursor.execute(f"""UPDATE alunos SET presente = 0 WHERE ra = '{aluno[1]}' """)
             else:
-                entrada = datetime.strptime(f"{aluno[3]}", "%H:%M:%S")
-                saida = datetime.strptime(f"{aluno[4]}", "%H:%M:%S")
+                entrada = datetime.strptime(f"{aluno[2]}", "%H:%M")
+                saida = datetime.strptime(f"{aluno[3]}", "%H:%M")
                 tempo_aula = saida - entrada
-                if tempo_aula < timedelta(minutes=37):
-                    cursor.execute(f"""UPDATE faltas SET presente = 1 WHERE ra = '{aluno[1]}' """)
+                if tempo_aula < timedelta(minutes=2):
+                    cursor.execute(f"""UPDATE alunos SET presente = 0 WHERE ra = '{aluno[1]}' """)
+                elif tempo_aula >= timedelta(minutes=2):
+                    cursor.execute(f"""UPDATE alunos SET presente = 1 WHERE ra = '{aluno[1]}' """)
 
         cursor.close()
-
 
 # Adiciona à lista ra_alunos cada aluno daquela turma
 def append_alunos(turma, ra_alunos, conexao):
@@ -660,22 +662,26 @@ def presenca_aluno(ra):
     with conexao:
         cursor.execute(f"""SELECT nome, email FROM alunos WHERE ra = "{ra}" """)
         results = cursor.fetchone()
-        cursor.execute(f"""UPDATE alunos SET presente = 1 WHERE ra = "{ra}" """)
+        #cursor.execute(f"""UPDATE alunos SET presente = 1 WHERE ra = "{ra}" """)
 
     envia_email_confirmando_presenca(results[0], ra, results[1], h_entrada)
 
 def hora_chegada(ra):
     
-    h_entrada = datetime.now().strftime("%H:%M")
+    hora = datetime.now().strftime("%H:%M")
     
     conexao = sqlite3.connect("banco.db")
     cursor = conexao.cursor()
     with conexao:
-        cursor.execute(f"""UPDATE presenca SET hora_entrada = "{h_entrada}" WHERE ra = "{ra}" """)
-        cursor.close()
-        conexao.commit()
+        cursor.execute(f"""SELECT hora_entrada FROM presenca WHERE ra = "{ra}" """)
+        results = cursor.fetchone()
 
-    return h_entrada
+        if results[0] == None:
+            cursor.execute(f"""UPDATE presenca SET hora_entrada = "{hora}" WHERE ra = "{ra}" """)
+        elif results[0] != None:
+            cursor.execute(f"""UPDATE presenca SET hora_saida = "{hora}" WHERE ra = "{ra}" """)
+
+    return hora
 
 # Verifica os alunos que não chegaram na aula, por meio da turma
 def alunos_para_avisar(turma):
