@@ -495,42 +495,21 @@ def reseta_presenca_dia():
 
     with conexao:
         cursor = conexao.cursor()
-        cursor.execute(f"""UPDATE alunos SET
-                        presente = 0
-                        WHERE presente = 1
-                        """)
+
+        # Apaga dados da tabela presença
         cursor.execute("""DELETE FROM presenca""")
 
     # Remove fotos da pasta imagensAlunos/
-    path = 'imagensAlunos'
-    imagens = os.listdir(path)
+    imagens = os.listdir("imagensAlunos")
 
     if imagens != []:
         print('Limpando as imagens de alunos do dia')
     
         for imagem in imagens:
-            os.remove(f'{path}/{imagem}')
-
-# Computa as faltas no final do dia
-def computa_falta(turma, dia):
-    global dia_semana
-
-    conexao = sqlite3.connect("banco.db")
-    ra_alunos = []
-    with conexao:
-        append_alunos(turma, ra_alunos, conexao)
-        
-        for ra in ra_alunos:
-            update_faltas(ra, dia, turma, conexao)
-
-        cursor = conexao.cursor()
-        
-        cursor.execute("""DELETE FROM presenca""")
-
-        cursor.close()
+            os.remove(f'imagensAlunos/{imagem}')
 
 # Confere tempo de aula do aluno
-def confere_presenca():
+def confere_presenca(turma, dia):
     conexao = sqlite3.connect("banco.db")
     cursor = conexao.cursor()
     with conexao:
@@ -541,27 +520,16 @@ def confere_presenca():
 
         for aluno in results:
             if aluno[3] == None:
-                cursor.execute(f"""UPDATE alunos SET presente = 0 WHERE ra = '{aluno[1]}' """)
+                update_faltas(aluno[1], dia, turma, conexao)
             else:
                 entrada = datetime.strptime(f"{aluno[2]}", "%H:%M")
                 saida = datetime.strptime(f"{aluno[3]}", "%H:%M")
                 tempo_aula = saida - entrada
-                if tempo_aula < timedelta(minutes=37):
-                    cursor.execute(f"""UPDATE alunos SET presente = 0 WHERE ra = '{aluno[1]}' """)
-                elif tempo_aula >= timedelta(minutes=37):
-                    cursor.execute(f"""UPDATE alunos SET presente = 1 WHERE ra = '{aluno[1]}' """)
+                if tempo_aula < timedelta(minutes=2):
+                    update_faltas(aluno[1], dia, turma, conexao)
+                elif tempo_aula >= timedelta(minutes=2):
+                    continue
 
-        cursor.close()
-
-# Adiciona à lista ra_alunos cada aluno daquela turma
-def append_alunos(turma, ra_alunos, conexao):
-    cursor = conexao.cursor()
-
-    with conexao:
-        cursor.execute(f"""SELECT ra FROM alunos WHERE turma_id = "{turma}" AND presente = 0""")
-        for elemento in (cursor.fetchall()):
-            ra_alunos.append(elemento[0])
-    
         cursor.close()
 
 # Atualiza o quadro de faltas de cada aula
@@ -589,8 +557,8 @@ def cria_aluno(lista):
     with conexao:
         cursor = conexao.cursor()
 
-        cursor.execute(f"""INSERT INTO alunos (ra, nome, email, telefone, sexo, foto, turma_id, presente)
-                                       VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}", "{lista[3]}", "{lista[4]}", "{lista[5]}", "{lista[6]}", 0 ) """)
+        cursor.execute(f"""INSERT INTO alunos (ra, nome, email, telefone, sexo, foto, turma_id)
+                                       VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}", "{lista[3]}", "{lista[4]}", "{lista[5]}", "{lista[6]}") """)
 
 # Mostra os alunos
 def mostra_aluno():
@@ -662,7 +630,6 @@ def presenca_aluno(ra):
     with conexao:
         cursor.execute(f"""SELECT nome, email FROM alunos WHERE ra = "{ra}" """)
         results = cursor.fetchone()
-        #cursor.execute(f"""UPDATE alunos SET presente = 1 WHERE ra = "{ra}" """)
 
     envia_email_confirmando_presenca(results[0], ra, results[1], h_entrada)
 
@@ -691,7 +658,6 @@ def alunos_para_avisar(turma):
         cursor = conexao.cursor()
         cursor.execute(f""" SELECT ra, nome, email FROM alunos
                             WHERE turma_id = "{turma}" 
-                            AND presente = 0
                         """)
 
         results = cursor.fetchall()

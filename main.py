@@ -15,59 +15,69 @@ from datetime import *
 from email_utils import envia_email_alerta, envia_email_acusando_falta, envia_email_aula_comeca
 from PIL import Image, ImageTk
 from reconhecedor_rostos import inicia_reconhecimento
+from customtkinter import *
 
+# ---------------------------------------- Constantes --------------------------------------------------------
 # Tamanho da janela
-WIDTH = 850
+WIDTH = 1050
 HEIGHT = 620
 
 # Cores
-AZUL_CLARO = "#71BAFF"
-AZUL_ESCURO = "#075EBD"
+AZUL_CLARO = "#075EBD"
+AZUL_ESCURO = "#023D71"
 PRETO = "#000000"
 BRANCO = "#FFFFFF"
 VERDE = "#66C475"
+VERDE_ESCURO = "#539E5E"
 VERMELHO = "#FF5961"
+VERMELHO_ESCURO = "#B74046"
+
+# FONTEs
+FONTE = ("Ivy", 16)
+FONTE_TITULO = ("Ivy", 20, 'bold')
+FONTE_BOTAO = ("Ivy", 13, 'bold')
+
+# ------------------------------------------- Dotenv --------------------------------------------------------
 
 # Lê as variáveis de ambiente presentes no arquivo .env
 load_dotenv()
 
-# Janela
-janela = Tk()
+# =========================================== Código =========================================================
+
+# ------------------------------------------- Configurações da janela --------------------------------------------------------
+janela = CTk()
 janela.title("Sistema de chamada")
-janela.rowconfigure(0, weight=1)
-janela.columnconfigure(0, weight=1)
 janela.geometry(f"{WIDTH}x{HEIGHT}")
-janela.resizable(False, False)
+janela.minsize(width=WIDTH, height=HEIGHT)
 
-# Páginas
-pagina_inicial = Frame(janela)
-pagina_cadastro = Frame(janela)
+set_appearance_mode("Dark")
 
-# Fontes
-fonte = ("Ivy", 11)
-fonte_titulo = ("Ivy", 15, 'bold')
-fonte_botao = ("Ivy", 8, 'bold')
+janela.grid_columnconfigure(0, weight=1)
+janela.grid_columnconfigure(2, weight=1)
 
-# Adicionando as páginas
-paginas = (pagina_inicial, pagina_cadastro)
+janela.grid_rowconfigure(1, weight=1)
+janela.grid_rowconfigure(3, weight=1)
 
-# Adiciona os frames nas páginas
-for frame in paginas:
-    frame.grid(row=0, column=0, sticky='nsew')
+# ------------------------------------------- Configurações de páginas --------------------------------------------------------
+# Frames / Páginas
+frame_conteudo = CTkFrame(janela, fg_color='transparent', corner_radius=0)
+frame_conteudo.grid(row=1, column=0, sticky='nsew', rowspan=3, columnspan=3)
 
-# Mostra o Frame que queremos
+frame_conteudo.grid_columnconfigure(0, weight=1)
+frame_conteudo.grid_columnconfigure(4, weight=1)
 
+frame_conteudo.grid_rowconfigure(8, weight=1)
 
-def show_frame(frame):
-    frame.tkraise()
+pagina_inicial = CTkFrame(frame_conteudo, corner_radius=0)
+pagina_inicial.grid(row=0, column=0, sticky='nsew', columnspan=5, rowspan=9)
 
+pagina_cadastro = CTkFrame(frame_conteudo)
+pagina_cadastro.grid(row=1, column=0, sticky='nsew', columnspan=5, rowspan=3)
 
-# Primeira página a aparecer
-show_frame(pagina_inicial)
+# ------------------------------------------- Criação de banco de dados --------------------------------------------------------
 
 # Cria o banco de dados se não existir ainda
 db = Banco.Banco()
-
 
 # Aulas do dia
 global aulas_dia
@@ -75,8 +85,6 @@ global aulas_dia
 aulas_dia = []
 
 # Arruma o banco e salva as turmas que terão aula no dia e seus respectivos horários
-
-
 def prepara_dia():
     global aulas_dia
 
@@ -97,8 +105,6 @@ def prepara_dia():
 
 
 # Computa as faltas do dia
-
-
 def computa_faltas():
     current_time = datetime.now()
 
@@ -109,11 +115,13 @@ def computa_faltas():
     if dia_semana in [0, 1, 2, 3, 4]:
         # Turma é Terceiro elemento do "aulas_dia"
         for aula in aulas_dia:
-            utils.computa_falta(aula[2], dia_semana)
+            utils.confere_presenca(aula[2], dia_semana)
         utils.reseta_presenca_dia()
         print("Faltas computadas")
-    
+
 # Manda mensagens para os alunos sobre as aulas
+
+
 def manda_mensagens():
     global aulas_dia
 
@@ -146,18 +154,15 @@ def manda_mensagens():
 def inicia_app():
 
     prepara_dia()
-    
-    #manda_mensagens()
 
-    # Confere presença do aluno
-    utils.confere_presenca()
-    
+    manda_mensagens()
+
     computa_faltas()
 
 # Fecha o aplicativo e seus subprocessos
 
 
-def sair_app():
+def sair():
     os._exit(0)
 
 # ========================= Schedules ================================
@@ -167,119 +172,220 @@ schedule.every(40).minutes.do(manda_mensagens)
 schedule.every().day.at("00:00").do(prepara_dia)
 schedule.every().day.at("23:59").do(computa_faltas)
 
-# ================ Pagina inicial =======================
+# ------------------------------------------- Funções --------------------------------------------------------
 
-pagina_inicial.configure(bg=AZUL_CLARO)
+# Mostra os frames
 
-# Frame Titulo
-frame_titulo_inicial = Frame(
-    pagina_inicial, width=WIDTH, height=52, bg=AZUL_ESCURO)
-frame_titulo_inicial.place(x=0, y=0)
 
-casa_icone_titulo = Image.open('images/icon_casa.png')
-casa_icone_titulo = casa_icone_titulo.resize((45, 45))
-casa_icone_titulo = ImageTk.PhotoImage(casa_icone_titulo)
+def show_frame(frame):
+    frame.tkraise()
 
-pagina_inicial_titulo = Label(frame_titulo_inicial, image=casa_icone_titulo, text="  Menu Principal",
-                              width=WIDTH, compound=LEFT, anchor=NW, font=fonte_titulo, bg=AZUL_ESCURO, fg=BRANCO)
-pagina_inicial_titulo.place(x=10, y=0)
+# Troca informações do Título
 
-cadastro_icone = Image.open('images/icon_cadastro.png')
-cadastro_icone = cadastro_icone.resize((50, 50))
-cadastro_icone = ImageTk.PhotoImage(cadastro_icone)
 
-botao_pagina_aluno = Button(pagina_inicial, command=lambda: show_frame(pagina_cadastro), image=cadastro_icone, text="Cadastro geral".upper(),
-                            compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
-botao_pagina_aluno['width'] = 160
-botao_pagina_aluno['height'] = 160
-botao_pagina_aluno.place(x=190 - 45, y=HEIGHT/2 - 80)
+def troca_titulo(texto, nome_img):
 
-iniciar_icone = Image.open('images/icon_iniciar.png')
-iniciar_icone = iniciar_icone.resize((50, 50))
-iniciar_icone = ImageTk.PhotoImage(iniciar_icone)
+    img = CTkImage(light_image=Image.open(f"images/icon_{nome_img}.png"),
+                   dark_image=Image.open(f"images/icon_{nome_img}.png"),
+                   size=(40, 40))
 
-botao_iniciar = Button(pagina_inicial, command=inicia_app, image=iniciar_icone, text="Teste".upper(),
-                       compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
-botao_iniciar['width'] = 160
-botao_iniciar['height'] = 160
-botao_iniciar.place(x=190*2 - 45, y=HEIGHT/2 - 80)
+    label_titulo.configure(text=texto, image=img)
 
-saida_icone = Image.open('images/icon_saida.png')
-saida_icone = saida_icone.resize((50, 50))
-saida_icone = ImageTk.PhotoImage(saida_icone)
 
-botao_sair = Button(pagina_inicial, command=sair_app, image=saida_icone, text="Sair".upper(),
-                    compound=TOP, overrelief=RIDGE, anchor=CENTER, font=fonte, bg=AZUL_ESCURO, foreground=BRANCO)
-botao_sair['width'] = 160
-botao_sair['height'] = 160
-botao_sair.place(x=190*3 - 45, y=HEIGHT/2 - 80)
+# ================================================== Cabeçalho ========================================================
+# --------------------------------------------------- Imagens --------------------------------------------------------
 
-# ================ Pagina de cadastro =======================
 
-pagina_cadastro.configure(bg=AZUL_CLARO)
+img_titulo = CTkImage(light_image=Image.open("images/icon_casa.png"),
+                      dark_image=Image.open("images/icon_casa.png"),
+                      size=(40, 40))
 
-# -------------------------- Frames da página -------------------------------
+# --------------------------------------------------- Título --------------------------------------------------------
 
-# Frame Titulo
-frame_titulo_aluno = Frame(pagina_cadastro, width=WIDTH,
-                           height=52, bg=AZUL_ESCURO)
-frame_titulo_aluno.place(x=0, y=0)
+frame_decorativo = CTkFrame(
+    janela, fg_color=AZUL_ESCURO, corner_radius=0, height=60)
+frame_decorativo.grid(row=0, column=0, sticky="ew", columnspan=3)
 
-# Frame dos botões
-frame_aluno_botoes = Frame(
-    pagina_cadastro, width=WIDTH, height=65, bg=AZUL_CLARO)
-frame_aluno_botoes.place(x=0, y=53)
+frame_titulo = CTkFrame(janela, fg_color=AZUL_CLARO, corner_radius=0)
+frame_titulo.grid(row=0, column=0, sticky="ew", columnspan=3)
 
-# Frame do conteúdo / informações
-frame_info = Frame(pagina_cadastro, width=WIDTH,
-                   height=230, bg=AZUL_CLARO, padx=10)
-frame_info.place(x=0, y=118)
+label_titulo = CTkLabel(frame_titulo, text="  Menu Inicial", fg_color="transparent",
+                        compound=LEFT, anchor=W, font=FONTE_TITULO, image=img_titulo)
+label_titulo.grid(row=0, column=0, padx=20, pady=5, sticky="ew")
 
-# Frame das tabelas
-frame_tabela = Frame(pagina_cadastro, width=WIDTH,
-                     height=250, bg=AZUL_CLARO, padx=10)
-frame_tabela.place(x=0, y=118+240)
+# ================================================== Página Inicial ========================================================
+# --------------------------------------------------- Imagens --------------------------------------------------------
 
-# ----------------------------- Icones de Título ----------------------------------
+# Imagem do botão de Cadastro
+img_cadastro = CTkImage(light_image=Image.open("images/icon_cadastro.png"),
+                        dark_image=Image.open("images/icon_cadastro.png"),
+                        size=(50, 50))
 
-global titulo_cadastro_label
+# Imagem do botão de Iniciar
+img_iniciar = CTkImage(light_image=Image.open("images/icon_iniciar.png"),
+                       dark_image=Image.open("images/icon_iniciar.png"),
+                       size=(50, 50))
 
-icone_titulo_aluno = Image.open('images/icon_aluno.png')
-icone_titulo_aluno = icone_titulo_aluno.resize((50, 50))
-icone_titulo_aluno = ImageTk.PhotoImage(icone_titulo_aluno)
+# Imagem do botão de Sair
+img_sair = CTkImage(light_image=Image.open("images/icon_saida.png"),
+                    dark_image=Image.open("images/icon_saida.png"),
+                    size=(50, 50))
 
-icone_titulo_curso = Image.open('images/icon_cursos.png')
-icone_titulo_curso = icone_titulo_curso.resize((50, 50))
-icone_titulo_curso = ImageTk.PhotoImage(icone_titulo_curso)
+# ---------------------------------------- Configuração de Janela / Grid --------------------------------------------------------
+# Colunas
+pagina_inicial.grid_columnconfigure(0, weight=1)
+pagina_inicial.grid_columnconfigure(2, weight=1)
 
-icone_titulo_aula = Image.open('images/icon_aula.png')
-icone_titulo_aula = icone_titulo_aula.resize((50, 50))
-icone_titulo_aula = ImageTk.PhotoImage(icone_titulo_aula)
+# Linhas
+pagina_inicial.grid_rowconfigure(0, weight=1)
+pagina_inicial.grid_rowconfigure(2, weight=1)
+pagina_inicial.grid_rowconfigure(4, weight=1)
+pagina_inicial.grid_rowconfigure(6, weight=1)
 
-icone_titulo_camera = Image.open('images/icon_camera.png')
-icone_titulo_camera = icone_titulo_camera.resize((50, 50))
-icone_titulo_camera = ImageTk.PhotoImage(icone_titulo_camera)
+# Tornar frame transparente
+pagina_inicial.configure(fg_color='transparent')
 
-icone_titulo_faltas = Image.open('images/icon_falta.png')
-icone_titulo_faltas = icone_titulo_faltas.resize((50, 50))
-icone_titulo_faltas = ImageTk.PhotoImage(icone_titulo_faltas)
+# ---------------------------------------- Botões --------------------------------------------------------
+# Botão de Cadastro
+btn_cadastro = CTkButton(pagina_inicial, text="Cadastro", command=lambda: direciona_cadastro(), image=img_cadastro,
+                         corner_radius=45, width=250, height=60, compound=LEFT, font=FONTE_TITULO)
+btn_cadastro.grid(row=1, column=1, sticky="ew")
 
-# ------------------------ Funções / Sub-paginas de cadastro -----------------------------
+# Botão de Iniciar
+btn_inicia = CTkButton(pagina_inicial, text="Iniciar", command=inicia_app, image=img_iniciar,
+                       corner_radius=45, width=250, height=60, compound=LEFT, font=FONTE_TITULO)
+btn_inicia.grid(row=3, column=1, sticky="ew")
 
+# Botão de Sair
+btn_sair = CTkButton(pagina_inicial, text="Sair", command=sair, image=img_sair,
+                     corner_radius=45, width=250, height=60, compound=LEFT, font=FONTE_TITULO)
+btn_sair.grid(row=5, column=1, sticky="ew")
+
+# ================================================== Página de Cadastro ========================================================
+# --------------------------------------------------- Imagens --------------------------------------------------------
+
+# Imagem da aba de Alunos
+img_alunos = CTkImage(light_image=Image.open("images/icon_aluno.png"),
+                      dark_image=Image.open("images/icon_aluno.png"),
+                      size=(25, 25))
+
+# Imagem da aba de Cursos e Turmas
+img_cursos = CTkImage(light_image=Image.open("images/icon_cursos.png"),
+                      dark_image=Image.open("images/icon_cursos.png"),
+                      size=(25, 25))
+
+# Imagem da aba de Aulas
+img_aulas = CTkImage(light_image=Image.open("images/icon_aula.png"),
+                     dark_image=Image.open("images/icon_aula.png"),
+                     size=(25, 25))
+
+# Imagem da aba de Faltas
+img_faltas = CTkImage(light_image=Image.open("images/icon_falta.png"),
+                      dark_image=Image.open("images/icon_falta.png"),
+                      size=(25, 25))
+
+# Imagem da aba de Câmeras
+img_cameras = CTkImage(light_image=Image.open("images/icon_camera.png"),
+                       dark_image=Image.open("images/icon_camera.png"),
+                       size=(25, 25))
+
+# Imagem de Voltar
+img_voltar = CTkImage(light_image=Image.open("images/icon_voltar.png"),
+                      dark_image=Image.open("images/icon_voltar.png"),
+                      size=(25, 25))
+
+# Imagem de Pesquisa
+img_pesquisa = CTkImage(light_image=Image.open("images/icon_lupa_lightmode.png"),
+                        dark_image=Image.open("images/icon_lupa_darkmode.png"),
+                        size=(25, 25))
+
+# ---------------------------------------- Frame das Abas --------------------------------------------------------
+
+# Frame das abas (Botões)
+frame_abas = CTkFrame(frame_conteudo, fg_color=AZUL_ESCURO,
+                      corner_radius=0, height=60)
+frame_abas.grid(row=0, column=0, sticky="ew", columnspan=7)
+
+btn_aluno = CTkButton(frame_abas, text="Alunos", image=img_alunos, command=lambda: controle('alunos'),
+                      corner_radius=45, width=50, height=30, compound=LEFT, font=FONTE_BOTAO)
+btn_aluno.pack(side=LEFT, expand=True, fill=X, padx=(20, 0), pady=(0, 5))
+
+btn_cursos = CTkButton(frame_abas, text="Cursos/Turmas", image=img_cursos, command=lambda: controle('cursos'),
+                       corner_radius=45, width=50, height=30, compound=LEFT, font=FONTE_BOTAO)
+btn_cursos.pack(after=btn_aluno, side=LEFT, expand=True,
+                fill=X, padx=(20, 0), pady=(0, 5))
+
+btn_aulas = CTkButton(frame_abas, text="Aulas", image=img_aulas, command=lambda: controle('aulas'),
+                      corner_radius=45, width=50, height=30, compound=LEFT, font=FONTE_BOTAO)
+btn_aulas.pack(after=btn_cursos, side=LEFT, expand=True,
+               fill=X, padx=(20, 0), pady=(0, 5))
+
+btn_faltas = CTkButton(frame_abas, text="Faltas", image=img_faltas, command=lambda: controle('faltas'),
+                       corner_radius=45, width=50, height=30, compound=LEFT, font=FONTE_BOTAO)
+btn_faltas.pack(after=btn_aulas, side=LEFT, expand=True,
+                fill=X, padx=(20, 0), pady=(0, 5))
+
+btn_camera = CTkButton(frame_abas, text="Câmeras", image=img_cameras, command=lambda: controle('cameras'),
+                       corner_radius=45, width=50, height=30, compound=LEFT, font=FONTE_BOTAO)
+btn_camera.pack(after=btn_faltas, side=LEFT, expand=True,
+                fill=X, padx=(20, 0), pady=(0, 5))
+
+btn_voltar = CTkButton(frame_abas, text="Alunos", image=img_voltar, command=lambda: voltar(),
+                       corner_radius=45, width=50, height=30, compound=LEFT, font=FONTE_BOTAO)
+btn_voltar.pack(after=btn_camera, side=LEFT, expand=True,
+                fill=X, padx=(20, 20), pady=(0, 5))
+
+# ---------------------------------------- Frame das Tabelas --------------------------------------------------------
+
+frame_tabela = CTkFrame(frame_conteudo)
+frame_tabela.grid(row=4, column=0, sticky='nsew', columnspan=5,
+                  rowspan=5, ipadx=5, ipady=10)
+
+frame_tabela.grid_columnconfigure(0, weight=1)
+frame_tabela.grid_columnconfigure(4, weight=1)
+
+frame_tabela.grid_rowconfigure(0, weight=1)
+frame_tabela.grid_rowconfigure(4, weight=1)
+
+# ---------------------------------------- Configuração da Página de cadastro --------------------------------------------------------
+# Colunas
+pagina_cadastro.grid_columnconfigure(0, weight=2)
+pagina_cadastro.grid_columnconfigure(1, weight=1)
+pagina_cadastro.grid_columnconfigure(2, weight=2)
+pagina_cadastro.grid_columnconfigure(3, weight=2)
+pagina_cadastro.grid_columnconfigure(5, weight=1)
+
+# Tornar frame transparente
+pagina_cadastro.configure(fg_color='transparent')
+
+# ---------------------------------------- Alunos ---------------------------------------------------------------
 # Função de cadastro de alunos
 
 
 def alunos():
     # Titulo da página
-    global titulo_cadastro_label
+    troca_titulo('  Cadastro de Alunos', 'aluno')
 
-    titulo_cadastro_label = Label(frame_titulo_aluno, image=icone_titulo_aluno, text="Cadastro de alunos",
-                                  width=WIDTH, compound=LEFT, relief=RAISED, anchor=NW, font=fonte_titulo, bg=AZUL_ESCURO, fg=BRANCO)
-    titulo_cadastro_label.place(x=0, y=0)
-    ttk.Separator(pagina_cadastro, orient=HORIZONTAL).place(
-        x=0, y=52, width=WIDTH)
+# ---------------------------------------- Configuração da pagina de cadastro --------------------------------------------------------
 
-    # ------------------------------------------------- Detalhes do Aluno ---------------------------------------------------
+    pagina_cadastro.grid_columnconfigure(0, weight=2)
+    pagina_cadastro.grid_columnconfigure(1, weight=1)
+    pagina_cadastro.grid_columnconfigure(2, weight=2)
+    pagina_cadastro.grid_columnconfigure(3, weight=2)
+    pagina_cadastro.grid_columnconfigure(4, weight=0)
+    pagina_cadastro.grid_columnconfigure(5, weight=1)
+
+# ---------------------------------------- Configuração do frame de tabela --------------------------------------------------------
+
+    frame_tabela.grid_columnconfigure(0, weight=1)
+    frame_tabela.grid_columnconfigure(3, weight=0)
+    frame_tabela.grid_columnconfigure(4, weight=1)
+
+    frame_tabela.grid_rowconfigure(0, weight=0)
+    frame_tabela.grid_rowconfigure(1, weight=0)
+    frame_tabela.grid_rowconfigure(4, weight=1)
+
+# ------------------------------------------------- Detalhes do Aluno ---------------------------------------------------
 
     global undo_list, botao_undo, undo_falta
     undo_list = []
@@ -334,8 +440,9 @@ def alunos():
 
             label_foto.destroy()
 
-            mostra_alunos()
-        except:
+            alunos()
+
+        except: 
             messagebox.showerror("Erro", "RA já cadastrado")
 
     # Carrega informações do aluno
@@ -374,12 +481,10 @@ def alunos():
             foto_string = aluno_foto
 
             aluno_foto = utils.convertToImage(aluno_foto)
-            aluno_foto = aluno_foto.resize((130, 130))
-            aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
-            label_foto = Label(frame_info, image=aluno_foto,
-                               bg=AZUL_CLARO, fg=BRANCO)
-            label_foto.place(x=300, y=10)
+            label_foto = CTkLabel(frame_foto, text="",
+                                  image=aluno_foto, fg_color='transparent')
+            label_foto.grid(row=0, column=0, sticky='nsew', rowspan=5)
 
             botao_undo.destroy()
 
@@ -443,14 +548,14 @@ def alunos():
                 mostra_alunos()
 
                 # Botão desfazer alteração do aluno
-                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10, height=2,
-                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-                botao_undo.place(x=726, y=70)
+                botao_undo = CTkButton(pagina_cadastro, command=undo_atualiza, anchor=CENTER, text='DESFAZER',
+                                       font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+                botao_undo.grid(row=2, column=6, sticky='ew')
 
             # Botão salvar alterações do aluno
-            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text='SALVAR\nALTERAÇÕES', width=10, height=2,
-                                  overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-            botao_salvar.place(x=726, y=125)
+            botao_salvar = CTkButton(pagina_cadastro, command=atualiza, anchor=CENTER, text='SALVAR\nALTERAÇÕES',
+                                     font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=58)
+            botao_salvar.grid(row=4, column=6, sticky='ew')
 
         except IndexError:
             messagebox.showerror("Erro", "Selecione um aluno na tabela.")
@@ -493,9 +598,9 @@ def alunos():
                     utils.cria_falta([falta[0], falta[1], falta[2]])
 
             # Botão desfazer deleção de aluno
-            botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=10, height=2,
-                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-            botao_desfazer.place(x=726, y=70)
+            botao_desfazer = CTkButton(pagina_cadastro, command=undo_apaga, anchor=CENTER, text='DESFAZER',
+                                       font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
+            botao_desfazer.grid(row=2, column=6, sticky='ew')
 
         except IndexError:
             messagebox.showerror("Erro", "Selecione um aluno na tabela.")
@@ -536,12 +641,12 @@ def alunos():
 
             # Inserindo foto do Aluno na tela
             aluno_foto = utils.convertToImage(aluno_foto)
-            aluno_foto = aluno_foto.resize((130, 130))
+            aluno_foto = aluno_foto.resize((130, 150))
             aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
-            label_foto = Label(frame_info, image=aluno_foto,
-                               bg=AZUL_CLARO, fg=BRANCO)
-            label_foto.place(x=300, y=10)
+            label_foto = CTkLabel(frame_foto, text="",
+                                  image=aluno_foto, fg_color='transparent')
+            label_foto.grid(row=0, column=0, sticky='nsew', rowspan=5)
 
             def atualiza():
                 global botao_undo, undo_falta
@@ -603,14 +708,14 @@ def alunos():
                 mostra_alunos()
 
                 # Botão desfazer alteração do aluno
-                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10, height=2,
-                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-                botao_undo.place(x=726, y=70)
+                botao_undo = CTkButton(pagina_cadastro, command=undo_atualiza, anchor=CENTER, text='DESFAZER', font=FONTE_BOTAO,
+                                       fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
+                botao_undo.grid(row=2, column=6, sticky='ew')
 
             # Botão salvar alterações do aluno
-            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text='SALVAR\nALTERAÇÕES', width=10, height=2,
-                                  overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-            botao_salvar.place(x=726, y=125)
+            botao_salvar = CTkButton(pagina_cadastro, command=atualiza, anchor=CENTER, text='SALVAR\nALTERAÇÕES',
+                                     font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=58)
+            botao_salvar.grid(row=4, column=6, sticky='ew')
 
         except:
             messagebox.showerror("Erro", "Aluno não encontrado.")
@@ -645,61 +750,60 @@ def alunos():
 
             # Inserindo foto do Aluno na tela
             aluno_foto = utils.convertToImage(aluno_foto)
-            aluno_foto = aluno_foto.resize((130, 130))
+            aluno_foto = aluno_foto.resize((130, 150))
             aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
-            label_foto = Label(frame_info, image=aluno_foto,
-                               bg=AZUL_CLARO, fg=BRANCO)
-            label_foto.place(x=300, y=10)
+            label_foto = CTkLabel(frame_foto, text="",
+                                  image=aluno_foto, fg_color='transparent')
+            label_foto.grid(row=0, column=0, sticky='nsew', rowspan=5)
 
         except IndexError:
             messagebox.showerror("Erro", "Selecione um aluno na tabela.")
 
     # Label e entry do Nome do aluno
-    label_nome = Label(frame_info, text="Nome *",
-                       height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_nome.place(x=10, y=10)
+    label_nome = CTkLabel(pagina_cadastro, text="Nome *",
+                          anchor=NW, font=FONTE, fg_color='transparent')
+    label_nome.grid(row=0, column=0, sticky='ew', padx=10, pady=(10, 5))
 
-    entry_nome_aluno = Entry(frame_info, width=45,
-                             justify='left', relief=SOLID)
-    entry_nome_aluno.place(x=12, y=40)
+    entry_nome_aluno = CTkEntry(
+        pagina_cadastro, placeholder_text='Nome do Aluno')
+    entry_nome_aluno.grid(row=1, column=0, sticky='ew',
+                          columnspan=2, padx=10, pady=(0, 5))
 
     # Label e entry do email
-    label_email = Label(frame_info, text="Email *",
-                        height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_email.place(x=10, y=70)
+    label_email = CTkLabel(pagina_cadastro, text="Email *",
+                           compound=LEFT, anchor=NW, font=FONTE, fg_color='transparent')
+    label_email.grid(row=2, column=0, sticky='ew', padx=10, pady=(10, 5))
 
-    entry_email = Entry(frame_info, width=45,
-                        justify='left', relief=SOLID)
-    entry_email.place(x=12, y=100)
+    entry_email = CTkEntry(pagina_cadastro, placeholder_text='Email do Aluno')
+    entry_email.grid(row=3, column=0, sticky='ew',
+                     columnspan=2, padx=10, pady=(0, 5))
 
     # Label e entry do Telefone
-    label_telefone = Label(frame_info, text="Telefone *",
-                           height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_telefone.place(x=10, y=130)
+    label_telefone = CTkLabel(pagina_cadastro, text="Telefone *",
+                              compound=LEFT, anchor=NW, font=FONTE, fg_color='transparent')
+    label_telefone.grid(row=4, column=0, sticky='ew', padx=10, pady=(10, 5))
 
-    entry_telefone = Entry(frame_info, width=20,
-                           justify='left', relief=SOLID)
-    entry_telefone.place(x=12, y=160)
+    entry_telefone = CTkEntry(
+        pagina_cadastro, placeholder_text='Telefone do Aluno')
+    entry_telefone.grid(row=5, column=0, sticky='ew', padx=10, pady=(0, 5))
 
     # Label e combobox do Sexo
-    label_sexo = Label(frame_info, text="Sexo *",
-                       height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_sexo.place(x=190, y=130)
+    label_sexo = CTkLabel(pagina_cadastro, text="Sexo *", compound=LEFT,
+                          anchor=NW, font=FONTE, fg_color='transparent')
+    label_sexo.grid(row=4, column=1, sticky='ew', padx=10, pady=(10, 5))
 
-    combobox_sexo = ttk.Combobox(frame_info, width=12, font=fonte_botao)
-    combobox_sexo['values'] = ['Masculino', 'Feminino']
-    combobox_sexo['state'] = 'readonly'
-    combobox_sexo.place(x=190, y=160)
+    combobox_sexo = CTkComboBox(pagina_cadastro, font=FONTE_BOTAO, values=[
+                                'Masculino', 'Feminino'], state='readonly')
+    combobox_sexo.grid(row=5, column=1, sticky='ew', padx=10, pady=(0, 5))
 
     # Label e entry do RA
-    label_ra = Label(frame_info, text="RA *",
-                     height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_ra.place(x=451, y=70)
+    label_ra = CTkLabel(pagina_cadastro, text="RA *", compound=LEFT,
+                        anchor=NW, font=FONTE, fg_color='transparent')
+    label_ra.grid(row=2, column=3, sticky='ew', padx=5, pady=(10, 5))
 
-    entry_ra = Entry(frame_info, width=20,
-                     justify='left', relief=SOLID)
-    entry_ra.place(x=455, y=100)
+    entry_ra = CTkEntry(pagina_cadastro, placeholder_text='RA do Aluno')
+    entry_ra.grid(row=3, column=3, sticky='ew', padx=5, pady=(0, 5))
 
     # Pegando as Turmas
     turmas = utils.mostra_turma()
@@ -709,14 +813,13 @@ def alunos():
         turma.append(item[1])
 
     # Label e combobox do Curso
-    label_turma = Label(frame_info, text="Turma *",
-                        height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_turma.place(x=451, y=130)
+    label_turma = CTkLabel(pagina_cadastro, text="Turma *",
+                           compound=LEFT, anchor=NW, font=FONTE, fg_color='transparent')
+    label_turma.grid(row=4, column=3, sticky='ew', padx=5, pady=(10, 5))
 
-    combobox_turma = ttk.Combobox(frame_info, width=20, font=fonte_botao)
-    combobox_turma['values'] = turma
-    combobox_turma['state'] = 'readonly'
-    combobox_turma.place(x=455, y=160)
+    combobox_turma = CTkComboBox(
+        pagina_cadastro, font=FONTE_BOTAO, values=turma, state='readonly')
+    combobox_turma.grid(row=5, column=3, sticky='ew', padx=5, pady=(0, 5))
 
     # Dados da Imagem
     global aluno_foto, label_foto, foto_string
@@ -737,11 +840,11 @@ def alunos():
             aluno_foto = aluno_foto.resize((130, 130))
             aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
-            label_foto = Label(frame_info, image=aluno_foto,
-                               bg=AZUL_CLARO, fg=BRANCO)
-            label_foto.place(x=300, y=10)
+            label_foto = CTkLabel(frame_foto, text="",
+                                  image=aluno_foto, fg_color='transparent')
+            label_foto.grid(row=0, column=0, sticky='ns', rowspan=5)
 
-            botao_carregar['text'] = "TROCAR DE FOTO"
+            botao_carregar.configure(text="TROCAR DE FOTO")
         except:
             # Se não for selecionada nenhuma foto, apenas retorna
             return
@@ -757,9 +860,9 @@ def alunos():
             aluno_foto = aluno_foto.resize((130, 130))
             aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
-            label_foto = Label(frame_info, image=aluno_foto,
-                               bg=AZUL_CLARO, fg=BRANCO)
-            label_foto.place(x=300, y=10)
+            label_foto = CTkLabel(frame_foto, text="",
+                                  image=aluno_foto, fg_color='transparent')
+            label_foto.grid(row=0, column=0, sticky='ns', rowspan=5)
         except:
             messagebox.showerror(
                 'Erro', 'Não foi possível processar a foto corretamente.\nPor favor tente novamente')
@@ -774,73 +877,71 @@ def alunos():
         utils.atualiza_falta(undo_falta)
 
     # Botão desfazer alteração do aluno
-    botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
-                        overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-    botao_undo.place(x=726, y=70)
+    botao_undo = CTkButton(pagina_cadastro, command=undo_atualiza,
+                           anchor=CENTER, text='DESFAZER', font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_undo.grid(row=2, column=5, sticky='ew')
 
     botao_undo.destroy()
 
-    canvas_rect = Canvas(frame_info, width=130, height=130, background=AZUL_CLARO)
-    canvas_rect.place(x=300,y=10)
+    frame_foto = CTkFrame(pagina_cadastro, fg_color='transparent',
+                          border_width=2, width=130, height=150, border_color=BRANCO)
+    frame_foto.grid(row=0, column=2, pady=(10, 0), rowspan=5)
 
     # Botão Tira foto
-    botao_foto = Button(frame_info, command=tira_foto, text='Tirar foto'.upper(
-    ), width=18, compound=CENTER, overrelief=RIDGE, anchor=CENTER, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_foto.place(x=300, y=160)
+    botao_foto = CTkButton(pagina_cadastro, command=tira_foto, text='Tirar foto'.upper(
+    ), anchor=CENTER, font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=45)
+    botao_foto.grid(row=5, column=2, sticky='ew', padx=5, pady=(5, 0))
 
     # Botão Carregar Foto
-    botao_carregar = Button(frame_info, command=escolhe_imagem, text='Carregar foto'.upper(
-    ), width=18, compound=CENTER, overrelief=RIDGE, anchor=CENTER, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_carregar.place(x=300, y=200)
+    botao_carregar = CTkButton(pagina_cadastro, command=escolhe_imagem, text='Carregar\nfoto'.upper(
+    ), anchor=CENTER, font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=58)
+    botao_carregar.grid(row=6, column=2, sticky='ew', padx=5, pady=(5, 0))
 
-    # Linha de separação
-    label_linha = Label(frame_info, relief=GROOVE, text='h', width=1,
-                        height=200, anchor=NW, font=("Ivy, 1"), bg=PRETO, fg=PRETO)
-    label_linha.place(x=605, y=0)
-    label_linha = Label(frame_info, relief=GROOVE, text='h', width=1,
-                        height=200, anchor=NW, font=("Ivy, 1"), bg=BRANCO, fg=PRETO)
-    label_linha.place(x=603, y=0)
+    linha_separacao = CTkFrame(
+        pagina_cadastro, width=5, fg_color=BRANCO, corner_radius=100)
+    linha_separacao.grid(row=0, column=4, sticky='ns', rowspan=7)
 
     # Procura Aluno
-    label_procura_nome = Label(frame_info, text="Procurar Aluno [Entrar com RA]",
-                               height=1, anchor=NW, font=("Ivy, 10"), bg=AZUL_CLARO, fg=PRETO)
-    label_procura_nome.place(x=620, y=10)
+    label_procura_nome = CTkLabel(
+        pagina_cadastro, text="Procurar Aluno", anchor=NW, font=FONTE, fg_color='transparent')
+    label_procura_nome.grid(row=0, column=5, sticky='ew',
+                            columnspan=2, padx=(10, 0), pady=(10, 0))
 
-    entry_procura = Entry(frame_info, width=17,
-                          justify='left', relief=SOLID, font=("Ivy, 10"))
-    entry_procura.place(x=622, y=35)
+    entry_procura = CTkEntry(pagina_cadastro, placeholder_text='RA do Aluno')
+    entry_procura.grid(row=1, column=5, sticky='ew', padx=(10, 5), pady=5)
 
-    botao_procurar = Button(frame_info, command=pesquisa_aluno, text="PESQUISAR",
-                            font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
-    botao_procurar.place(x=757, y=33)
+    botao_procurar = CTkButton(pagina_cadastro, command=pesquisa_aluno, text="", image=img_pesquisa,
+                               font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_procurar.grid(row=1, column=6, sticky='ew', padx=5)
 
     # ------------------------------------ Botões ---------------------------------
 
     # Botão adicionar aluno
-    botao_adicionar = Button(frame_info, command=novo_aluno, anchor=CENTER, text='ADICIONAR', width=10, height=2,
-                             overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-    botao_adicionar.place(x=617, y=70)
+    botao_adicionar = CTkButton(pagina_cadastro, command=novo_aluno, anchor=CENTER, text='ADICIONAR',
+                                font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_adicionar.grid(row=2, column=5, sticky='ew', padx=5, pady=(10, 0))
 
     # Botão alterar aluno
-    botao_alterar = Button(frame_info, command=carregar_aluno, anchor=CENTER, text='ALTERAR', width=10, height=2,
-                           overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_alterar.place(x=617, y=125)
+    botao_alterar = CTkButton(pagina_cadastro, command=carregar_aluno, anchor=CENTER, text='ALTERAR',
+                              font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_alterar.grid(row=4, column=5, sticky='ew', padx=5)
 
     # Botão deletar aluno
-    botao_deletar = Button(frame_info, command=apagar_aluno, anchor=CENTER, text='DELETAR', width=10, height=2,
-                           overrelief=RIDGE, font=fonte_botao, bg=VERMELHO, foreground=BRANCO)
-    botao_deletar.place(x=617, y=180)
+    botao_deletar = CTkButton(pagina_cadastro, command=apagar_aluno, anchor=CENTER, text='DELETAR',
+                              font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_deletar.grid(row=6, column=5, sticky='ew', padx=5)
 
     # Botão informações do aluno
-    botao_mostrar = Button(frame_info, command=info_aluno, anchor=CENTER, text='INFO', width=10, height=2,
-                           overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_mostrar.place(x=727, y=180)
+    botao_mostrar = CTkButton(pagina_cadastro, command=info_aluno, anchor=CENTER, text='INFO',
+                              font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_mostrar.grid(row=6, column=6, sticky='ew', padx=5)
 
     # Mostra a tabela com os alunos
+
     def mostra_alunos():
-        tabela_alunos_label = Label(frame_info, text="Tabela de alunos",
-                                    height=1, relief="flat", anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-        tabela_alunos_label.place(x=0, y=210)
+        tabela_alunos_label = CTkLabel(
+            pagina_cadastro, text="Tabela de alunos", anchor=SW, font=FONTE, fg_color='transparent')
+        tabela_alunos_label.grid(row=6, column=0, sticky='ew', padx=5)
 
         lista_cabecalho = ['RA', 'Nome', 'Email',
                            'Telefone', 'Sexo', 'Foto', 'Turma']
@@ -851,60 +952,55 @@ def alunos():
 
         tree_alunos = ttk.Treeview(
             frame_tabela, selectmode="extended", columns=lista_cabecalho, show='headings')
+        tree_alunos.grid(row=0, column=0, columnspan=6,
+                         rowspan=6, padx=5, sticky='nsew')
 
         # Scrollbars
-        scroll_vertical = ttk.Scrollbar(
-            frame_tabela, orient='vertical', command=tree_alunos.yview)
-        scroll_horizontal = ttk.Scrollbar(
-            frame_tabela, orient="horizontal", command=tree_alunos.xview)
+        scroll_vertical = CTkScrollbar(
+            frame_tabela, orientation='vertical', command=tree_alunos.yview, corner_radius=32)
+        scroll_vertical.grid(row=0, column=6, rowspan=5, sticky='ns')
 
-        tree_alunos.configure(yscrollcommand=scroll_vertical,
-                              xscrollcommand=scroll_horizontal)
+        scroll_horizontal = CTkScrollbar(
+            frame_tabela, orientation="horizontal", command=tree_alunos.xview, corner_radius=32)
+        scroll_horizontal.grid(row=6, column=0, columnspan=6, sticky='ew')
 
-        tree_alunos.place(x=0, y=0, width=WIDTH - 60, height=200)
-        scroll_vertical.place(x=WIDTH - 60, y=0 + 1, height=200)
-        scroll_horizontal.place(x=0, y=200, width=WIDTH - 60)
-
-        posicao_coluna = ["nw", "nw", "nw", "center",
-                          "center", "center", "center"]
-        largura_coluna = [60, 150, 150, 70, 70, 70, 80]
-        cont = 0
+        tree_alunos.configure(yscrollcommand=scroll_vertical.set,
+                              xscrollcommand=scroll_horizontal.set)
 
         for coluna in lista_cabecalho:
             tree_alunos.heading(coluna, text=coluna.title(), anchor=NW)
-            tree_alunos.column(
-                coluna, width=largura_coluna[cont], anchor=posicao_coluna[cont])
-
-            cont += 1
+            tree_alunos.column(coluna)
 
         for item in lista_itens:
             tree_alunos.insert('', 'end', values=item)
 
     mostra_alunos()
 
-# Função de cadastro de cursos e turmas
+# ---------------------------------------- Cursos/Turmas --------------------------------------------------------
+# Função de cadastro de alunos
 
 
 def cursos_turmas():
     # Titulo da página
-    global titulo_cadastro_label
+    troca_titulo('  Cadastro de Cursos e Turmas', 'cursos')
 
-    titulo_cadastro_label = Label(frame_titulo_aluno, image=icone_titulo_curso, text="Cadastro de Cursos e Turmas",
-                                  width=WIDTH, compound=LEFT, relief=RAISED, anchor=NW, font=fonte_titulo, bg=AZUL_ESCURO, fg=BRANCO)
-    titulo_cadastro_label.place(x=0, y=0)
-    
-    ttk.Separator(pagina_cadastro, orient=HORIZONTAL).place(
-        x=0, y=52, width=WIDTH)
+# ---------------------------------------- Configuração da pagina de cadastro --------------------------------------------------------
 
-    # Tabela de cursos
-    frame_tabela_cursos = Frame(
-        frame_tabela, width=300, height=200, bg=AZUL_CLARO)
-    frame_tabela_cursos.place(x=30, y=0)
+    pagina_cadastro.grid_columnconfigure(0, weight=2)
+    pagina_cadastro.grid_columnconfigure(1, weight=1)
+    pagina_cadastro.grid_columnconfigure(2, weight=2)
+    pagina_cadastro.grid_columnconfigure(3, weight=2)
+    pagina_cadastro.grid_columnconfigure(4, weight=0)
+    pagina_cadastro.grid_columnconfigure(5, weight=1)
 
-    # Divisão entre cursos e turmas
-    frame_linha = Frame(
-        frame_tabela, width=15, height=200, bg=AZUL_CLARO)
-    frame_linha.place(x=300 + 85, y=0)
+# ---------------------------------------- Configuração do frame de tabela --------------------------------------------------------
+
+    frame_tabela.grid_columnconfigure(1, weight=1)
+    frame_tabela.grid_columnconfigure(4, weight=1)
+
+    frame_tabela.grid_rowconfigure(0, weight=0)
+    frame_tabela.grid_rowconfigure(1, weight=0)
+    frame_tabela.grid_rowconfigure(3, weight=1)
 
     # -------------------- Detalhes do Curso -----------------------------------
 
@@ -998,13 +1094,15 @@ def cursos_turmas():
                 botao_salvar.destroy()
 
                 # Botão desfazer alteração do aluno
-                botao_undo_curso = Button(frame_info, command=undo_atualiza_curso, anchor=CENTER, text='DESFAZER', width=10,
-                                          overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-                botao_undo_curso.place(x=240, y=130)
+                botao_undo_curso = CTkButton(pagina_cadastro, command=undo_atualiza_curso, anchor=CENTER, text='DESFAZER',
+                                             font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+                botao_undo_curso.grid(
+                    row=4, column=2, sticky='ew', padx=5, pady=(10, 5))
 
-            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text="Salvar alterações".upper(
-            ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, fg=BRANCO)
-            botao_salvar.place(x=190, y=130)
+            botao_salvar = CTkButton(pagina_cadastro, command=atualiza, anchor=CENTER, text="Salvar\nalterações".upper(
+            ), font=FONTE_BOTAO, fg_color=VERDE, hover=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+            botao_salvar.grid(row=4, column=1, sticky='ew',
+                              padx=5, pady=(10, 5))
         except IndexError:
             messagebox.showerror("Erro", "Selecione um curso na tabela.")
 
@@ -1043,51 +1141,57 @@ def cursos_turmas():
                 botao_desfazer.destroy()
 
             # Botão desfazer deleção de aluno
-            botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=10,
-                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-            botao_desfazer.place(x=240, y=130)
+            botao_desfazer = CTkButton(pagina_cadastro, command=undo_apaga, anchor=CENTER, text='DESFAZER',
+                                       font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+            botao_desfazer.grid(
+                row=4, column=2, sticky='ew', padx=5, pady=(10, 5))
 
         except IndexError:
             messagebox.showerror("Erro", "Selecione um curso na tabela.")
 
     # Label e entry do Nome do curso
-    label_nome = Label(frame_info, text="Nome do Curso *",
-                       height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_nome.place(x=10, y=10)
+    label_nome = CTkLabel(pagina_cadastro, text="Nome do Curso *",
+                          anchor=NW, font=FONTE, fg_color='transparent')
+    label_nome.grid(row=0, column=0, sticky='ew', padx=10, pady=(10, 5))
 
-    entry_nome_curso = Entry(frame_info, width=35,
-                             justify='left', relief=SOLID)
-    entry_nome_curso.place(x=12, y=40)
+    entry_nome_curso = CTkEntry(
+        pagina_cadastro, placeholder_text="Nome do Curso")
+    entry_nome_curso.grid(row=1, column=0, sticky='ew',
+                          columnspan=2, padx=10, pady=(0, 5))
 
     # Label e entry da Duração do curso
-    label_duracao = Label(frame_info, text="Duração *",
-                          height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_duracao.place(x=10, y=70)
+    label_duracao = CTkLabel(
+        pagina_cadastro, text="Duração *", anchor=NW, font=FONTE, fg_color='transparent')
+    label_duracao.grid(row=2, column=0, sticky='ew', padx=10, pady=(10, 5))
 
-    entry_duracao = Entry(frame_info, width=20,
-                          justify='left', relief=SOLID)
-    entry_duracao.place(x=12, y=100)
+    entry_duracao = CTkEntry(
+        pagina_cadastro, placeholder_text="Duração do curso")
+    entry_duracao.grid(row=3, column=0, sticky='ew', padx=10, pady=(0, 5))
 
     # Botão salvar curso
-    botao_curso_adicionar = Button(frame_info, command=novo_curso, anchor=CENTER, text='ADICIONAR', width=10,
-                                   overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-    botao_curso_adicionar.place(x=20, y=160)
+    botao_curso_adicionar = CTkButton(pagina_cadastro, command=novo_curso, anchor=CENTER, text='ADICIONAR',
+                                      font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_curso_adicionar.grid(
+        row=5, column=0, sticky='ew', padx=(10, 5), pady=(10, 5))
 
     # Botão atualizar curso
-    botao_curso_alterar = Button(frame_info, command=carregar_curso, anchor=CENTER, text='ALTERAR',
-                                 width=10, overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_curso_alterar.place(x=130, y=160)
+    botao_curso_alterar = CTkButton(pagina_cadastro, command=carregar_curso, anchor=CENTER, text='ALTERAR',
+                                    font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_curso_alterar.grid(
+        row=5, column=1, sticky='ew', padx=5, pady=(10, 5))
 
     # Botão deletar curso
-    botao_curso_deletar = Button(frame_info, command=apagar_curso, anchor=CENTER, text='DELETAR', width=10,
-                                 overrelief=RIDGE, font=fonte_botao, bg=VERMELHO, foreground=BRANCO)
-    botao_curso_deletar.place(x=240, y=160)
+    botao_curso_deletar = CTkButton(pagina_cadastro, command=apagar_curso, anchor=CENTER, text='DELETAR',
+                                    font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_curso_deletar.grid(
+        row=5, column=2, sticky='ew', padx=5, pady=(10, 5))
 
     # Mostra Tabela Cursos
     def mostra_cursos():
-        tabela_cursos_label = Label(frame_info, text="Tabela de cursos",
-                                    height=1, relief="flat", anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-        tabela_cursos_label.place(x=0, y=210)
+        tabela_cursos_label = CTkLabel(
+            pagina_cadastro, text="Tabela de cursos", anchor=SW, font=FONTE, fg_color='transparent')
+        tabela_cursos_label.grid(
+            row=6, column=0, sticky='ew', padx=10, pady=(10, 5))
 
         lista_cabecalho = ['ID', 'Curso', 'Duração']
 
@@ -1097,30 +1201,24 @@ def cursos_turmas():
 
         tree_cursos = ttk.Treeview(
             frame_tabela, selectmode="extended", columns=lista_cabecalho, show='headings')
+        tree_cursos.grid(row=0, column=0, sticky='nsew', padx=5,
+                         columnspan=2, rowspan=5)
 
         # Scrollbars
-        scroll_vertical = ttk.Scrollbar(
-            frame_tabela, orient='vertical', command=tree_cursos.yview)
-        scroll_horizontal = ttk.Scrollbar(
-            frame_tabela, orient="horizontal", command=tree_cursos.xview)
+        scroll_vertical = CTkScrollbar(
+            frame_tabela, orientation='vertical', command=tree_cursos.yview, corner_radius=32)
+        scroll_vertical.grid(row=0, column=2, sticky='ns', rowspan=5)
+
+        scroll_horizontal = CTkScrollbar(
+            frame_tabela, orientation="horizontal", command=tree_cursos.xview, corner_radius=32)
+        scroll_horizontal.grid(row=5, column=0, sticky='ew', columnspan=2)
 
         tree_cursos.configure(yscrollcommand=scroll_vertical,
                               xscrollcommand=scroll_horizontal)
 
-        tree_cursos.place(x=0, y=0, width=340, height=200)
-        scroll_vertical.place(x=340, y=0, height=200)
-        scroll_horizontal.place(x=0, y=200, width=340)
-
-        posicao_coluna = ["nw", "nw", "e"]
-        largura_coluna = [30, 150, 80]
-        cont = 0
-
         for coluna in lista_cabecalho:
             tree_cursos.heading(coluna, text=coluna.title(), anchor=NW)
-            tree_cursos.column(
-                coluna, width=largura_coluna[cont], anchor=posicao_coluna[cont])
-
-            cont += 1
+            tree_cursos.column(coluna)
 
         for item in lista_itens:
             tree_cursos.insert('', 'end', values=item)
@@ -1134,9 +1232,9 @@ def cursos_turmas():
         botao_undo_curso.destroy()
 
     # Botão desfazer alteração do aluno
-    botao_undo_curso = Button(frame_info, command=undo_atualiza_curso, anchor=CENTER, text='DESFAZER', width=9,
-                              overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-    botao_undo_curso.place(x=190, y=130)
+    botao_undo_curso = CTkButton(pagina_cadastro, command=undo_atualiza_curso, anchor=CENTER, text='DESFAZER',
+                                 font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_undo_curso.grid(row=4, column=2, sticky='ew', padx=10, pady=10)
 
     botao_undo_curso.destroy()
 
@@ -1144,21 +1242,9 @@ def cursos_turmas():
 
     # ------------------------------- Linha Separatória ---------------------------------------
 
-    # Linha separatória info
-    label_linha = Label(frame_info, relief=GROOVE, text='h', width=1,
-                        height=200, anchor=NW, font=("Ivy, 1"), bg=PRETO, fg=PRETO)
-    label_linha.place(x=390, y=0)
-    label_linha = Label(frame_info, relief=GROOVE, text='h', width=1,
-                        height=200, anchor=NW, font=("Ivy, 1"), bg=BRANCO, fg=PRETO)
-    label_linha.place(x=388, y=0)
-
-    # Linha separatória tabela
-    label_linha = Label(frame_linha, relief=GROOVE, text='h', width=1,
-                        height=200, anchor=NW, font=("Ivy, 1"), bg=PRETO, fg=PRETO)
-    label_linha.place(x=5, y=0)
-    label_linha = Label(frame_linha, relief=GROOVE, text='h', width=1,
-                        height=200, anchor=NW, font=("Ivy, 1"), bg=BRANCO, fg=PRETO)
-    label_linha.place(x=3, y=0)
+    linha_separacao = CTkFrame(
+        pagina_cadastro, width=5, fg_color=BRANCO, corner_radius=220)
+    linha_separacao.grid(row=0, column=3, sticky='ns', rowspan=7)
 
     # ------------------------------ Detalhes das Turmas ------------------------------------
 
@@ -1209,7 +1295,7 @@ def cursos_turmas():
 
             # Limpa os campos
             entry_nome_turma.delete(0, END)
-            combobox_curso.delete(0, END)
+            combobox_curso.set('')
             data_inicio.delete(0, END)
 
             # Insere dados nas Entrys
@@ -1247,7 +1333,7 @@ def cursos_turmas():
                     "Sucesso", "Os dados foram atualizados com sucesso")
 
                 entry_nome_turma.delete(0, END)
-                combobox_curso.delete(0, END)
+                combobox_curso.set('')
                 data_inicio.delete(0, END)
 
                 # atualiza os dados da tabela
@@ -1256,13 +1342,15 @@ def cursos_turmas():
                 botao_salvar.destroy()
 
                 # Botão desfazer alteração do aluno
-                botao_undo_turma = Button(frame_info, command=undo_atualiza_turma, anchor=CENTER, text='DESFAZER', width=10,
-                                          overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-                botao_undo_turma.place(x=687, y=130)
+                botao_undo_turma = CTkButton(pagina_cadastro, command=undo_atualiza_turma, anchor=CENTER, text='DESFAZER',
+                                             font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+                botao_undo_turma.grid(
+                    row=4, column=7, sticky='ew', padx=(0, 5), pady=(10, 5))
 
-            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text="Salvar alterações".upper(
-            ), overrelief=RIDGE, font=fonte_botao, bg=VERDE, fg=BRANCO)
-            botao_salvar.place(x=637, y=130)
+            botao_salvar = CTkButton(pagina_cadastro, command=atualiza, anchor=CENTER, text="Salvar\nalterações".upper(
+            ), font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+            botao_salvar.grid(row=4, column=6, sticky='ew',
+                              padx=(10, 5), pady=(10, 5))
         except IndexError:
             messagebox.showerror("Erro", "Selecione um turma na tabela.")
 
@@ -1299,23 +1387,26 @@ def cursos_turmas():
                 botao_desfazer.destroy()
 
             # Botão desfazer deleção de aluno
-            botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=10,
-                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-            botao_desfazer.place(x=687, y=130)
+            botao_desfazer = CTkButton(pagina_cadastro, command=undo_atualiza_turma, anchor=CENTER, text='DESFAZER',
+                                       font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+            botao_desfazer.grid(row=4, column=7, sticky='ew',
+                                padx=(0, 5), pady=(10, 5))
 
         except IndexError:
             messagebox.showerror("Erro", "Selecione um turma na tabela.")
 
-    label_nome = Label(frame_info, text="Nome Turma *",
-                       height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_nome.place(x=404, y=10)
-    entry_nome_turma = Entry(frame_info, width=35,
-                             justify=LEFT, relief="solid")
-    entry_nome_turma.place(x=407, y=40)
+    label_nome = CTkLabel(pagina_cadastro, text="Nome Turma *",
+                          anchor=NW, font=FONTE, fg_color='transparent')
+    label_nome.grid(row=0, column=4, sticky='ew',
+                    padx=5, pady=(10, 5), columnspan=2)
 
-    label_curso_turma = Label(frame_info, text="Curso *",
-                              height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_curso_turma.place(x=404, y=70)
+    entry_nome_turma = CTkEntry(
+        pagina_cadastro, placeholder_text="Nome da Turma")
+    entry_nome_turma.grid(row=1, column=4, sticky='ew', padx=5, pady=(0, 5))
+
+    label_curso_turma = CTkLabel(
+        pagina_cadastro, text="Curso *", anchor=NW, font=FONTE, fg_color='transparent')
+    label_curso_turma.grid(row=2, column=4, sticky='ew', padx=5, pady=(10, 5))
 
     # Pegando os cursos
     cursos = utils.mostra_curso()
@@ -1324,33 +1415,35 @@ def cursos_turmas():
     for item in cursos:
         curso.append(item[1])
 
-    combobox_curso = ttk.Combobox(frame_info, width=20, font=fonte_botao)
-    combobox_curso['values'] = curso
-    combobox_curso['state'] = 'readonly'
-    combobox_curso.place(x=407, y=100)
+    combobox_curso = CTkComboBox(
+        pagina_cadastro, values=curso, state='readonly')
+    combobox_curso.grid(row=3, column=4, sticky='ew', padx=5, pady=(0, 5))
 
-    label_data_inicio = Label(frame_info, text="Data de início *",
-                              height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_data_inicio.place(x=406, y=130)
+    label_data_inicio = CTkLabel(pagina_cadastro, text="Data de início *",
+                                 anchor=NW, font=FONTE, fg_color='transparent')
+    label_data_inicio.grid(row=4, column=4, sticky='ew', padx=5, pady=(10, 5))
 
-    data_inicio = DateEntry(frame_info, width=10, background=AZUL_ESCURO,
+    data_inicio = DateEntry(pagina_cadastro, background=AZUL_ESCURO,
                             foreground=BRANCO, borderwidth=2, year=2023)
-    data_inicio.place(x=407, y=160)
+    data_inicio.grid(row=5, column=4, sticky='ew', padx=5, pady=(10, 5))
 
     # Botão adicionar turma
-    botao_turma_adicionar = Button(frame_info, command=nova_turma, anchor=CENTER, text='ADICIONAR', width=10,
-                                   overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-    botao_turma_adicionar.place(x=507, y=160)
+    botao_turma_adicionar = CTkButton(pagina_cadastro, command=nova_turma, anchor=CENTER, text='ADICIONAR',
+                                      font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_turma_adicionar.grid(
+        row=5, column=5, sticky='ew', padx=(0, 5), pady=(10, 5))
 
     # Botão alterar turma
-    botao_turma_alterar = Button(frame_info, command=carregar_turma, anchor=CENTER, text='ALTERAR',
-                                 width=10, overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_turma_alterar.place(x=597, y=160)
+    botao_turma_alterar = CTkButton(pagina_cadastro, command=carregar_turma, anchor=CENTER, text='ALTERAR',
+                                    font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_turma_alterar.grid(
+        row=5, column=6, sticky='ew', padx=(0, 5), pady=(10, 5))
 
     # Botão deletar turma
-    botao_turma_deletar = Button(frame_info, command=apagar_turma, anchor=CENTER, text='DELETAR', width=10,
-                                 overrelief=RIDGE, font=fonte_botao, bg=VERMELHO, foreground=BRANCO)
-    botao_turma_deletar.place(x=687, y=160)
+    botao_turma_deletar = CTkButton(pagina_cadastro, command=apagar_turma, anchor=CENTER, text='DELETAR',
+                                    font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_turma_deletar.grid(
+        row=5, column=7, sticky='ew', padx=(0, 5), pady=(10, 5))
 
     def mostra_turmas():
         global combobox_curso
@@ -1365,14 +1458,13 @@ def cursos_turmas():
         for item in cursos:
             curso.append(item[1])
 
-        combobox_curso = ttk.Combobox(frame_info, width=20, font=fonte_botao)
-        combobox_curso['values'] = curso
-        combobox_curso['state'] = 'readonly'
-        combobox_curso.place(x=407, y=100)
+        combobox_curso = CTkComboBox(
+            pagina_cadastro, values=curso, state='readonly')
+        combobox_curso.grid(row=3, column=4, sticky='ew', padx=5, pady=(0, 5))
 
-        tabela_turma_label = Label(frame_info, text="Tabela de turmas",
-                                   height=1, relief="flat", anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-        tabela_turma_label.place(x=410, y=210)
+        tabela_turma_label = CTkLabel(pagina_cadastro, text="Tabela de turmas",
+                                      anchor=SW, font=FONTE, fg_color='transparent')
+        tabela_turma_label.grid(row=6, column=4, sticky='ew', padx=5)
 
         lista_cabecalho = ['ID', 'Nome da Turma', 'Curso', 'Inicio']
 
@@ -1382,30 +1474,24 @@ def cursos_turmas():
 
         tree_turma = ttk.Treeview(
             frame_tabela, selectmode="extended", columns=lista_cabecalho, show='headings')
+        tree_turma.grid(row=0, column=4, sticky='nsew', padx=5,
+                        columnspan=2, rowspan=5)
 
         # Scrollbars
-        scroll_vertical = ttk.Scrollbar(
-            frame_tabela, orient='vertical', command=tree_turma.yview)
-        scroll_horizontal = ttk.Scrollbar(
-            frame_tabela, orient="horizontal", command=tree_turma.xview)
+        scroll_vertical = CTkScrollbar(
+            frame_tabela, orientation='vertical', command=tree_turma.yview, corner_radius=32)
+        scroll_vertical.grid(row=0, column=6, sticky='ns', rowspan=5)
+
+        scroll_horizontal = CTkScrollbar(
+            frame_tabela, orientation="horizontal", command=tree_turma.xview, corner_radius=32)
+        scroll_horizontal.grid(row=5, column=4, sticky='ew', columnspan=2)
 
         tree_turma.configure(yscrollcommand=scroll_vertical,
                              xscrollcommand=scroll_horizontal)
 
-        tree_turma.place(x=410, y=0, width=395, height=200)
-        scroll_vertical.place(x=410 + 395, y=0, height=200)
-        scroll_horizontal.place(x=410, y=200, width=395)
-
-        posicao_coluna = ["nw", "nw", "e", "e"]
-        largura_coluna = [30, 130, 150, 80]
-        cont = 0
-
         for coluna in lista_cabecalho:
             tree_turma.heading(coluna, text=coluna.title(), anchor=NW)
-            tree_turma.column(
-                coluna, width=largura_coluna[cont], anchor=posicao_coluna[cont])
-
-            cont += 1
+            tree_turma.column(coluna)
 
         for item in lista_itens:
             tree_turma.insert('', 'end', values=item)
@@ -1418,29 +1504,33 @@ def cursos_turmas():
         botao_undo_turma.destroy()
 
     # Botão desfazer alteração do aluno
-    botao_undo_turma = Button(frame_info, command=undo_atualiza_turma, anchor=CENTER, text='DESFAZER', width=10,
-                              overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-    botao_undo_turma.place(x=190, y=130)
+    botao_undo_turma = CTkButton(pagina_cadastro, command=undo_atualiza_turma, anchor=CENTER, text='DESFAZER',
+                                 font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_undo_turma.grid(row=4, column=7, sticky='ew',
+                          padx=(0, 5), pady=(10, 5))
 
     botao_undo_turma.destroy()
 
     mostra_turmas()
 
-# Função de cadastro de aulas
+# ---------------------------------------- Aulas ----------------------------------------------------------------
+# Função de cadastro de alunos
 
 
 def aulas():
-    # ------------------------------------------------- Titulo da página ----------------------------------------------------
-    global titulo_cadastro_label
+    # Titulo da página
+    troca_titulo('  Cadastro de Aulas', 'aula')
 
-    titulo_cadastro_label = Label(frame_titulo_aluno, image=icone_titulo_aula, text="Cadastro de Aulas",
-                                  width=WIDTH, compound=LEFT, relief=RAISED, anchor=NW, font=fonte_titulo, bg=AZUL_ESCURO, fg=BRANCO)
-    titulo_cadastro_label.place(x=0, y=0)
-    ttk.Separator(pagina_cadastro, orient=HORIZONTAL).place(
-        x=0, y=52, width=WIDTH)
+# ---------------------------------------- Configuração da pagina de cadastro --------------------------------------------------------
 
-    # ------------------------------------------------- Detalhes da aula ---------------------------------------------------
+    pagina_cadastro.grid_columnconfigure(0, weight=1)
+    pagina_cadastro.grid_columnconfigure(1, weight=1)
+    pagina_cadastro.grid_columnconfigure(2, weight=1)
+    pagina_cadastro.grid_columnconfigure(3, weight=1)
+    pagina_cadastro.grid_columnconfigure(4, weight=1)
+    pagina_cadastro.grid_columnconfigure(5, weight=1)
 
+# ---------------------------------------- Detalhes das Aulas --------------------------------------------------------
     global undo_falta
 
     undo_falta = []
@@ -1555,15 +1645,16 @@ def aulas():
                 mostra_aula()
 
                 # Botão desfazer alteração do aula
-                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10, height=3,
-                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-                botao_undo.place(x=712, y=85)
+                botao_undo = CTkButton(pagina_cadastro, command=undo_atualiza, anchor=CENTER, text='DESFAZER', font=FONTE_BOTAO,
+                                       fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+                botao_undo.grid(row=3, column=5, sticky='ew', padx=10, pady=5)
 
                 botao_salvar.destroy()
 
-            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text="Salvar\nalterações".upper(
-            ), overrelief=RIDGE, width=10, height=3, font=fonte_botao, bg=VERDE, fg=BRANCO)
-            botao_salvar.place(x=712, y=160)
+            botao_salvar = CTkButton(pagina_cadastro, command=atualiza, anchor=CENTER, text="Salvar\nalterações".upper(
+            ), font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+            botao_salvar.grid(row=2, column=5, sticky='ew',
+                              padx=10, pady=(10, 5))
         except IndexError:
             messagebox.showerror("Erro", "Selecione uma aula na tabela.")
 
@@ -1611,9 +1702,9 @@ def aulas():
                     utils.cria_falta([falta[0], falta[1], falta[2]])
 
             # Botão desfazer deleção de aluno
-            botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=10, height=3,
-                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-            botao_desfazer.place(x=712, y=85)
+            botao_desfazer = CTkButton(pagina_cadastro, command=undo_apaga, anchor=CENTER, text='DESFAZER',
+                                       font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+            botao_desfazer.grid(row=3, column=5, sticky='ew', padx=10, pady=5)
 
         except IndexError:
             messagebox.showerror("Erro", "Selecione uma aula na tabela.")
@@ -1700,14 +1791,15 @@ def aulas():
                 mostra_aula()
 
                 # Botão desfazer alteração do aula
-                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10, height=3,
-                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-                botao_undo.place(x=712, y=85)
+                botao_undo = CTkButton(pagina_cadastro, command=undo_atualiza, anchor=CENTER, text='DESFAZER',
+                                       font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+                botao_undo.grid(row=3, column=5, sticky='ew', padx=10, pady=5)
 
             # Botão salvar alterações da aula
-            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text='Salvar alterações'.upper(
-            ), overrelief=RIDGE, width=10, height=3, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-            botao_salvar.place(x=712, y=160)
+            botao_salvar = CTkButton(pagina_cadastro, command=atualiza, anchor=CENTER, text='Salvar\nalterações'.upper(
+            ), font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+            botao_salvar.grid(row=2, column=5, sticky='ew',
+                              padx=10, pady=(10, 5))
 
         except:
             messagebox.showerror("Erro", "Aula não encontrada.")
@@ -1739,39 +1831,27 @@ def aulas():
             messagebox.showerror("Erro", "Selecione uma aula na tabela.")
 
     # Label e entry do Nome da aula
-    label_nome = Label(frame_info, text="Nome *",
-                       height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_nome.place(x=10, y=10)
+    label_nome = CTkLabel(pagina_cadastro, text="Nome *",
+                          anchor=NW, font=FONTE, fg_color='transparent')
+    label_nome.grid(row=0, column=0, sticky='ew', padx=10, pady=(10, 5))
 
-    entry_nome_aula = Entry(frame_info, width=45,
-                            justify='left', relief=SOLID)
-    entry_nome_aula.place(x=12, y=40)
+    entry_nome_aula = CTkEntry(
+        pagina_cadastro, placeholder_text='Nome da Aula')
+    entry_nome_aula.grid(row=1, column=0, sticky='ew',
+                         columnspan=2, padx=10, pady=(0, 5))
 
     # Label e entry do dia
-    label_dia = Label(frame_info, text="Dia da Semana *",
-                      height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_dia.place(x=10, y=70)
+    label_dia = CTkLabel(pagina_cadastro, text="Dia da Semana *",
+                         anchor=NW, font=FONTE, fg_color='transparent')
+    label_dia.grid(row=2, column=0, sticky='ew', padx=10, pady=(10, 5))
 
     # Dias da semana
     dia_semana = ['Segunda-feira', 'Terça-feira',
                   'Quarta-feira', 'Quinta-feira', 'Sexta-feira']
 
-    combobox_dia = ttk.Combobox(frame_info, width=20, font=fonte_botao)
-    combobox_dia['values'] = dia_semana
-    combobox_dia['state'] = 'readonly'
-    combobox_dia.place(x=12, y=100)
-
-    # Label e entry da hora de inicio
-    label_hora = Label(frame_info, text="Hora de inicio *",
-                       height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_hora.place(x=10, y=130)
-
-    entry_hora = SpinTimePickerModern(frame_info)
-    entry_hora.addAll(constants.HOURS24)
-    entry_hora.configureAll(bg=AZUL_CLARO, height=1, fg=BRANCO, font=fonte_titulo, hoverbg=AZUL_CLARO,
-                            hovercolor=AZUL_ESCURO, clickedbg=AZUL_ESCURO, clickedcolor=BRANCO)
-    entry_hora.configure_separator(bg=AZUL_CLARO, fg=BRANCO)
-    entry_hora.place(x=27, y=155)
+    combobox_dia = CTkComboBox(
+        pagina_cadastro, values=dia_semana, state='readonly')
+    combobox_dia.grid(row=3, column=0, sticky='ew', padx=10, pady=(0, 5))
 
     # Pegando as Turmas
     turmas = utils.mostra_turma()
@@ -1781,64 +1861,80 @@ def aulas():
         turma.append(item[1])
 
     # Label e combobox do Sexo
-    label_turma = Label(frame_info, text="Turma *",
-                        height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_turma.place(x=167, y=130)
+    label_turma = CTkLabel(pagina_cadastro, text="Turma *",
+                           anchor=NW, font=FONTE, fg_color='transparent')
+    label_turma.grid(row=0, column=2, sticky='ew', padx=15, pady=(10, 5))
 
-    combobox_turma = ttk.Combobox(frame_info, width=15, font=fonte_botao)
-    combobox_turma['values'] = turma
-    combobox_turma['state'] = 'readonly'
-    combobox_turma.place(x=170, y=160)
+    combobox_turma = CTkComboBox(
+        pagina_cadastro, values=turma, state='readonly')
+    combobox_turma.grid(row=1, column=2, sticky='ew', padx=15, pady=(0, 5))
+
+    # Label e entry da hora de inicio
+    label_hora = CTkLabel(pagina_cadastro, text="Hora de inicio *",
+                          anchor=NW, font=FONTE, fg_color='transparent')
+    label_hora.grid(row=2, column=2, sticky='ew', padx=15, pady=(10, 5))
+
+    # Frame que fica o relógio de cadastro de hora
+    frame_hora = CTkFrame(
+        pagina_cadastro, fg_color=AZUL_CLARO, corner_radius=32)
+    frame_hora.grid(row=3, column=2, sticky='ew', padx=0, pady=(0, 5))
+
+    frame_hora.columnconfigure(0, weight=1)
+    frame_hora.columnconfigure(2, weight=1)
+
+    entry_hora = SpinTimePickerModern(frame_hora)
+    entry_hora.addAll(constants.HOURS24)
+    entry_hora.configureAll(bg=AZUL_CLARO, fg=BRANCO, font=FONTE_TITULO, hoverbg=AZUL_CLARO,
+                            hovercolor=AZUL_ESCURO, clickedbg=AZUL_ESCURO, clickedcolor=BRANCO)
+    entry_hora.configure_separator(bg=AZUL_CLARO, fg=BRANCO)
+    entry_hora.grid(row=0, column=0, sticky='ew', padx=15, columnspan=3)
+
+    linha_separacao = CTkFrame(
+        pagina_cadastro, width=5, fg_color=BRANCO, corner_radius=100)
+    linha_separacao.grid(row=0, column=3, sticky='ns', rowspan=6)
 
     # Procura aula
-    label_procura_nome = Label(frame_info, text="Procurar aula [Entrar com nome]",
-                               height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_procura_nome.place(x=445, y=10)
+    label_procura_nome = CTkLabel(pagina_cadastro, text="Procurar aula",
+                                  anchor=NW, font=FONTE, fg_color='transparent')
+    label_procura_nome.grid(
+        row=0, column=4, sticky='ew', padx=10, pady=(10, 5))
 
-    entry_procura = Entry(frame_info, width=27,
-                          justify='left', relief=SOLID, font=fonte)
-    entry_procura.place(x=447, y=35)
-
-    # Linha de separação
-    label_linha = Label(frame_info, relief=GROOVE, text='h', width=1,
-                        height=200, anchor=NW, font=("Ivy, 1"), bg=PRETO, fg=PRETO)
-    label_linha.place(x=355, y=0)
-    label_linha = Label(frame_info, relief=GROOVE, text='h', width=1,
-                        height=200, anchor=NW, font=("Ivy, 1"), bg=BRANCO, fg=PRETO)
-    label_linha.place(x=353, y=0)
+    entry_procura = CTkEntry(pagina_cadastro, placeholder_text='Nome da aula')
+    entry_procura.grid(row=1, column=4, sticky='ew',
+                       padx=10, pady=(0, 5), columnspan=2)
 
     # ------------------------------------ Botões ---------------------------------
 
     # Botão adicionar aula
-    botao_adicionar = Button(frame_info, command=nova_aula, anchor=CENTER, text='ADICIONAR', width=10, height=3,
-                             overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-    botao_adicionar.place(x=402, y=85)
+    botao_adicionar = CTkButton(pagina_cadastro, command=nova_aula, anchor=CENTER, text='ADICIONAR',
+                                font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_adicionar.grid(row=2, column=4, sticky='ew', padx=10, pady=(10, 5))
 
     # Botão alterar aula
-    botao_alterar = Button(frame_info, command=carregar_aula, anchor=CENTER, text='ALTERAR', width=10, height=3,
-                           overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_alterar.place(x=402, y=160)
+    botao_alterar = CTkButton(pagina_cadastro, command=carregar_aula, anchor=CENTER, text='ALTERAR',
+                              font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_alterar.grid(row=3, column=4, sticky='ew', padx=10, pady=5)
 
     # Botão deletar aula
-    botao_deletar = Button(frame_info, command=apagar_aula, anchor=CENTER, text='DELETAR', width=10, height=3,
-                           overrelief=RIDGE, font=fonte_botao, bg=VERMELHO, foreground=BRANCO)
-    botao_deletar.place(x=557, y=85)
+    botao_deletar = CTkButton(pagina_cadastro, command=apagar_aula, anchor=CENTER, text='DELETAR',
+                              font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_deletar.grid(row=4, column=4, sticky='ew', padx=10, pady=(5, 10))
 
     # Botão informações do aula
-    botao_mostrar = Button(frame_info, command=info_aula, anchor=CENTER, text='INFO', width=10, height=3,
-                           overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_mostrar.place(x=557, y=160)
+    botao_mostrar = CTkButton(pagina_cadastro, command=info_aula, anchor=CENTER, text='INFO',
+                              font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_mostrar.grid(row=4, column=5, sticky='ew', padx=10, pady=(5, 10))
 
     # Botão pesquisa aula
-    botao_procurar = Button(frame_info, command=pesquisa_aula, text="Pesquisar".upper(), width=10,
-                            font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
-    botao_procurar.place(x=682, y=33)
+    botao_procurar = CTkButton(pagina_cadastro, command=pesquisa_aula, text="", image=img_pesquisa,
+                               font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_procurar.grid(row=1, column=6, sticky='ew', padx=(0, 5), pady=(0, 5))
     # ---------------------------------- Tabela das aulas -------------------------------------
 
     def mostra_aula():
-        tabela_aula_label = Label(frame_info, text="Tabela de aulas",
-                                  height=1, relief="flat", anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-        tabela_aula_label.place(x=0, y=210)
+        tabela_aula_label = CTkLabel(
+            pagina_cadastro, text="Tabela de aulas", anchor=NW, font=FONTE, fg_color='transparent')
+        tabela_aula_label.grid(row=5, column=0, sticky='ew', padx=10)
 
         lista_cabecalho = ['ID', 'Nome', 'Dia', 'Hora', 'ID Turma']
 
@@ -1848,31 +1944,24 @@ def aulas():
 
         tree_aulas = ttk.Treeview(
             frame_tabela, selectmode="extended", columns=lista_cabecalho, show='headings')
+        tree_aulas.grid(row=0, column=0, sticky='nsew',
+                        padx=5, columnspan=5, rowspan=5)
 
         # Scrollbars
-        scroll_vertical = ttk.Scrollbar(
-            frame_tabela, orient='vertical', command=tree_aulas.yview)
-        scroll_horizontal = ttk.Scrollbar(
-            frame_tabela, orient="horizontal", command=tree_aulas.xview)
+        scroll_vertical = CTkScrollbar(
+            frame_tabela, orientation='vertical', command=tree_aulas.yview)
+        scroll_vertical.grid(row=0, column=5, sticky='ns', rowspan=5)
+
+        scroll_horizontal = CTkScrollbar(
+            frame_tabela, orientation="horizontal", command=tree_aulas.xview)
+        scroll_horizontal.grid(row=5, column=0, sticky='ew', columnspan=5)
 
         tree_aulas.configure(yscrollcommand=scroll_vertical,
                              xscrollcommand=scroll_horizontal)
 
-        tree_aulas.place(x=0, y=0, width=WIDTH - 60, height=200)
-        scroll_vertical.place(x=WIDTH - 60, y=0 + 1, height=200)
-        scroll_horizontal.place(x=0, y=200, width=WIDTH - 60)
-
-        posicao_coluna = ["nw", "nw", "nw", "nw",
-                          "nw"]
-        largura_coluna = [60, 150, 150, 70, 150]
-        cont = 0
-
         for coluna in lista_cabecalho:
             tree_aulas.heading(coluna, text=coluna.title(), anchor=NW)
-            tree_aulas.column(
-                coluna, width=largura_coluna[cont], anchor=posicao_coluna[cont])
-
-            cont += 1
+            tree_aulas.column(coluna)
 
         for item in lista_itens:
             tree_aulas.insert('', 'end', values=item)
@@ -1886,26 +1975,30 @@ def aulas():
         botao_undo.destroy()
 
     # Botão desfazer alteração do aula
-    botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10, height=3,
-                        overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-    botao_undo.place(x=712, y=85)
+    botao_undo = CTkButton(pagina_cadastro, command=undo_atualiza, anchor=CENTER, text='DESFAZER',
+                           font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_undo.grid(row=3, column=5, sticky='ew', padx=20, pady=10)
 
     botao_undo.destroy()
 
     mostra_aula()
 
-# Função da relação de faltas
+# ---------------------------------------- Faltas ---------------------------------------------------------------
+# Função de cadastro de alunos
 
 
 def faltas():
-    # ------------------------------------------------- Titulo da página ----------------------------------------------------
-    global titulo_cadastro_label
+    # Titulo da página
+    troca_titulo('  Faltas', 'falta')
 
-    titulo_cadastro_label = Label(frame_titulo_aluno, image=icone_titulo_faltas, text="Faltas",
-                                  width=WIDTH, compound=LEFT, relief=RAISED, anchor=NW, font=fonte_titulo, bg=AZUL_ESCURO, fg=BRANCO)
-    titulo_cadastro_label.place(x=0, y=0)
-    ttk.Separator(pagina_cadastro, orient=HORIZONTAL).place(
-        x=0, y=52, width=WIDTH)
+    # ---------------------------------------- Configuração da pagina de cadastro --------------------------------------------------------
+
+    pagina_cadastro.grid_columnconfigure(0, weight=1)
+    pagina_cadastro.grid_columnconfigure(1, weight=0)
+    pagina_cadastro.grid_columnconfigure(2, weight=2)
+    pagina_cadastro.grid_columnconfigure(3, weight=1)
+    pagina_cadastro.grid_columnconfigure(4, weight=0)
+    pagina_cadastro.grid_columnconfigure(5, weight=2)
 
     # ------------------------------------------------- Detalhes das faltas ---------------------------------------------------
 
@@ -1935,45 +2028,49 @@ def faltas():
             messagebox.showerror("Erro", "Aula não encontrada.")
 
     # Procura por aluno
-    label_procura_aluno = Label(frame_tabela, text="Procurar aluno [Entrar com RA]",
-                                height=1, anchor=NW, font=("Ivy, 10"), bg=AZUL_CLARO, fg=PRETO)
-    label_procura_aluno.place(x=40, y=10)
+    label_procura_aluno = CTkLabel(pagina_cadastro, text="Procurar aluno",
+                                   anchor=NW, font=FONTE, fg_color='transparent')
+    label_procura_aluno.grid(
+        row=0, column=0, sticky='ew', padx=10, pady=(10, 5))
 
-    entry_procura_aluno = Entry(frame_tabela, width=17,
-                                justify='left', relief=SOLID, font=("Ivy, 10"))
-    entry_procura_aluno.place(x=42, y=35)
+    entry_procura_aluno = CTkEntry(
+        pagina_cadastro, placeholder_text='RA do Aluno')
+    entry_procura_aluno.grid(
+        row=1, column=0, sticky='ew', padx=(10, 5), pady=(0, 5))
 
     # Botão pesquisa aluno
-    botao_procura_aluno = Button(frame_tabela, command=pesquisa_faltas_aluno, text="Pesquisar Aluno",
-                                 font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
-    botao_procura_aluno.place(x=167, y=33)
+    botao_procura_aluno = CTkButton(pagina_cadastro, command=pesquisa_faltas_aluno, text="", image=img_pesquisa,
+                                    font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_procura_aluno.grid(
+        row=1, column=1, sticky='ew', padx=(0, 5), pady=(0, 5))
 
     # Procura por aula
-    label_procura_aula = Label(frame_tabela, text="Procurar aula [Entrar com nome]",
-                               height=1, anchor=NW, font=("Ivy, 10"), bg=AZUL_CLARO, fg=PRETO)
-    label_procura_aula.place(x=310, y=10)
+    label_procura_aula = CTkLabel(pagina_cadastro, text="Procurar aula",
+                                  anchor=NW, font=FONTE, fg_color='transparent')
+    label_procura_aula.grid(
+        row=0, column=3, sticky='ew', padx=10, pady=(10, 5))
 
-    entry_procura_aula = Entry(frame_tabela, width=17,
-                               justify='left', relief=SOLID, font=("Ivy, 10"))
-    entry_procura_aula.place(x=312, y=35)
+    entry_procura_aula = CTkEntry(
+        pagina_cadastro, placeholder_text='Nome da aula')
+    entry_procura_aula.grid(row=1, column=3, sticky='ew',
+                            padx=(10, 5), pady=(0, 5))
 
     # Botão pesquisa aula
-    botao_procurar_aula = Button(frame_tabela, command=pesquisa_faltas_aula, text="Pesquisar Aula",
-                                 font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
-    botao_procurar_aula.place(x=439, y=33)
+    botao_procurar_aula = CTkButton(pagina_cadastro, command=pesquisa_faltas_aula, text="", image=img_pesquisa,
+                                    font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_procurar_aula.grid(
+        row=1, column=4, sticky='ew', padx=(0, 5), pady=(0, 5))
 
     # Botão mostra tabela de faltas, sem pesquisa
-    botao_procurar_aula = Button(frame_tabela, command=lambda: mostra_falta(""), text="Cancelar procura",
-                                 font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
-    botao_procurar_aula.place(x=610, y=33)
+    botao_procurar_aula = CTkButton(pagina_cadastro, command=lambda: mostra_falta(""), text="CANCELAR\nPROCURA",
+                                    font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_procurar_aula.grid(
+        row=1, column=6, sticky='ew', padx=15, pady=(0, 5))
 
     # ---------------------------------- Tabela das faltas -------------------------------------
 
     def mostra_falta(tipo):
         global dados_falta
-
-        frame_info['height'] = 370
-        frame_tabela.place(x=0, y=118+380)
 
         lista_cabecalho = ['ID', 'RA',
                            'Nome do Aluno', 'Aula', 'Turma', 'Faltas']
@@ -1985,50 +2082,47 @@ def faltas():
             dados_falta = []
 
         tree_faltas = ttk.Treeview(
-            frame_info, selectmode="extended", columns=lista_cabecalho, show='headings')
+            frame_tabela, selectmode="extended", columns=lista_cabecalho, show='headings')
+        tree_faltas.grid(row=0, column=0, sticky='nsew',
+                         columnspan=5, rowspan=5, padx=5)
 
         # Scrollbars
-        scroll_vertical = ttk.Scrollbar(
-            frame_info, orient='vertical', command=tree_faltas.yview)
-        scroll_horizontal = ttk.Scrollbar(
-            frame_info, orient="horizontal", command=tree_faltas.xview)
+        scroll_vertical = CTkScrollbar(
+            frame_tabela, orientation='vertical', command=tree_faltas.yview)
+        scroll_vertical.grid(row=0, column=5, sticky='ns', rowspan=5)
+
+        scroll_horizontal = CTkScrollbar(
+            frame_tabela, orientation="horizontal", command=tree_faltas.xview)
+        scroll_horizontal.grid(row=5, column=0, sticky='ew', columnspan=5)
 
         tree_faltas.configure(yscrollcommand=scroll_vertical,
                               xscrollcommand=scroll_horizontal)
 
-        tree_faltas.place(x=0, y=10, width=WIDTH - 60, height=340)
-        scroll_vertical.place(x=WIDTH - 60, y=10, height=350)
-        scroll_horizontal.place(x=0, y=350, width=WIDTH - 60)
-
-        posicao_coluna = ["nw", "nw", "nw", "nw",
-                          "nw", "nw"]
-        largura_coluna = [40, 60, 150, 70, 150, 60]
-        cont = 0
-
         for coluna in lista_cabecalho:
             tree_faltas.heading(coluna, text=coluna.title(), anchor=NW)
-            tree_faltas.column(
-                coluna, width=largura_coluna[cont], anchor=posicao_coluna[cont])
-
-            cont += 1
+            tree_faltas.column(coluna)
 
         for item in lista_itens:
             tree_faltas.insert('', 'end', values=item)
 
     mostra_falta("")
+# ---------------------------------------- Câmeras --------------------------------------------------------------
+# Função de cadastro de alunos
 
-
-# Função de cadastro de cameras
 
 def cameras():
-    # ------------------------------------------------- Titulo da página ----------------------------------------------------
-    global titulo_cadastro_label
+    # Titulo da página
+    troca_titulo('  Cadastro de Câmeras', 'camera')
 
-    titulo_cadastro_label = Label(frame_titulo_aluno, image=icone_titulo_camera, text="Cadastro de cameras",
-                                  width=WIDTH, compound=LEFT, relief=RAISED, anchor=NW, font=fonte_titulo, bg=AZUL_ESCURO, fg=BRANCO)
-    titulo_cadastro_label.place(x=0, y=0)
-    ttk.Separator(pagina_cadastro, orient=HORIZONTAL).place(
-        x=0, y=52, width=WIDTH)
+# ---------------------------------------- Configuração da pagina de cadastro --------------------------------------------------------
+
+    pagina_cadastro.grid_columnconfigure(0, weight=1)
+    pagina_cadastro.grid_columnconfigure(1, weight=0)
+    pagina_cadastro.grid_columnconfigure(2, weight=0)
+    pagina_cadastro.grid_columnconfigure(3, weight=0)
+    pagina_cadastro.grid_columnconfigure(4, weight=0)
+    pagina_cadastro.grid_columnconfigure(5, weight=0)
+    pagina_cadastro.grid_columnconfigure(6, weight=0)
 
     # ------------------------------------------------- Detalhes da Camera ---------------------------------------------------
 
@@ -2131,13 +2225,15 @@ def cameras():
                 mostra_camera()
 
                 # Botão desfazer alteração do aula
-                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10, height=3,
-                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-                botao_undo.place(x=732, y=85)
+                botao_undo = CTkButton(pagina_cadastro, command=undo_atualiza, anchor=CENTER, text='DESFAZER',
+                                       font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+                botao_undo.grid(row=3, column=5, sticky='ew',
+                                padx=(0, 5), pady=(0, 5))
 
-            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text="SALVAR\nALTERAÇÕES", width=10, height=3,
-                                  overrelief=RIDGE, font=fonte_botao, bg=VERDE, fg=BRANCO)
-            botao_salvar.place(x=612, y=160)
+            botao_salvar = Button(pagina_cadastro, command=atualiza, anchor=CENTER, text="SALVAR\nALTERAÇÕES",
+                                  font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+            botao_salvar.grid(row=3, column=4, sticky='ew',
+                              padx=(0, 5), pady=(0, 5))
 
         except IndexError:
             messagebox.showerror("Erro", "Selecione uma camera na tabela.")
@@ -2177,9 +2273,10 @@ def cameras():
                 botao_desfazer.destroy()
 
             # Botão desfazer deleção de aluno
-            botao_desfazer = Button(frame_info, command=undo_apaga, anchor=CENTER, text='DESFAZER', width=10, height=3,
-                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-            botao_desfazer.place(x=732, y=85)
+            botao_desfazer = CTkButton(pagina_cadastro, command=undo_apaga, anchor=CENTER, text='DESFAZER',
+                                       font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+            botao_desfazer.grid(row=3, column=5, sticky='ew',
+                                padx=(0, 5), pady=(0, 5))
 
         except IndexError:
             messagebox.showerror("Erro", "Selecione uma camera na tabela.")
@@ -2254,14 +2351,16 @@ def cameras():
                 mostra_camera()
 
                 # Botão desfazer alteração do aula
-                botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10, height=3,
-                                    overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-                botao_undo.place(x=732, y=85)
+                botao_undo = CTkButton(pagina_cadastro, command=undo_atualiza, anchor=CENTER, text='DESFAZER',
+                                       font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+                botao_undo.grid(row=3, column=5, sticky='ew',
+                                padx=(0, 5), pady=(0, 5))
 
             # Botão salvar alterações da camera
-            botao_salvar = Button(frame_info, command=atualiza, anchor=CENTER, text='SALVAR\nALTERAÇÕES', width=10, height=3,
-                                  overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-            botao_salvar.place(x=612, y=160)
+            botao_salvar = CTkButton(pagina_cadastro, command=atualiza, anchor=CENTER, text='SALVAR\nALTERAÇÕES',
+                                     font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+            botao_salvar.grid(row=3, column=4, sticky='ew',
+                              padx=(0, 5), pady=(0, 5))
 
         except:
             messagebox.showerror("Erro", "Camera não encontrada.")
@@ -2305,98 +2404,93 @@ def cameras():
             messagebox.showerror("Erro", "Selecione uma camera na tabela.")
 
     # Label e entry do Nome da camera
-    label_nome = Label(frame_info, text="Nome *",
-                       height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_nome.place(x=10, y=10)
+    label_nome = CTkLabel(pagina_cadastro, text="Nome *",
+                          anchor=NW, font=FONTE, fg_color='transparent')
+    label_nome.grid(row=0, column=0, sticky='ew', padx=10, pady=(10, 5))
 
-    entry_nome_camera = Entry(frame_info, width=45,
-                              justify='left', relief=SOLID)
-    entry_nome_camera.place(x=12, y=40)
+    entry_nome_camera = CTkEntry(
+        pagina_cadastro, placeholder_text='Nome da câmera')
+    entry_nome_camera.grid(row=1, column=0, sticky='ew', padx=10, pady=(0, 5))
 
     # Label e entry do ip
-    label_ip = Label(frame_info, text="IP *",
-                     height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_ip.place(x=10, y=70)
+    label_ip = CTkLabel(pagina_cadastro, text="IP *",
+                        anchor=NW, font=FONTE, fg_color='transparent')
+    label_ip.grid(row=2, column=0, sticky='ew', padx=10, pady=(10, 5))
 
-    entry_ip = Entry(frame_info, width=45,
-                     justify='left', relief=SOLID)
-    entry_ip.place(x=12, y=100)
+    entry_ip = CTkEntry(pagina_cadastro, placeholder_text='IP da câmera')
+    entry_ip.grid(row=3, column=0, sticky='ew', padx=10, pady=(0, 5))
 
     # Label e entry do usuario
-    label_usuario = Label(frame_info, text="Usuario *",
-                          height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_usuario.place(x=10, y=130)
+    label_usuario = CTkLabel(pagina_cadastro, text="Usuario *",
+                             anchor=NW, font=FONTE, fg_color='transparent')
+    label_usuario.grid(row=0, column=1, sticky='ew', padx=10, pady=(10, 5))
 
-    entry_usuario = Entry(frame_info, width=20,
-                          justify='left', relief=SOLID)
-    entry_usuario.place(x=12, y=160)
+    entry_usuario = CTkEntry(
+        pagina_cadastro, placeholder_text='Nome de usuário')
+    entry_usuario.grid(row=1, column=1, sticky='ew', padx=10, pady=(0, 5))
 
     # Label e combobox do Sexo
-    label_senha = Label(frame_info, text="Senha *", height=1,
-                        anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_senha.place(x=157, y=130)
+    label_senha = CTkLabel(pagina_cadastro, text="Senha *",
+                           anchor=NW, font=FONTE, fg_color='transparent')
+    label_senha.grid(row=2, column=1, sticky='ew', padx=10, pady=(10, 5))
 
-    entry_senha = Entry(frame_info, width=20,
-                        justify='left', relief=SOLID)
+    entry_senha = CTkEntry(pagina_cadastro, placeholder_text='Senha')
     entry_senha['show'] = "*"
-    entry_senha.place(x=160, y=160)
-
-    # Procura Aluno
-    label_procura_nome = Label(frame_info, text="Procurar camera [Entrar com ip]",
-                               height=1, anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-    label_procura_nome.place(x=445, y=10)
-
-    entry_procura = Entry(frame_info, width=27,
-                          justify='left', relief=SOLID, font=fonte)
-    entry_procura.place(x=447, y=35)
+    entry_senha.grid(row=3, column=1, sticky='ew', padx=10, pady=(0, 5))
 
     # Linha de separação
-    label_linha = Label(frame_info, relief=GROOVE, text='h', width=1,
-                        height=200, anchor=NW, font=("Ivy, 1"), bg=PRETO, fg=PRETO)
-    label_linha.place(x=355, y=0)
-    label_linha = Label(frame_info, relief=GROOVE, text='h', width=1,
-                        height=200, anchor=NW, font=("Ivy, 1"), bg=BRANCO, fg=PRETO)
-    label_linha.place(x=353, y=0)
+    linha_separacao = CTkFrame(
+        pagina_cadastro, width=5, fg_color=BRANCO, corner_radius=100)
+    linha_separacao.grid(row=0, column=2, sticky='ns', rowspan=5)
+
+    # Procura Aluno
+    label_procura_nome = CTkLabel(pagina_cadastro, text="Procurar camera",
+                                  anchor=NW, font=FONTE, fg_color='transparent')
+    label_procura_nome.grid(
+        row=0, column=3, sticky='ew', padx=10, pady=(10, 5))
+
+    entry_procura = CTkEntry(pagina_cadastro, placeholder_text='IP da câmera')
+    entry_procura.grid(row=1, column=3, sticky='ew', padx=10, pady=(0, 5))
 
     # ------------------------------------ Botões ---------------------------------
 
     # Botão adicionar camera
-    botao_adicionar = Button(frame_info, command=nova_camera, anchor=CENTER, text='ADICIONAR', width=10, height=3,
-                             overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-    botao_adicionar.place(x=372, y=85)
+    botao_adicionar = CTkButton(pagina_cadastro, command=nova_camera, anchor=CENTER, text='ADICIONAR',
+                                font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_adicionar.grid(row=2, column=3, sticky='ew',
+                         padx=(10, 5), pady=(10, 5))
 
     # Botão alterar camera
-    botao_alterar = Button(frame_info, command=carregar_camera, anchor=CENTER, text='ALTERAR', width=10, height=3,
-                           overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_alterar.place(x=372, y=160)
+    botao_alterar = CTkButton(pagina_cadastro, command=carregar_camera, anchor=CENTER, text='ALTERAR',
+                              font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_alterar.grid(row=2, column=4, sticky='ew', padx=(0, 5), pady=(10, 5))
 
     # Botão deletar camera
-    botao_deletar = Button(frame_info, command=apagar_camera, anchor=CENTER, text='DELETAR', width=10, height=3,
-                           overrelief=RIDGE, font=fonte_botao, bg=VERMELHO, foreground=BRANCO)
-    botao_deletar.place(x=492, y=85)
+    botao_deletar = CTkButton(pagina_cadastro, command=apagar_camera, anchor=CENTER, text='DELETAR',
+                              font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_deletar.grid(row=2, column=5, sticky='ew', padx=(0, 5), pady=(10, 5))
 
     # Botão informações do camera
-    botao_mostrar = Button(frame_info, command=info_camera, anchor=CENTER, text='INFO', width=10, height=3,
-                           overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_mostrar.place(x=492, y=160)
+    botao_mostrar = CTkButton(pagina_cadastro, command=info_camera, anchor=CENTER, text='INFO',
+                              font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_mostrar.grid(row=2, column=6, sticky='ew', padx=(0, 5), pady=(10, 5))
 
     # Botão pesquisa camera
-    botao_procurar = Button(frame_info, command=pesquisa_camera, text="PESQUISAR",
-                            font=fonte_botao, compound=LEFT, overrelief=RIDGE, bg=AZUL_ESCURO, fg=BRANCO)
-    botao_procurar.place(x=682, y=33)
+    botao_procurar = CTkButton(pagina_cadastro, command=pesquisa_camera, text="", image=img_pesquisa,
+                               font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_procurar.grid(row=1, column=4, sticky='ew', padx=10, pady=(0, 5))
 
     # Botão mostra visão da camera
-    botao_imagem = Button(frame_info, command=mostra_imagem, anchor=CENTER, text='MOSTRAR\nVÍDEO', width=10, height=3,
-                          overrelief=RIDGE, font=fonte_botao, bg=AZUL_ESCURO, foreground=BRANCO)
-    botao_imagem.place(x=612, y=85)
+    botao_imagem = CTkButton(pagina_cadastro, command=mostra_imagem, anchor=CENTER, text='MOSTRAR\nVÍDEO',
+                             font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_imagem.grid(row=3, column=3, sticky='ew', padx=(10, 5), pady=(0, 5))
 
     # ---------------------------------- Tabela das cameras -------------------------------------
 
     def mostra_camera():
-        tabela_camera_label = Label(frame_info, text="Tabela de cameras",
-                                    height=1, relief="flat", anchor=NW, font=fonte, bg=AZUL_CLARO, fg=PRETO)
-        tabela_camera_label.place(x=0, y=210)
-
+        tabela_camera_label = CTkLabel(pagina_cadastro, text="Tabela de cameras",
+                                       anchor=NW, font=FONTE, fg_color='transparent')
+        tabela_camera_label.grid(row=4, column=0, sticky='ew', padx=10)
         lista_cabecalho = ['ID', 'Nome', 'IP', 'Usuario']
 
         lista_itens = utils.mostra_camera()
@@ -2405,30 +2499,24 @@ def cameras():
 
         tree_cameras = ttk.Treeview(
             frame_tabela, selectmode="extended", columns=lista_cabecalho, show='headings')
+        tree_cameras.grid(row=0, column=0, sticky="nsew",
+                          columnspan=5, rowspan=5, padx=5)
 
         # Scrollbars
-        scroll_vertical = ttk.Scrollbar(
-            frame_tabela, orient='vertical', command=tree_cameras.yview)
-        scroll_horizontal = ttk.Scrollbar(
-            frame_tabela, orient="horizontal", command=tree_cameras.xview)
+        scroll_vertical = CTkScrollbar(
+            frame_tabela, orientation='vertical', command=tree_cameras.yview)
+        scroll_vertical.grid(row=0, column=5, sticky='ns', rowspan=5)
+
+        scroll_horizontal = CTkScrollbar(
+            frame_tabela, orientation="horizontal", command=tree_cameras.xview)
+        scroll_horizontal.grid(row=5, column=0, sticky='ew', columnspan=5)
 
         tree_cameras.configure(yscrollcommand=scroll_vertical,
                                xscrollcommand=scroll_horizontal)
 
-        tree_cameras.place(x=0, y=0, width=WIDTH - 60, height=200)
-        scroll_vertical.place(x=WIDTH - 60, y=0 + 1, height=200)
-        scroll_horizontal.place(x=0, y=200, width=WIDTH - 60)
-
-        posicao_coluna = ["nw", "nw", "nw", "nw"]
-        largura_coluna = [60, 150, 150, 70]
-        cont = 0
-
         for coluna in lista_cabecalho:
             tree_cameras.heading(coluna, text=coluna.title(), anchor=NW)
-            tree_cameras.column(
-                coluna, width=largura_coluna[cont], anchor=posicao_coluna[cont])
-
-            cont += 1
+            tree_cameras.column(coluna)
 
         for item in lista_itens:
             tree_cameras.insert('', 'end', values=item)
@@ -2440,35 +2528,46 @@ def cameras():
         botao_undo.destroy()
 
     # Botão desfazer alteração do aula
-    botao_undo = Button(frame_info, command=undo_atualiza, anchor=CENTER, text='DESFAZER', width=10,
-                        overrelief=RIDGE, font=fonte_botao, bg=VERDE, foreground=BRANCO)
-    botao_undo.place(x=732, y=85)
+    botao_undo = CTkButton(pagina_cadastro, command=undo_atualiza, anchor=CENTER, text='DESFAZER',
+                           font=FONTE_BOTAO, fg_color=VERMELHO, hover_color=VERMELHO_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_undo.grid(row=3, column=4, sticky='ew', padx=(0, 5), pady=(0, 5))
 
     botao_undo.destroy()
 
     mostra_camera()
 
+# ---------------------------------------- Ir e voltar da Página Inicial --------------------------------------------------------------
 
-# Função para voltar
+
+def direciona_cadastro():
+    # Mostra aba de cadastro de aluno
+    controle('alunos')
+
+    # Direciona para a página de cadastro
+    show_frame(frame_abas)
+    show_frame(pagina_cadastro)
+    show_frame(frame_tabela)
+
+
 def voltar():
-    alunos()
+    # Titulo da página
+    troca_titulo('  Menu Inicial', 'casa')
+
+    # Direciona para a página inicial
     show_frame(pagina_inicial)
+
+# ---------------------------------------- Troca de janelas --------------------------------------------------------------
 
 # Função de troca de janelas
 
 
 def controle(comando_botao):
 
-    frame_info['height'] = 230
-    frame_tabela.place(x=0, y=118+240)
-
-    for widget in frame_info.winfo_children():
+    for widget in pagina_cadastro.winfo_children():
         widget.destroy()
 
     for widget in frame_tabela.winfo_children():
         widget.destroy()
-
-    titulo_cadastro_label.destroy()
 
     if comando_botao == 'alunos':
         alunos()
@@ -2485,74 +2584,16 @@ def controle(comando_botao):
     if comando_botao == 'cameras':
         cameras()
 
-    if comando_botao == 'voltar':
-        voltar()
 
-# ------------------------ Botões de navegação -----------------------------
+# ---------------------------------------- Métodos de inicialização --------------------------------------------------------
 
+# Fecha processos no "X" da janela
+janela.protocol("WM_DELETE_WINDOW", sair)
 
-icone_aluno_cadastro = Image.open('images/icon_aluno_2.png')
-icone_aluno_cadastro = icone_aluno_cadastro.resize((20, 20))
-icone_aluno_cadastro = ImageTk.PhotoImage(icone_aluno_cadastro)
+# Primeira página a aparecer
+show_frame(pagina_inicial)
 
-botao_cadastro = Button(frame_aluno_botoes, command=lambda: controle('alunos'), image=icone_aluno_cadastro,
-                        text="Alunos", width=100, compound=LEFT, overrelief=RIDGE, font=fonte, bg=AZUL_ESCURO, fg=BRANCO)
-botao_cadastro.place(x=10, y=30)
-
-icone_cursos = Image.open('images/icon_cursos.png')
-icone_cursos = icone_cursos.resize((20, 20))
-icone_cursos = ImageTk.PhotoImage(icone_cursos)
-
-botao_cursos = Button(frame_aluno_botoes, command=lambda: controle('cursos'), image=icone_cursos,
-                      text="Cursos/Turmas", width=130, compound=LEFT, overrelief=RIDGE, font=fonte, bg=AZUL_ESCURO, fg=BRANCO)
-botao_cursos.place(x=130, y=30)
-
-icone_aula = Image.open('images/icon_aula.png')
-icone_aula = icone_aula.resize((20, 20))
-icone_aula = ImageTk.PhotoImage(icone_aula)
-
-botao_aula = Button(frame_aluno_botoes, command=lambda: controle('aulas'), image=icone_aula,
-                    text=" Aula", width=100, compound=LEFT, overrelief=RIDGE, font=fonte, bg=AZUL_ESCURO, fg=BRANCO)
-botao_aula.place(x=280, y=30)
-
-icone_faltas = Image.open('images/icon_falta.png')
-icone_faltas = icone_faltas.resize((20, 20))
-icone_faltas = ImageTk.PhotoImage(icone_faltas)
-
-botao_faltas = Button(frame_aluno_botoes, command=lambda: controle('faltas'), image=icone_faltas,
-                      text="Faltas", width=100, compound=LEFT, overrelief=RIDGE, font=fonte, bg=AZUL_ESCURO, fg=BRANCO)
-botao_faltas.place(x=400, y=30)
-
-icone_camera = Image.open('images/icon_camera.png')
-icone_camera = icone_camera.resize((20, 20))
-icone_camera = ImageTk.PhotoImage(icone_camera)
-
-botao_camera = Button(frame_aluno_botoes, command=lambda: controle('cameras'), image=icone_camera,
-                      text="Cameras", width=100, compound=LEFT, overrelief=RIDGE, font=fonte, bg=AZUL_ESCURO, fg=BRANCO)
-botao_camera.place(x=520, y=30)
-
-icone_voltar = Image.open('images/icon_voltar.png')
-icone_voltar = icone_voltar.resize((20, 20))
-icone_voltar = ImageTk.PhotoImage(icone_voltar)
-
-botao_voltar = Button(frame_aluno_botoes, command=lambda: controle('voltar'), image=icone_voltar,
-                      text=" Voltar", width=100, compound=LEFT, overrelief=RIDGE, font=fonte, bg=AZUL_ESCURO, fg=BRANCO)
-botao_voltar.place(x=640, y=30)
-
-ttk.Separator(pagina_cadastro, orient=HORIZONTAL).place(
-    x=0, y=118, width=WIDTH)
-
-# ===================================== Método de inicialização =========================================
-
-# Primeira "janela" na tela de cadastros é a de alunos
-alunos()
-
-# Ao fechar pelo "X" da janela, encerra todos os processos
-janela.protocol("WM_DELETE_WINDOW", sair_app)
-
-# ===================================== Main loop =========================================
-
-# Janela principal
+# Main loop
 
 
 def run():

@@ -36,7 +36,6 @@ class Banco():
                     sexo TEXT,
                     foto LONGTEXT NOT NULL,
                     turma_id INTEGER NOT NULL,
-                    presente BOOL NOT NULL,
                     FOREIGN KEY(turma_id) REFERENCES turmas(id) ON DELETE CASCADE
                     )""")
         
