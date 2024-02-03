@@ -6,7 +6,7 @@ import sqlite3
 from datetime import *
 from PIL import Image
 import numpy 
-from email_utils import envia_email_confirmando_presenca
+import email_utils
 from customtkinter import CTkImage
 
 global dia_semana
@@ -323,11 +323,8 @@ def verifica_aula_dia(dia):
 
 # Verifica qual a próxima aula
 def tempo_para_aula(aulas):
-    muito_antes = []
     antes = []
     durante = []
-    depois = []
-    muito_depois = []
 
     current = datetime.now()
     dia = current.strftime("%Y/%m/%d")
@@ -337,7 +334,7 @@ def tempo_para_aula(aulas):
         tempo = datetime.strptime(f"{dia} {aula[1]}", "%Y/%m/%d %H:%M")
         tempo_restante = tempo - current
         if tempo_restante > timedelta(minutes=40):
-            muito_antes.append(aula)
+            continue
         # Se faltar menos de 40 min pra aula, adiciona a turma à lista
         elif tempo_restante <= timedelta(minutes=40) and tempo_restante > timedelta(minutes=0):
             antes.append(aula)
@@ -346,11 +343,11 @@ def tempo_para_aula(aulas):
             durante.append(aula)
         # 40 minutos depois da aula
         elif tempo_restante < timedelta(minutes=-40) and tempo_restante >= timedelta(minutes=-80):
-            depois.append(aula)
+            continue
         elif tempo_restante < timedelta(minutes=-40) and tempo_restante >= timedelta(minutes=-80):
-            muito_depois.append(aula)
+            continue
 
-    todas_aulas = {"muito_antes": muito_antes, "antes": antes, "durante": durante, "depois": depois, "muito_depois":muito_depois}
+    todas_aulas = {"antes": antes, "durante": durante}
 
     return todas_aulas
 
@@ -537,8 +534,11 @@ def confere_presenca(aula, dia):
                 if hora_inicio_aula > entrada:
                     if hora_fim_aula > saida:
                         tempo = saida - hora_inicio_aula
-                    else:
+                    elif saida > hora_fim_aula and saida <= (hora_fim_aula + timedelta(minutes=20)):
                         tempo = hora_fim_aula - hora_inicio_aula
+                    elif saida > (hora_fim_aula + timedelta(minutes=20)):
+                        update_faltas(aluno[1], dia, aula[2], conexao)
+
                 else:
                     if hora_fim_aula > saida:
                         tempo = saida - entrada
@@ -554,6 +554,7 @@ def confere_presenca(aula, dia):
 
 # Atualiza o quadro de faltas de cada aula
 def update_faltas(ra, dia, turma, conexao):
+
     cursor = conexao.cursor()
     with conexao:
         cursor.execute(f"""SELECT f.id FROM faltas f
@@ -565,6 +566,12 @@ def update_faltas(ra, dia, turma, conexao):
             cursor.execute(f"""UPDATE faltas SET falta = falta + 1 WHERE ra = "{ra}"
                                 AND id = "{id_aula[0]}"
                                 """)
+            cursor.execute(f"""SELECT nome, email from alunos WHERE ra = "{ra}" """)
+            aluno = cursor.fetchone()
+
+            # Envia email para os alunos que receberam falta
+            email_utils.envia_email_acusando_falta(aluno=aluno[0], ID=ra, destinatario=aluno[1])
+        
     cursor.close()
 
 # --------------------------------- Tabela alunos -------------------------------------------
@@ -641,18 +648,6 @@ def apaga_aluno(ra):
 
 # Conta presença parar o aluno
 def presenca_aluno(ra):
-
-    h_entrada = hora_chegada(ra)
-
-    conexao = sqlite3.connect("banco.db")
-    cursor = conexao.cursor()
-    with conexao:
-        cursor.execute(f"""SELECT nome, email FROM alunos WHERE ra = "{ra}" """)
-        results = cursor.fetchone()
-
-    envia_email_confirmando_presenca(results[0], ra, results[1], h_entrada)
-
-def hora_chegada(ra):
     
     hora = datetime.now().strftime("%H:%M")
     
@@ -664,10 +659,13 @@ def hora_chegada(ra):
 
         if results[0] == None:
             cursor.execute(f"""UPDATE presenca SET hora_entrada = "{hora}" WHERE ra = "{ra}" """)
+            cursor.execute(f"""SELECT nome, email FROM alunos WHERE ra = "{ra}" """)
+
+            aluno = cursor.fetchone()
+
+            email_utils.envia_email_confirmando_presenca(aluno=aluno[0], ID=ra, destinatario=aluno[1], hora_chegada=hora)
         elif results[0] != None:
             cursor.execute(f"""UPDATE presenca SET hora_saida = "{hora}" WHERE ra = "{ra}" """)
-
-    return hora
 
 # Verifica os alunos que não chegaram na aula, por meio da turma
 def alunos_para_avisar(turma):
@@ -675,9 +673,10 @@ def alunos_para_avisar(turma):
     conexao = sqlite3.connect("banco.db")
     with conexao:
         cursor = conexao.cursor()
-        cursor.execute(f""" SELECT ra, nome, email FROM alunos
-                            WHERE turma_id = "{turma}" 
-                        """)
+
+        cursor.execute(f"""SELECT al.ra, al.nome, al.email from alunos al
+                       JOIN presenca p ON p.ra = al.ra
+                       WHERE p.hora_entrada == NULL """)
 
         results = cursor.fetchall()
 
