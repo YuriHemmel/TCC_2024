@@ -509,25 +509,45 @@ def reseta_presenca_dia():
             os.remove(f'imagensAlunos/{imagem}')
 
 # Confere tempo de aula do aluno
-def confere_presenca(turma, dia):
+def confere_presenca(aula, dia):
+    # aula[0] = id da aula
+    # aula[1] = horário da aula
+    # aula[2] = turma que tem esta aula
+
     conexao = sqlite3.connect("banco.db")
     cursor = conexao.cursor()
     with conexao:
 
         cursor.execute("""SELECT * FROM presenca""")
 
-        results = cursor.fetchall()
+        alunos = cursor.fetchall()
 
-        for aluno in results:
+        for aluno in alunos:
             if aluno[3] == None:
-                update_faltas(aluno[1], dia, turma, conexao)
+                update_faltas(aluno[1], dia, aula[2], conexao)
             else:
+                hora_inicio_aula = datetime.strptime(f"{aula[1]}", "%H:%M")
+
+                hora_fim_aula = hora_inicio_aula + timedelta(hours=1, minutes=15)
+
                 entrada = datetime.strptime(f"{aluno[2]}", "%H:%M")
+
                 saida = datetime.strptime(f"{aluno[3]}", "%H:%M")
-                tempo_aula = saida - entrada
-                if tempo_aula < timedelta(minutes=2):
-                    update_faltas(aluno[1], dia, turma, conexao)
-                elif tempo_aula >= timedelta(minutes=2):
+
+                if hora_inicio_aula > entrada:
+                    if hora_fim_aula > saida:
+                        tempo = saida - hora_inicio_aula
+                    else:
+                        tempo = hora_fim_aula - hora_inicio_aula
+                else:
+                    if hora_fim_aula > saida:
+                        tempo = saida - entrada
+                    else:
+                        tempo = hora_fim_aula - entrada
+
+                if tempo < timedelta(minutes=2):
+                    update_faltas(aluno[1], dia, aula[2], conexao)
+                elif tempo >= timedelta(minutes=2):
                     continue
 
         cursor.close()
@@ -546,7 +566,6 @@ def update_faltas(ra, dia, turma, conexao):
                                 AND id = "{id_aula[0]}"
                                 """)
     cursor.close()
-
 
 # --------------------------------- Tabela alunos -------------------------------------------
 

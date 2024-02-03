@@ -115,7 +115,7 @@ def computa_faltas():
     if dia_semana in [0, 1, 2, 3, 4]:
         # Turma é Terceiro elemento do "aulas_dia"
         for aula in aulas_dia:
-            utils.confere_presenca(aula[2], dia_semana)
+            utils.confere_presenca(aula, dia_semana)
         utils.reseta_presenca_dia()
         print("Faltas computadas")
 
