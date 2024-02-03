@@ -92,7 +92,6 @@ def prepara_dia():
 
     # Verifica se hoje é dia de semana ou fim de semana
     dia_semana = current_time.weekday()
-    dia_semana = 4
 
     if dia_semana in [0, 1, 2, 3, 4]:
         # Aulas do dia
@@ -111,7 +110,7 @@ def computa_faltas():
 
     # Verifica se hoje é dia de semana ou fim de semana
     dia_semana = current_time.weekday()
-    dia_semana = 4
+    
     # 0 = Segunda a 6 = domingo
     if dia_semana in [0, 1, 2, 3, 4]:
         # Turma é Terceiro elemento do "aulas_dia"
