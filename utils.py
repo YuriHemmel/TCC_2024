@@ -98,15 +98,14 @@ def adiciona_fotos_alunos(aulas_dia, dia):
     
     conexao = sqlite3.connect("banco.db")
     for aula in aulas_dia:
-        print(aula[2])
     
         with conexao:
             cursor = conexao.cursor()
 
             cursor.execute(
                 f"""
-                     select al.ra, al.foto from alunos al left join aulas au on al.turma_id = au.turma_id 
-                     where au.turma_id = "{aula[2]}" AND au.dia = "{dia_semana[dia]}"; 
+                     SELECT al.ra, al.foto FROM alunos al LEFT JOIN aulas au ON al.turma_id = au.turma_id 
+                     WHERE au.turma_id = "{aula[2]}" AND au.dia = "{dia_semana[dia]}"; 
                 """
             )
 
@@ -333,19 +332,12 @@ def tempo_para_aula(aulas):
     for aula in aulas:
         tempo = datetime.strptime(f"{dia} {aula[1]}", "%Y/%m/%d %H:%M")
         tempo_restante = tempo - current
-        if tempo_restante > timedelta(minutes=40):
-            continue
-        # Se faltar menos de 40 min pra aula, adiciona a turma à lista
-        elif tempo_restante <= timedelta(minutes=40) and tempo_restante > timedelta(minutes=0):
+        # 40 min antes da aula começar
+        if tempo_restante == timedelta(minutes=40):
             antes.append(aula)
         # Aula começou
-        elif tempo_restante >= timedelta(minutes=-40) and tempo_restante < timedelta(minutes=0):
+        elif tempo_restante == timedelta(minutes=0):
             durante.append(aula)
-        # 40 minutos depois da aula
-        elif tempo_restante < timedelta(minutes=-40) and tempo_restante >= timedelta(minutes=-80):
-            continue
-        elif tempo_restante < timedelta(minutes=-40) and tempo_restante >= timedelta(minutes=-80):
-            continue
 
     todas_aulas = {"antes": antes, "durante": durante}
 
@@ -676,13 +668,14 @@ def alunos_para_avisar(turma):
 
         cursor.execute(f"""SELECT al.ra, al.nome, al.email from alunos al
                        JOIN presenca p ON p.ra = al.ra
-                       WHERE p.hora_entrada == NULL """)
+                       WHERE p.hora_entrada == "NULL" AND al.turma_id = "{turma}" """)
 
         results = cursor.fetchall()
 
     return results
 
-
+#adiciona_fotos_alunos(verifica_aula_dia(0), 0)
+#print(alunos_para_avisar("CC01"))
 # --------------------------------- Tabela cameras -------------------------------------------
 
 # Função criar camera

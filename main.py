@@ -164,8 +164,7 @@ def sair():
 
 # ========================= Schedules ================================
 
-
-schedule.every(40).minutes.do(manda_mensagens)
+schedule.every().minute.at(":00").do(manda_mensagens)
 schedule.every().day.at("00:00").do(prepara_dia)
 schedule.every().day.at("23:59").do(computa_faltas)
 
@@ -478,9 +477,10 @@ def alunos():
             foto_string = aluno_foto
 
             aluno_foto = utils.convertToImage(aluno_foto)
+            aluno_foto = aluno_foto.resize((130, 150))
+            aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
-            label_foto = CTkLabel(frame_foto, text="",
-                                  image=aluno_foto, fg_color='transparent')
+            label_foto = CTkLabel(frame_foto, text="", image=aluno_foto, fg_color='transparent')
             label_foto.grid(row=0, column=0, sticky='nsew', rowspan=5)
 
             botao_undo.destroy()
