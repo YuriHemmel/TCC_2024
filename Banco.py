@@ -71,7 +71,7 @@ class Banco():
         # Tabela de Presença
         cursor.execute("""CREATE TABLE IF NOT EXISTS presenca (
                      id INTEGER PRIMARY KEY AUTOINCREMENT,
-                     id_aula INTEGER
+                     id_aula INTEGER,
                      ra TEXT NOT NULL,
                      hora_entrada TEXT,
                      hora_saida TEXT,
