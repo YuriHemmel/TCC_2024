@@ -5,7 +5,7 @@ import cv2 as cv
 import sqlite3
 from datetime import *
 from PIL import Image
-import numpy 
+import numpy
 import email_utils
 from customtkinter import CTkImage
 
@@ -22,7 +22,7 @@ def tira_foto_binario():
     global bytes_foto
 
     print('Conectando com a camera...')
-    cap = cv.VideoCapture(0)#, cv.CAP_FFMPEG)
+    cap = cv.VideoCapture(0)  # , cv.CAP_FFMPEG)
 
     if cap.isOpened():
         validacao, frame = cap.read()
@@ -30,7 +30,7 @@ def tira_foto_binario():
             validacao, frame = cap.read()
             cv.imshow("Video da Webcam", frame)
             key = cv.waitKey(1)
-            if key == ord('q') or key == ord('Q') or key == 27: # 27 == ESC
+            if key == ord('q') or key == ord('Q') or key == 27:  # 27 == ESC
                 break
         cv.imwrite("imagem.jpg", frame)
         bytes_foto = convertToBinaryData("imagem.jpg")
@@ -47,12 +47,14 @@ def convertToBinaryData(filename):
     return bytes_foto
 
 # Decodifica bytes em imagem
+
+
 def convertToImage(bytes_foto):
     string = str(bytes_foto).strip("b'")[:-1]
     code_with_padding = f"{string}{'=' * (len(string) % 4)}"
     binary_data = base64.b64decode(code_with_padding)
     imagem = Image.open(io.BytesIO(binary_data))
-    
+
     return imagem
 
 
@@ -67,7 +69,7 @@ def recupera_imagem_aluno(bytes_foto):
 def mostra_video_camera(lista):
 
     nome = str(lista[1]).lower()
-    
+
     if nome == "Webcam".lower():
         webcam = cv.VideoCapture(0)
     else:
@@ -85,20 +87,22 @@ def mostra_video_camera(lista):
             validacao, frame = webcam.read()
             cv.imshow(f"Video da {lista[1]}", frame)
             key = cv.waitKey(1)
-            if key == ord('q') or key == ord('Q') or key == 27: # ESC
+            if key == ord('q') or key == ord('Q') or key == 27:  # ESC
                 break
     webcam.release()
     cv.destroyAllWindows()
 
 # Preenche a pasta imagensAlunos com fotos dos alunos que devem comparecer no dia
+
+
 def adiciona_fotos_alunos(aulas_dia, dia):
     if aulas_dia == []:
         print("Não há aula para esse dia")
         return
-    
+
     conexao = sqlite3.connect("banco.db")
     for aula in aulas_dia:
-    
+
         with conexao:
             cursor = conexao.cursor()
 
@@ -115,7 +119,8 @@ def adiciona_fotos_alunos(aulas_dia, dia):
                 ra = foto[0]
 
                 # Adiciona os alunos na tabela de presença do dia
-                cursor.execute(f"""INSERT INTO presenca (ra) VALUES ("{ra}") """)
+                cursor.execute(
+                    f"""INSERT INTO presenca (ra) VALUES ("{ra}") """)
 
                 path_foto = f"{path}/{ra}.jpeg"
                 print(path_foto)
@@ -129,6 +134,8 @@ def adiciona_fotos_alunos(aulas_dia, dia):
 # --------------------------------- Tabela cursos -------------------------------------------
 
 # Função criar cursos
+
+
 def cria_curso(lista):
     conexao = sqlite3.connect("banco.db")
 
@@ -244,6 +251,8 @@ def cria_aula(lista):
                             VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}", "{lista[3]}") """)
 
 # Função criar aula
+
+
 def cria_aula_id(lista):
     conexao = sqlite3.connect("banco.db")
 
@@ -305,6 +314,8 @@ def apaga_aula(id):
         cursor.execute(f"""DELETE FROM aulas WHERE id="{id}" """)
 
 # Verifica as aulas do dia
+
+
 def verifica_aula_dia(dia):
     global dia_semana
 
@@ -321,6 +332,8 @@ def verifica_aula_dia(dia):
     return results
 
 # Verifica qual a próxima aula
+
+
 def tempo_para_aula(aulas):
     antes = []
     durante = []
@@ -333,17 +346,17 @@ def tempo_para_aula(aulas):
         tempo = datetime.strptime(f"{dia} {aula[1]}", "%Y/%m/%d %H:%M")
         tempo_restante = tempo - current
         # 40 min antes da aula começar
-        if tempo_restante == timedelta(minutes=40):
+        if tempo_restante <= timedelta(minutes=40) and tempo_restante > timedelta(minutes=0):
             antes.append(aula)
         # Aula começou
-        elif tempo_restante == timedelta(minutes=0):
+        elif tempo_restante <= timedelta(minutes=0) and tempo_restante >= timedelta(minutes=-30):
             durante.append(aula)
 
     todas_aulas = {"antes": antes, "durante": durante}
 
     return todas_aulas
 
-#Verifica última aula criada
+# Verifica última aula criada
 def ultima_aula_criada():
     conexao = sqlite3.connect("banco.db")
 
@@ -358,6 +371,8 @@ def ultima_aula_criada():
 # --------------------------------- Tabela faltas -------------------------------------------
 
 # Função criar falta
+
+
 def cria_falta(lista):
     conexao = sqlite3.connect("banco.db")
 
@@ -369,6 +384,8 @@ def cria_falta(lista):
         cursor.close()
 
 # Atualiza as faltas
+
+
 def atualiza_falta(lista):
     conexao = sqlite3.connect("banco.db")
 
@@ -380,6 +397,8 @@ def atualiza_falta(lista):
         cursor.close()
 
 # Apaga faltas pelo ra do aluno
+
+
 def apaga_falta_aluno(ra):
     conexao = sqlite3.connect("banco.db")
     with conexao:
@@ -388,6 +407,8 @@ def apaga_falta_aluno(ra):
         cursor.close()
 
 # Apaga faltas pelo id da aula
+
+
 def apaga_falta_aula(id_aula):
     conexao = sqlite3.connect("banco.db")
     with conexao:
@@ -396,6 +417,8 @@ def apaga_falta_aula(id_aula):
         cursor.close()
 
 # Mostra as faltas
+
+
 def mostra_falta():
     conexao = sqlite3.connect("banco.db")
 
@@ -412,6 +435,8 @@ def mostra_falta():
     return results
 
 # Pesquisa as faltas pelo ra do aluno
+
+
 def pesquisa_falta_aluno(ra):
     conexao = sqlite3.connect("banco.db")
 
@@ -430,6 +455,8 @@ def pesquisa_falta_aluno(ra):
     return results
 
 # Retorna apenas os dados da falta via ra (Usado para o "Undo")
+
+
 def mostra_falta_aluno(ra):
     conexao = sqlite3.connect("banco.db")
 
@@ -445,6 +472,8 @@ def mostra_falta_aluno(ra):
     return results
 
 # Retorna apenas os dados da falta via nome da aula (Usado para o "Undo")
+
+
 def mostra_falta_aula(nome_aula):
     conexao = sqlite3.connect("banco.db")
 
@@ -461,6 +490,8 @@ def mostra_falta_aula(nome_aula):
     return results
 
 # Pesquisa as faltas pelo nome da aula
+
+
 def pesquisa_falta_aula(nome_aula):
     conexao = sqlite3.connect("banco.db")
 
@@ -493,11 +524,13 @@ def reseta_presenca_dia():
 
     if imagens != []:
         print('Limpando as imagens de alunos do dia')
-    
+
         for imagem in imagens:
             os.remove(f'imagensAlunos/{imagem}')
 
 # Confere tempo de aula do aluno
+
+
 def confere_presenca(aula, dia):
     # aula[0] = id da aula
     # aula[1] = horário da aula
@@ -517,7 +550,8 @@ def confere_presenca(aula, dia):
             else:
                 hora_inicio_aula = datetime.strptime(f"{aula[1]}", "%H:%M")
 
-                hora_fim_aula = hora_inicio_aula + timedelta(hours=1, minutes=15)
+                hora_fim_aula = hora_inicio_aula + \
+                    timedelta(hours=1, minutes=15)
 
                 entrada = datetime.strptime(f"{aluno[2]}", "%H:%M")
 
@@ -545,6 +579,8 @@ def confere_presenca(aula, dia):
         cursor.close()
 
 # Atualiza o quadro de faltas de cada aula
+
+
 def update_faltas(ra, dia, turma, conexao):
 
     cursor = conexao.cursor()
@@ -558,17 +594,21 @@ def update_faltas(ra, dia, turma, conexao):
             cursor.execute(f"""UPDATE faltas SET falta = falta + 1 WHERE ra = "{ra}"
                                 AND id = "{id_aula[0]}"
                                 """)
-            cursor.execute(f"""SELECT nome, email from alunos WHERE ra = "{ra}" """)
+            cursor.execute(
+                f"""SELECT nome, email from alunos WHERE ra = "{ra}" """)
             aluno = cursor.fetchone()
 
             # Envia email para os alunos que receberam falta
-            email_utils.envia_email_acusando_falta(aluno=aluno[0], ID=ra, destinatario=aluno[1])
-        
+            email_utils.envia_email_acusando_falta(
+                aluno=aluno[0], ID=ra, destinatario=aluno[1])
+
     cursor.close()
 
 # --------------------------------- Tabela alunos -------------------------------------------
 
 # Função criar aluno
+
+
 def cria_aluno(lista):
     conexao = sqlite3.connect("banco.db")
 
@@ -579,6 +619,8 @@ def cria_aluno(lista):
                                        VALUES ("{lista[0]}", "{lista[1]}", "{lista[2]}", "{lista[3]}", "{lista[4]}", "{lista[5]}", "{lista[6]}") """)
 
 # Mostra os alunos
+
+
 def mostra_aluno():
     lista = []
     conexao = sqlite3.connect("banco.db")
@@ -594,6 +636,8 @@ def mostra_aluno():
     return lista
 
 # Pesquisa os alunos com base na turma
+
+
 def mostra_aluno_da_turma(turma):
     lista = []
     conexao = sqlite3.connect("banco.db")
@@ -610,6 +654,8 @@ def mostra_aluno_da_turma(turma):
     return lista
 
 # Pesquisa alunos pelo ra
+
+
 def pesquisa_aluno(ra):
     conexao = sqlite3.connect("banco.db")
 
@@ -623,6 +669,8 @@ def pesquisa_aluno(ra):
     return results
 
 # Atualiza dados do aluno
+
+
 def atualiza_aluno(lista):
     conexao = sqlite3.connect("banco.db")
     with conexao:
@@ -632,6 +680,8 @@ def atualiza_aluno(lista):
                        WHERE ra="{lista[7]}" """)
 
 # Deleta dados do aluno
+
+
 def apaga_aluno(ra):
     conexao = sqlite3.connect("banco.db")
     with conexao:
@@ -639,27 +689,36 @@ def apaga_aluno(ra):
         cursor.execute(f"""DELETE FROM alunos WHERE ra="{ra}" """)
 
 # Conta presença parar o aluno
+
+
 def presenca_aluno(ra):
-    
+
     hora = datetime.now().strftime("%H:%M")
-    
+
     conexao = sqlite3.connect("banco.db")
     cursor = conexao.cursor()
     with conexao:
-        cursor.execute(f"""SELECT hora_entrada FROM presenca WHERE ra = "{ra}" """)
+        cursor.execute(
+            f"""SELECT hora_entrada FROM presenca WHERE ra = "{ra}" """)
         results = cursor.fetchone()
 
         if results[0] == None:
-            cursor.execute(f"""UPDATE presenca SET hora_entrada = "{hora}" WHERE ra = "{ra}" """)
-            cursor.execute(f"""SELECT nome, email FROM alunos WHERE ra = "{ra}" """)
+            cursor.execute(
+                f"""UPDATE presenca SET hora_entrada = "{hora}" WHERE ra = "{ra}" """)
+            cursor.execute(
+                f"""SELECT nome, email FROM alunos WHERE ra = "{ra}" """)
 
             aluno = cursor.fetchone()
 
-            email_utils.envia_email_confirmando_presenca(aluno=aluno[0], ID=ra, destinatario=aluno[1], hora_chegada=hora)
+            email_utils.envia_email_confirmando_presenca(
+                aluno=aluno[0], ID=ra, destinatario=aluno[1], hora_chegada=hora)
         elif results[0] != None:
-            cursor.execute(f"""UPDATE presenca SET hora_saida = "{hora}" WHERE ra = "{ra}" """)
+            cursor.execute(
+                f"""UPDATE presenca SET hora_saida = "{hora}" WHERE ra = "{ra}" """)
 
 # Verifica os alunos que não chegaram na aula, por meio da turma
+
+
 def alunos_para_avisar(turma):
 
     conexao = sqlite3.connect("banco.db")
@@ -668,14 +727,12 @@ def alunos_para_avisar(turma):
 
         cursor.execute(f"""SELECT al.ra, al.nome, al.email from alunos al
                        JOIN presenca p ON p.ra = al.ra
-                       WHERE p.hora_entrada == "NULL" AND al.turma_id = "{turma}" """)
+                       WHERE p.hora_entrada IS NULL AND al.turma_id = "{turma}" """)
 
         results = cursor.fetchall()
 
     return results
 
-#adiciona_fotos_alunos(verifica_aula_dia(0), 0)
-#print(alunos_para_avisar("CC01"))
 # --------------------------------- Tabela cameras -------------------------------------------
 
 # Função criar camera
@@ -727,6 +784,8 @@ def apaga_camera(id):
         cursor.execute(f"""DELETE FROM cameras WHERE id="{id}" """)
 
 # Pesquisa a câmera pelo ip
+
+
 def pesquisa_camera(ip):
     conexao = sqlite3.connect("banco.db")
 
@@ -740,6 +799,8 @@ def pesquisa_camera(ip):
     return results
 
 # Pesquisa a câmera pelo id
+
+
 def pesquisa_camera_id(id):
     conexao = sqlite3.connect("banco.db")
 

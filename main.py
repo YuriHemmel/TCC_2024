@@ -91,16 +91,17 @@ def prepara_dia():
     current_time = datetime.now()
 
     # Verifica se hoje é dia de semana ou fim de semana
-    dia_semana = current_time.weekday()
+    #dia_semana = current_time.weekday()
+    dia_semana = 4
 
     if dia_semana in [0, 1, 2, 3, 4]:
         # Aulas do dia
         aulas_dia = utils.verifica_aula_dia(dia_semana)
+        print(f"Aulas do dia: {aulas_dia}")
         utils.adiciona_fotos_alunos(aulas_dia, dia_semana)
         if (os.listdir('imagensAlunos') == []):
             print('Não há nenhum aluno ou aula para este dia letivo.')
         else:
-            inicia_reconhecimento()
             print("Preparação de aulas do dia concluida")
 
 
@@ -109,7 +110,8 @@ def computa_faltas():
     current_time = datetime.now()
 
     # Verifica se hoje é dia de semana ou fim de semana
-    dia_semana = current_time.weekday()
+    #dia_semana = current_time.weekday()
+    dia_semana = 4
     
     # 0 = Segunda a 6 = domingo
     if dia_semana in [0, 1, 2, 3, 4]:
@@ -127,10 +129,14 @@ def manda_mensagens():
 
     aulas = utils.tempo_para_aula(aulas_dia)
 
+    print(f"Aulas: {aulas}")
+
     for aula in aulas:
         for turma in aulas[aula]:
             # Pega os alunos desta aula
             alunos = utils.alunos_para_avisar(turma[2])
+
+            print(f"Alunos: {alunos}")
 
             # Dados de cada aluno
             for aluno in alunos:
@@ -150,9 +156,12 @@ def manda_mensagens():
 
 def inicia_app():
 
+    '''
     prepara_dia()
 
     manda_mensagens()
+    
+    '''
 
     computa_faltas()
 
@@ -2596,6 +2605,10 @@ show_frame(pagina_inicial)
 def run():
     janela.mainloop()
 
+
+def inicia():
+    prepara_dia()
+    inicia_reconhecimento()
 # Inicia as schedules
 
 
@@ -2609,4 +2622,5 @@ if __name__ == "__main__":
     # Multiprocessamento
     with concurrent.futures.ProcessPoolExecutor() as executor:
         codigo_janela = executor.submit(run)
+        codigo_rodar = executor.submit(inicia)
         codigo_dia_semana = executor.submit(run_schedules)
