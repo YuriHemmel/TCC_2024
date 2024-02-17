@@ -108,7 +108,7 @@ def adiciona_fotos_alunos(aulas_dia, dia):
 
             cursor.execute(
                 f"""
-                     SELECT al.ra, al.foto FROM alunos al LEFT JOIN aulas au ON al.turma_id = au.turma_id 
+                     SELECT DISTINCT al.ra, al.foto FROM alunos al LEFT JOIN aulas au ON al.turma_id = au.turma_id 
                      WHERE au.turma_id = "{aula[2]}" AND au.dia = "{dia_semana[dia]}"; 
                 """
             )
@@ -120,7 +120,7 @@ def adiciona_fotos_alunos(aulas_dia, dia):
 
                 # Adiciona os alunos na tabela de presença do dia
                 cursor.execute(
-                    f"""INSERT INTO presenca (ra) VALUES ("{ra}") """)
+                    f"""INSERT INTO presenca (id_aula, ra) VALUES ("{aula[0]}", "{ra}") """)
 
                 path_foto = f"{path}/{ra}.jpeg"
                 print(path_foto)
@@ -128,7 +128,6 @@ def adiciona_fotos_alunos(aulas_dia, dia):
                 img = recupera_imagem_aluno(foto[1])
                 img = cv.imdecode(img, cv.IMREAD_COLOR)
                 cv.imwrite(path_foto, img)
-#                aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
 # ============================== Funções de Tabelas =========================================
 # --------------------------------- Tabela cursos -------------------------------------------
@@ -531,76 +530,97 @@ def reseta_presenca_dia():
 # Confere tempo de aula do aluno
 
 
-def confere_presenca(aula, dia):
+def confere_presenca(aulas_dia):
+
     # aula[0] = id da aula
     # aula[1] = horário da aula
     # aula[2] = turma que tem esta aula
 
-    conexao = sqlite3.connect("banco.db")
-    cursor = conexao.cursor()
-    with conexao:
+    for aula in aulas_dia:
 
-        cursor.execute("""SELECT * FROM presenca""")
+        conexao = sqlite3.connect("banco.db")
+        cursor = conexao.cursor()
+        with conexao:
 
-        alunos = cursor.fetchall()
+            cursor.execute(f"""SELECT * FROM presenca WHERE id_aula = "{aula[0]}" """)
 
-        for aluno in alunos:
-            if aluno[3] == None:
-                update_faltas(aluno[1], dia, aula[2], conexao)
-            else:
-                hora_inicio_aula = datetime.strptime(f"{aula[1]}", "%H:%M")
+            alunos = cursor.fetchall()
 
-                hora_fim_aula = hora_inicio_aula + \
-                    timedelta(hours=1, minutes=15)
-
-                entrada = datetime.strptime(f"{aluno[2]}", "%H:%M")
-
-                saida = datetime.strptime(f"{aluno[3]}", "%H:%M")
-
-                if hora_inicio_aula > entrada:
-                    if hora_fim_aula > saida:
-                        tempo = saida - hora_inicio_aula
-                    elif saida > hora_fim_aula and saida <= (hora_fim_aula + timedelta(minutes=20)):
-                        tempo = hora_fim_aula - hora_inicio_aula
-                    elif saida > (hora_fim_aula + timedelta(minutes=20)):
-                        update_faltas(aluno[1], dia, aula[2], conexao)
-
+            for aluno in alunos:
+                if aluno[3] == None:
+                    update_faltas(aluno[2], aula[0], conexao)
+                elif aluno[4] == None:
+                    update_faltas(aluno[2], aula[0], conexao)
                 else:
-                    if hora_fim_aula > saida:
-                        tempo = saida - entrada
+                    hora_inicio_aula = datetime.strptime(f"{aula[1]}", "%H:%M")
+
+                    hora_fim_aula = hora_inicio_aula + timedelta(hours=1, minutes=15)
+
+                    entrada = datetime.strptime(f"{aluno[3]}", "%H:%M")
+
+                    saida = datetime.strptime(f"{aluno[4]}", "%H:%M")
+
+                    if hora_inicio_aula > entrada:
+                        if hora_fim_aula > saida:
+                            tempo = saida - hora_inicio_aula
+                        elif saida > hora_fim_aula and saida <= (hora_fim_aula + timedelta(minutes=20)):
+                            tempo = hora_fim_aula - hora_inicio_aula
+                        elif saida > (hora_fim_aula + timedelta(minutes=20)):
+                            update_faltas(aluno[2], aula[0], conexao)
+
                     else:
-                        tempo = hora_fim_aula - entrada
+                        if hora_fim_aula > saida:
+                            tempo = saida - entrada
+                        else:
+                            tempo = hora_fim_aula - entrada
 
-                if tempo < timedelta(minutes=2):
-                    update_faltas(aluno[1], dia, aula[2], conexao)
-                elif tempo >= timedelta(minutes=2):
-                    continue
+                    if tempo < timedelta(minutes=2):
+                        update_faltas(aluno[2], aula[0], conexao)
+                    elif tempo >= timedelta(minutes=2):
+                        continue
 
-        cursor.close()
+            cursor.close()
 
 # Atualiza o quadro de faltas de cada aula
 
 
-def update_faltas(ra, dia, turma, conexao):
+def update_faltas(ra, id_aula, conexao):
 
     cursor = conexao.cursor()
     with conexao:
+        cursor.execute(f""" SELECT f.id FROM faltas f
+                       JOIN alunos al ON f.ra = al.ra
+                       JOIN aulas au ON f.id_aula = au.id
+                       WHERE au.id = "{id_aula}" AND al.ra = "{ra}"
+                       """)
+        
+        id_falta = cursor.fetchone()
+
+        cursor.execute(f""" UPDATE faltas SET falta = falta + 1 WHERE id = "{id_falta[0]}" """)
+
+        cursor.execute(f"""SELECT nome, email from alunos WHERE ra = "{ra}" """)
+        aluno = cursor.fetchone()
+
+        # Envia email para os alunos que receberam falta
+        email_utils.envia_email_acusando_falta(aluno=aluno[0], ID=ra, destinatario=aluno[1])
+
+        '''
         cursor.execute(f"""SELECT f.id FROM faltas f
                        JOIN alunos al ON f.ra = al.ra
                        JOIN aulas au ON f.id_aula = au.id
                        WHERE al.turma_id = "{turma}" AND au.dia = "{dia_semana[dia]}" """)
+
         id = cursor.fetchall()
         for id_aula in id:
             cursor.execute(f"""UPDATE faltas SET falta = falta + 1 WHERE ra = "{ra}"
                                 AND id = "{id_aula[0]}"
                                 """)
-            cursor.execute(
-                f"""SELECT nome, email from alunos WHERE ra = "{ra}" """)
+            cursor.execute(f"""SELECT nome, email from alunos WHERE ra = "{ra}" """)
             aluno = cursor.fetchone()
 
             # Envia email para os alunos que receberam falta
-            email_utils.envia_email_acusando_falta(
-                aluno=aluno[0], ID=ra, destinatario=aluno[1])
+            email_utils.envia_email_acusando_falta(aluno=aluno[0], ID=ra, destinatario=aluno[1])
+        '''
 
     cursor.close()
 

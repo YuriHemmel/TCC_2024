@@ -85,15 +85,16 @@ global aulas_dia
 aulas_dia = []
 
 # Arruma o banco e salva as turmas que terão aula no dia e seus respectivos horários
+
+
 def prepara_dia():
     global aulas_dia
 
     current_time = datetime.now()
 
     # Verifica se hoje é dia de semana ou fim de semana
-    #dia_semana = current_time.weekday()
+    dia_semana = current_time.weekday()
     dia_semana = 4
-
     if dia_semana in [0, 1, 2, 3, 4]:
         # Aulas do dia
         aulas_dia = utils.verifica_aula_dia(dia_semana)
@@ -103,6 +104,7 @@ def prepara_dia():
             print('Não há nenhum aluno ou aula para este dia letivo.')
         else:
             print("Preparação de aulas do dia concluida")
+            inicia_reconhecimento()
 
 
 # Computa as faltas do dia
@@ -110,14 +112,13 @@ def computa_faltas():
     current_time = datetime.now()
 
     # Verifica se hoje é dia de semana ou fim de semana
-    #dia_semana = current_time.weekday()
+    dia_semana = current_time.weekday()
     dia_semana = 4
-    
     # 0 = Segunda a 6 = domingo
     if dia_semana in [0, 1, 2, 3, 4]:
+
         # Turma é Terceiro elemento do "aulas_dia"
-        for aula in aulas_dia:
-            utils.confere_presenca(aula, dia_semana)
+        utils.confere_presenca(aulas_dia)
         utils.reseta_presenca_dia()
         print("Faltas computadas")
 
@@ -156,12 +157,9 @@ def manda_mensagens():
 
 def inicia_app():
 
-    '''
     prepara_dia()
 
     manda_mensagens()
-    
-    '''
 
     computa_faltas()
 
@@ -173,7 +171,9 @@ def sair():
 
 # ========================= Schedules ================================
 
-schedule.every().minute.at(":00").do(manda_mensagens)
+
+# schedule.every().minute.at(":00").do(manda_mensagens)
+schedule.every(40).minutes.do(manda_mensagens)
 schedule.every().day.at("00:00").do(prepara_dia)
 schedule.every().day.at("23:59").do(computa_faltas)
 
@@ -447,7 +447,7 @@ def alunos():
 
             alunos()
 
-        except: 
+        except:
             messagebox.showerror("Erro", "RA já cadastrado")
 
     # Carrega informações do aluno
@@ -489,7 +489,8 @@ def alunos():
             aluno_foto = aluno_foto.resize((130, 150))
             aluno_foto = ImageTk.PhotoImage(aluno_foto)
 
-            label_foto = CTkLabel(frame_foto, text="", image=aluno_foto, fg_color='transparent')
+            label_foto = CTkLabel(frame_foto, text="",
+                                  image=aluno_foto, fg_color='transparent')
             label_foto.grid(row=0, column=0, sticky='nsew', rowspan=5)
 
             botao_undo.destroy()
@@ -2606,11 +2607,14 @@ def run():
     janela.mainloop()
 
 
+'''
 def inicia():
     prepara_dia()
     inicia_reconhecimento()
-# Inicia as schedules
+'''
 
+
+# Inicia as schedules
 
 def run_schedules():
     while True:
@@ -2622,5 +2626,5 @@ if __name__ == "__main__":
     # Multiprocessamento
     with concurrent.futures.ProcessPoolExecutor() as executor:
         codigo_janela = executor.submit(run)
-        codigo_rodar = executor.submit(inicia)
+        # codigo_rodar = executor.submit(inicia)
         codigo_dia_semana = executor.submit(run_schedules)
