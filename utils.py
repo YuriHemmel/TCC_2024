@@ -294,8 +294,7 @@ def cria_curso(lista):
     with conexao:
         cursor = conexao.cursor()
 
-        cursor.execute(
-            f"""INSERT INTO cursos (nome, duracao) VALUES ("{lista[0]}", "{lista[1]}") """)
+        cursor.execute(f"""INSERT INTO cursos (nome, duracao) VALUES ("{lista[0]}", "{lista[1]}") """)
 
 # Mostra os cursos
 

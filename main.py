@@ -83,11 +83,6 @@ pagina_cadastro.grid(row=1, column=0, sticky='nsew', columnspan=5, rowspan=3)
 # Cria o banco de dados se não existir ainda
 db = Banco.Banco()
 
-# Janela para abrir o relatório
-global janela_relatorio
-
-janela_relatorio = None
-
 # Aulas do dia
 global aulas_dia
 
@@ -194,8 +189,6 @@ schedule.every().day.at("23:59").do(computa_faltas)
 # ------------------------------------------- Funções --------------------------------------------------------
 
 # Mostra os frames
-
-
 def show_frame(frame):
     frame.tkraise()
 
@@ -210,6 +203,10 @@ def troca_titulo(texto, nome_img):
 
     label_titulo.configure(text=texto, image=img)
 
+global janela_relatorio
+
+janela_relatorio = CTkToplevel()
+janela_relatorio.destroy()
 
 # ================================================== Cabeçalho ========================================================
 # --------------------------------------------------- Imagens --------------------------------------------------------
@@ -2577,7 +2574,7 @@ def relatorio():
     global janela_relatorio
     # ---------------------------------------- Configuração da pagina --------------------------------------------------------
 
-    if janela_relatorio == None:
+    if janela_relatorio is None or not janela_relatorio.winfo_exists():
 
         janela_relatorio = CTkToplevel()
         janela_relatorio.title("Sistema de chamada")
@@ -2591,13 +2588,14 @@ def relatorio():
         janela_relatorio.grid_rowconfigure(4, weight=1)
         janela_relatorio.grid_rowconfigure(8, weight=1)
 
+        janela_relatorio.focus()
 
     else:
         janela_relatorio.focus()
 
-    # ------------------------------------------------- Detalhes da Camera ---------------------------------------------------
+    # ------------------------------------------------- Detalhes da janela Relatório ---------------------------------------------------
 
-    # Label e entry do Nome da camera
+    # Label e entry do relatorio de aulas
     label_aula = CTkLabel(janela_relatorio, text="Relatório de aulas",
                           anchor=NW, font=FONTE, fg_color='transparent')
     label_aula.grid(row=1, column=1, sticky='ew', padx=10, pady=(10, 5))
@@ -2606,7 +2604,7 @@ def relatorio():
         janela_relatorio, placeholder_text='Nome da aula')
     entry_aula.grid(row=2, column=1, sticky='ew', padx=10, pady=(0, 5))
 
-    # Label e entry do Nome da camera
+    # Label e entry do relatorio de alunos
     label_aula = CTkLabel(janela_relatorio, text="Relatório de alunos",
                           anchor=NW, font=FONTE, fg_color='transparent')
     label_aula.grid(row=5, column=1, sticky='ew', padx=10, pady=(10, 5))
