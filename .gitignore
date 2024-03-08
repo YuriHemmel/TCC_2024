@@ -3,3 +3,6 @@ env
 .env
 .vscode
 banco.db
+TESTEPDF.py
+output.pdf
+top.py

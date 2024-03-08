@@ -22,6 +22,10 @@ from customtkinter import *
 WIDTH = 1050
 HEIGHT = 620
 
+# Tamanho da janela de relatório
+WIDTH_R = 350
+HEIGHT_R = 400
+
 # Cores
 AZUL_CLARO = "#075EBD"
 AZUL_ESCURO = "#023D71"
@@ -78,6 +82,11 @@ pagina_cadastro.grid(row=1, column=0, sticky='nsew', columnspan=5, rowspan=3)
 
 # Cria o banco de dados se não existir ainda
 db = Banco.Banco()
+
+# Janela para abrir o relatório
+global janela_relatorio
+
+janela_relatorio = None
 
 # Aulas do dia
 global aulas_dia
@@ -163,6 +172,11 @@ def inicia_app():
 
     computa_faltas()
 
+# Inicia relatorio
+'''
+def relatorio():
+    return
+'''
 # Fecha o aplicativo e seus subprocessos
 
 
@@ -232,6 +246,11 @@ img_iniciar = CTkImage(light_image=Image.open("images/icon_iniciar.png"),
                        size=(50, 50))
 
 # Imagem do botão de Sair
+img_relatorio = CTkImage(light_image=Image.open("images/icon_relatorio.png"),
+                         dark_image=Image.open("images/icon_relatorio.png"),
+                         size=(50, 50))
+
+# Imagem do botão de Sair
 img_sair = CTkImage(light_image=Image.open("images/icon_saida.png"),
                     dark_image=Image.open("images/icon_saida.png"),
                     size=(50, 50))
@@ -246,6 +265,7 @@ pagina_inicial.grid_rowconfigure(0, weight=1)
 pagina_inicial.grid_rowconfigure(2, weight=1)
 pagina_inicial.grid_rowconfigure(4, weight=1)
 pagina_inicial.grid_rowconfigure(6, weight=1)
+pagina_inicial.grid_rowconfigure(8, weight=1)
 
 # Tornar frame transparente
 pagina_inicial.configure(fg_color='transparent')
@@ -261,10 +281,15 @@ btn_inicia = CTkButton(pagina_inicial, text="Iniciar", command=inicia_app, image
                        corner_radius=45, width=250, height=60, compound=LEFT, font=FONTE_TITULO)
 btn_inicia.grid(row=3, column=1, sticky="ew")
 
+# Botão de Relatório
+btn_relatorio = CTkButton(pagina_inicial, text="Relatório", command=lambda:relatorio(), image=img_relatorio,
+                          corner_radius=45, width=250, height=60, compound=LEFT, font=FONTE_TITULO)
+btn_relatorio.grid(row=5, column=1, sticky="ew")
+
 # Botão de Sair
 btn_sair = CTkButton(pagina_inicial, text="Sair", command=sair, image=img_sair,
                      corner_radius=45, width=250, height=60, compound=LEFT, font=FONTE_TITULO)
-btn_sair.grid(row=5, column=1, sticky="ew")
+btn_sair.grid(row=7, column=1, sticky="ew")
 
 # ================================================== Página de Cadastro ========================================================
 # --------------------------------------------------- Imagens --------------------------------------------------------
@@ -364,7 +389,7 @@ pagina_cadastro.grid_columnconfigure(5, weight=1)
 pagina_cadastro.configure(fg_color='transparent')
 
 # ---------------------------------------- Alunos ---------------------------------------------------------------
-# Função de cadastro de alunos
+# Função de cadastro de Alunos
 
 
 def alunos():
@@ -984,7 +1009,7 @@ def alunos():
     mostra_alunos()
 
 # ---------------------------------------- Cursos/Turmas --------------------------------------------------------
-# Função de cadastro de alunos
+# Função de cadastro de Cursos e Turmas
 
 
 def cursos_turmas():
@@ -1521,7 +1546,7 @@ def cursos_turmas():
     mostra_turmas()
 
 # ---------------------------------------- Aulas ----------------------------------------------------------------
-# Função de cadastro de alunos
+# Função de cadastro de Aulas
 
 
 def aulas():
@@ -1991,7 +2016,7 @@ def aulas():
     mostra_aula()
 
 # ---------------------------------------- Faltas ---------------------------------------------------------------
-# Função de cadastro de alunos
+# Função da tabela de Faltas
 
 
 def faltas():
@@ -2113,8 +2138,9 @@ def faltas():
             tree_faltas.insert('', 'end', values=item)
 
     mostra_falta("")
+
 # ---------------------------------------- Câmeras --------------------------------------------------------------
-# Função de cadastro de alunos
+# Função de cadastro de Câmeras
 
 
 def cameras():
@@ -2543,6 +2569,65 @@ def cameras():
 
     mostra_camera()
 
+# ---------------------------------------- Relatório --------------------------------------------------------------
+# Função do Relatório
+
+
+def relatorio():
+    global janela_relatorio
+    # ---------------------------------------- Configuração da pagina --------------------------------------------------------
+
+    if janela_relatorio == None:
+
+        janela_relatorio = CTkToplevel()
+        janela_relatorio.title("Sistema de chamada")
+        janela_relatorio.geometry(f"{WIDTH_R}x{HEIGHT_R}")
+        janela_relatorio.minsize(width=WIDTH_R, height=HEIGHT_R)
+
+        janela_relatorio.grid_columnconfigure(0, weight=1)
+        janela_relatorio.grid_columnconfigure(2, weight=1)
+
+        janela_relatorio.grid_rowconfigure(0, weight=1)
+        janela_relatorio.grid_rowconfigure(4, weight=1)
+        janela_relatorio.grid_rowconfigure(8, weight=1)
+
+
+    else:
+        janela_relatorio.focus()
+
+    # ------------------------------------------------- Detalhes da Camera ---------------------------------------------------
+
+    # Label e entry do Nome da camera
+    label_aula = CTkLabel(janela_relatorio, text="Relatório de aulas",
+                          anchor=NW, font=FONTE, fg_color='transparent')
+    label_aula.grid(row=1, column=1, sticky='ew', padx=10, pady=(10, 5))
+
+    entry_aula = CTkEntry(
+        janela_relatorio, placeholder_text='Nome da aula')
+    entry_aula.grid(row=2, column=1, sticky='ew', padx=10, pady=(0, 5))
+
+    # Label e entry do Nome da camera
+    label_aula = CTkLabel(janela_relatorio, text="Relatório de alunos",
+                          anchor=NW, font=FONTE, fg_color='transparent')
+    label_aula.grid(row=5, column=1, sticky='ew', padx=10, pady=(10, 5))
+
+    entry_aluno = CTkEntry(
+        janela_relatorio, placeholder_text='Nome do aluno')
+    entry_aluno.grid(row=6, column=1, sticky='ew', padx=10, pady=(0, 5))
+
+    # ------------------------------------ Botões ---------------------------------
+
+    # Botão gerar relatório de aulas
+    botao_aula = CTkButton(janela_relatorio, command=lambda:utils.gera_relatorio_aula(entry_aula.get()), anchor=CENTER, text='Gerar relatório'.upper(),
+                           font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_aula.grid(row=3, column=1, sticky='ew',
+                    padx=(10, 5), pady=(10, 5))
+
+    # Botão gerar relatório de alunos
+    botao_aluno = CTkButton(janela_relatorio, command=lambda:utils.gera_relatorio_aluno(entry_aluno.get()), anchor=CENTER, text='Gerar relatório'.upper(),
+                            font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
+    botao_aluno.grid(row=7, column=1, sticky='ew', padx=(0, 5), pady=(10, 5))
+
 # ---------------------------------------- Ir e voltar da Página Inicial --------------------------------------------------------------
 
 
@@ -2564,7 +2649,6 @@ def voltar():
     show_frame(pagina_inicial)
 
 # ---------------------------------------- Troca de janelas --------------------------------------------------------------
-
 # Função de troca de janelas
 
 
@@ -2591,8 +2675,8 @@ def controle(comando_botao):
     if comando_botao == 'cameras':
         cameras()
 
-
 # ---------------------------------------- Métodos de inicialização --------------------------------------------------------
+
 
 # Fecha processos no "X" da janela
 janela.protocol("WM_DELETE_WINDOW", sair)
@@ -2613,8 +2697,8 @@ def inicia():
     inicia_reconhecimento()
 '''
 
-
 # Inicia as schedules
+
 
 def run_schedules():
     while True:

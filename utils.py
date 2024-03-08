@@ -8,6 +8,8 @@ from PIL import Image
 import numpy
 import email_utils
 from customtkinter import CTkImage
+import aspose.pdf as pdf
+from tkinter import messagebox
 
 global dia_semana
 
@@ -128,6 +130,157 @@ def adiciona_fotos_alunos(aulas_dia, dia):
                 img = recupera_imagem_aluno(foto[1])
                 img = cv.imdecode(img, cv.IMREAD_COLOR)
                 cv.imwrite(path_foto, img)
+
+# ============================== Funções do Relatório =========================================
+
+
+def gera_relatorio_aula(nome):
+    try:
+
+        nome = nome.lower()
+        
+        # Inicializar objeto de documento
+        document = pdf.Document()
+
+        page_info = document.page_info
+        margin_info = page_info.margin
+
+        margin_info.left = 37
+        margin_info.right = 37
+        margin_info.top = 37
+        margin_info.bottom = 37
+
+        # Adicionar Página
+        page = document.pages.add()
+
+        # Adiciona texto antes da tabela
+        page.paragraphs.add(pdf.text.TextFragment(f"Relação de faltas de {nome}"))
+
+        # Adicionar Tabela
+        table = pdf.Table()
+
+        table.column_widths = "60 100 60 100 60"
+        # table.alignment = table.alignment.CENTER
+
+        table.default_cell_border = pdf.BorderInfo(
+            pdf.BorderSide.ALL, 1.0, pdf.Color.black)
+
+        # Criando conexão com o banco de dados
+        conexao = sqlite3.connect('banco.db')
+
+        # Dados dos alunos de determinada aula
+        with conexao:
+            cursor = conexao.cursor()
+            cursor.execute(f"""SELECT al.ra, al.nome, al.turma_id, au.nome, f.falta
+                            FROM faltas f
+                            JOIN alunos al ON al.ra = f.ra
+                            JOIN aulas au ON au.id = f.id_aula
+                            WHERE LOWER(au.nome) = "{nome}"
+                            """)
+
+            results = cursor.fetchall()
+            cursor.close()
+
+        row = table.rows.add()
+
+        row.cells.add("RA")
+        row.cells.add("Nome")
+        row.cells.add("Turma")
+        row.cells.add("Aula")
+        row.cells.add("N° Faltas")
+
+        # Adicionando na tabela
+        for aluno in results:
+            
+            # Add a row to the table
+            row = table.rows.add()
+
+            for i in range(5):
+                # Add table cells
+                row.cells.add(str(aluno[i]))
+
+        # Add table to the target page
+        page.paragraphs.add(table)
+
+        # Salvar PDF atualizado
+        document.save(f"Relatorio_aula_{nome}.pdf")
+    except:
+            messagebox.showerror("Erro", "Aluno não encontrado.")
+
+def gera_relatorio_aluno(ra):
+    try:
+        ra = ra.upper()
+
+        # Inicializar objeto de documento
+        document = pdf.Document()
+
+        page_info = document.page_info
+        margin_info = page_info.margin
+
+        margin_info.left = 37
+        margin_info.right = 37
+        margin_info.top = 37
+        margin_info.bottom = 37
+
+        # Adicionar Página
+        page = document.pages.add()
+
+        # Adiciona texto antes da tabela
+        page.paragraphs.add(pdf.text.TextFragment(f"Relação de faltas de {ra}"))
+
+        # Adicionar Tabela
+        table = pdf.Table()
+
+        table.column_widths = "60 100 60 100 60"
+        # table.alignment = table.alignment.CENTER
+
+        table.default_cell_border = pdf.BorderInfo(
+            pdf.BorderSide.ALL, 1.0, pdf.Color.black)
+
+        # Criando conexão com o banco de dados
+        conexao = sqlite3.connect('banco.db')
+
+        # Dados dos alunos de determinada aula
+        with conexao:
+            cursor = conexao.cursor()
+            cursor.execute(f"""SELECT al.ra, al.nome, al.turma_id, au.nome, f.falta
+                            FROM faltas f
+                            JOIN alunos al ON al.ra = f.ra
+                            JOIN aulas au ON au.id = f.id_aula
+                            WHERE UPPER(al.ra) = "{ra}"
+                            """)
+
+            results = cursor.fetchall()
+            cursor.close()
+
+        print(results)
+            
+
+        row = table.rows.add()
+
+        row.cells.add("RA")
+        row.cells.add("Nome")
+        row.cells.add("Turma")
+        row.cells.add("Aula")
+        row.cells.add("N° Faltas")
+
+        # Adicionando na tabela
+        for aluno in results:
+            
+            # Add a row to the table
+            row = table.rows.add()
+
+            for i in range(5):
+                # Add table cells
+                row.cells.add(str(aluno[i]))
+
+        # Add table to the target page
+        page.paragraphs.add(table)
+
+        # Salvar PDF atualizado
+        document.save(f"Relatorio_aluno_{ra}.pdf")
+    except:
+        messagebox.showerror("Erro", "Aluno não encontrado.")
 
 # ============================== Funções de Tabelas =========================================
 # --------------------------------- Tabela cursos -------------------------------------------
@@ -356,6 +509,8 @@ def tempo_para_aula(aulas):
     return todas_aulas
 
 # Verifica última aula criada
+
+
 def ultima_aula_criada():
     conexao = sqlite3.connect("banco.db")
 
@@ -542,7 +697,8 @@ def confere_presenca(aulas_dia):
         cursor = conexao.cursor()
         with conexao:
 
-            cursor.execute(f"""SELECT * FROM presenca WHERE id_aula = "{aula[0]}" """)
+            cursor.execute(
+                f"""SELECT * FROM presenca WHERE id_aula = "{aula[0]}" """)
 
             alunos = cursor.fetchall()
 
@@ -554,13 +710,16 @@ def confere_presenca(aulas_dia):
                 else:
                     hora_inicio_aula = datetime.strptime(f"{aula[1]}", "%H:%M")
 
-                    hora_fim_aula = hora_inicio_aula + timedelta(hours=1, minutes=15)
+                    hora_fim_aula = hora_inicio_aula + \
+                        timedelta(hours=1, minutes=15)
 
                     entrada = datetime.strptime(f"{aluno[3]}", "%H:%M")
 
                     saida = datetime.strptime(f"{aluno[4]}", "%H:%M")
 
+                    # Se Aluno chegou antes do início da aula
                     if hora_inicio_aula > entrada:
+                        # Se Aluno saiu antes do final da aula
                         if hora_fim_aula > saida:
                             tempo = saida - hora_inicio_aula
                         elif saida > hora_fim_aula and saida <= (hora_fim_aula + timedelta(minutes=20)):
@@ -568,11 +727,15 @@ def confere_presenca(aulas_dia):
                         elif saida > (hora_fim_aula + timedelta(minutes=20)):
                             update_faltas(aluno[2], aula[0], conexao)
 
+                    # Se Aluno chegou depois do início da aula
                     else:
+                        # Se Aluno saiu antes do final da aula
                         if hora_fim_aula > saida:
                             tempo = saida - entrada
-                        else:
-                            tempo = hora_fim_aula - entrada
+                        elif saida > hora_fim_aula and saida <= (hora_fim_aula + timedelta(minutes=20)):
+                            tempo = hora_fim_aula - hora_inicio_aula
+                        elif saida > (hora_fim_aula + timedelta(minutes=20)):
+                            update_faltas(aluno[2], aula[0], conexao)
 
                     if tempo < timedelta(minutes=2):
                         update_faltas(aluno[2], aula[0], conexao)
@@ -593,16 +756,19 @@ def update_faltas(ra, id_aula, conexao):
                        JOIN aulas au ON f.id_aula = au.id
                        WHERE au.id = "{id_aula}" AND al.ra = "{ra}"
                        """)
-        
+
         id_falta = cursor.fetchone()
 
-        cursor.execute(f""" UPDATE faltas SET falta = falta + 1 WHERE id = "{id_falta[0]}" """)
+        cursor.execute(
+            f""" UPDATE faltas SET falta = falta + 1 WHERE id = "{id_falta[0]}" """)
 
-        cursor.execute(f"""SELECT nome, email from alunos WHERE ra = "{ra}" """)
+        cursor.execute(
+            f"""SELECT nome, email from alunos WHERE ra = "{ra}" """)
         aluno = cursor.fetchone()
 
         # Envia email para os alunos que receberam falta
-        email_utils.envia_email_acusando_falta(aluno=aluno[0], ID=ra, destinatario=aluno[1])
+        email_utils.envia_email_acusando_falta(
+            aluno=aluno[0], ID=ra, destinatario=aluno[1])
 
         '''
         cursor.execute(f"""SELECT f.id FROM faltas f
