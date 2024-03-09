@@ -7,5 +7,6 @@
 [ ] continuar texto explicando o Aspose.pdf
 [ ] revisar dados e codigo para otimizar a performance no raspberry pi (rever loops desnecessarios, codigos repetidos, ou que tenham complexidade maior que a necessaria (nota: pode ter sido algo assim que quebrou a execução na apresentação passada))
 [ ] atualmente conseguimos coletar mais do que uma fonte de dados para camera? ou apenas uma? ver quanto ao famoso (e quebrador de coluna) multiprocessamento
+[ ] criar um README.md que explique que problema o projeto se propoe a resolver e como utilizar
 
 mais tarefas podem ser adicionadas em breve
