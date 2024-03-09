@@ -357,7 +357,7 @@ btn_camera = CTkButton(frame_abas, text="Câmeras", image=img_cameras, command=l
 btn_camera.pack(after=btn_faltas, side=LEFT, expand=True,
                 fill=X, padx=(20, 0), pady=(0, 5))
 
-btn_voltar = CTkButton(frame_abas, text="Alunos", image=img_voltar, command=lambda: voltar(),
+btn_voltar = CTkButton(frame_abas, text="Voltar", image=img_voltar, command=lambda: voltar(),
                        corner_radius=45, width=50, height=30, compound=LEFT, font=FONTE_BOTAO)
 btn_voltar.pack(after=btn_camera, side=LEFT, expand=True,
                 fill=X, padx=(20, 20), pady=(0, 5))
@@ -2610,7 +2610,7 @@ def relatorio():
     label_aula.grid(row=5, column=1, sticky='ew', padx=10, pady=(10, 5))
 
     entry_aluno = CTkEntry(
-        janela_relatorio, placeholder_text='Nome do aluno')
+        janela_relatorio, placeholder_text='RA do aluno')
     entry_aluno.grid(row=6, column=1, sticky='ew', padx=10, pady=(0, 5))
 
     # ------------------------------------ Botões ---------------------------------
