@@ -117,6 +117,12 @@ def adiciona_fotos_alunos(aulas_dia, dia):
 
             fotos = cursor.fetchall()
             path = 'imagensAlunos'
+
+            # verifica se a pasta 'imagensAlunos/' existe, caso contrario cria ela
+
+            if not os.path.isdir(path):
+                os.mkdir(path)
+
             for foto in fotos:
                 ra = foto[0]
 
