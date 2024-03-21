@@ -27,17 +27,20 @@ WIDTH_R = 350
 HEIGHT_R = 400
 
 # Cores
-AZUL_CLARO = "#075EBD"
-AZUL_ESCURO = "#023D71"
+AZUL_CLARO = "#0A6ABF"
+AZUL_ESCURO = "#034873"
+AMARELO = "#F2CB05"
 PRETO = "#000000"
 BRANCO = "#FFFFFF"
-VERDE = "#66C475"
-VERDE_ESCURO = "#539E5E"
-VERMELHO = "#FF5961"
+BRANCO_ESCURO = "#F2F2F2"
+VERDE = "#2D8A3C"
+VERDE_ESCURO = "#1F723D"
+VERMELHO = "#D93654"
 VERMELHO_ESCURO = "#B74046"
 
 # FONTEs
 FONTE = ("Ivy", 16)
+FONTE_MENU = ("Ivy", 35, 'bold')
 FONTE_TITULO = ("Ivy", 20, 'bold')
 FONTE_BOTAO = ("Ivy", 13, 'bold')
 
@@ -54,7 +57,7 @@ janela.title("Sistema de chamada")
 janela.geometry(f"{WIDTH}x{HEIGHT}")
 janela.minsize(width=WIDTH, height=HEIGHT)
 
-set_appearance_mode("Dark")
+set_appearance_mode("dark")
 
 janela.grid_columnconfigure(0, weight=1)
 janela.grid_columnconfigure(2, weight=1)
@@ -167,6 +170,7 @@ def inicia_app():
 
     computa_faltas()
 
+
 # Inicia relatorio
 '''
 def relatorio():
@@ -189,6 +193,8 @@ schedule.every().day.at("23:59").do(computa_faltas)
 # ------------------------------------------- Funções --------------------------------------------------------
 
 # Mostra os frames
+
+
 def show_frame(frame):
     frame.tkraise()
 
@@ -202,6 +208,7 @@ def troca_titulo(texto, nome_img):
                    size=(40, 40))
 
     label_titulo.configure(text=texto, image=img)
+
 
 global janela_relatorio
 
@@ -226,7 +233,7 @@ frame_titulo = CTkFrame(janela, fg_color=AZUL_CLARO, corner_radius=0)
 frame_titulo.grid(row=0, column=0, sticky="ew", columnspan=3)
 
 label_titulo = CTkLabel(frame_titulo, text="  Menu Inicial", fg_color="transparent",
-                        compound=LEFT, anchor=W, font=FONTE_TITULO, image=img_titulo)
+                        compound=LEFT, anchor=W, font=FONTE_TITULO, image=img_titulo, text_color=BRANCO)
 label_titulo.grid(row=0, column=0, padx=20, pady=5, sticky="ew")
 
 # ================================================== Página Inicial ========================================================
@@ -255,14 +262,11 @@ img_sair = CTkImage(light_image=Image.open("images/icon_saida.png"),
 # ---------------------------------------- Configuração de Janela / Grid --------------------------------------------------------
 # Colunas
 pagina_inicial.grid_columnconfigure(0, weight=1)
-pagina_inicial.grid_columnconfigure(2, weight=1)
+pagina_inicial.grid_columnconfigure(1, weight=1)
 
 # Linhas
 pagina_inicial.grid_rowconfigure(0, weight=1)
-pagina_inicial.grid_rowconfigure(2, weight=1)
-pagina_inicial.grid_rowconfigure(4, weight=1)
-pagina_inicial.grid_rowconfigure(6, weight=1)
-pagina_inicial.grid_rowconfigure(8, weight=1)
+pagina_inicial.grid_rowconfigure(1, weight=1)
 
 # Tornar frame transparente
 pagina_inicial.configure(fg_color='transparent')
@@ -270,23 +274,23 @@ pagina_inicial.configure(fg_color='transparent')
 # ---------------------------------------- Botões --------------------------------------------------------
 # Botão de Cadastro
 btn_cadastro = CTkButton(pagina_inicial, text="Cadastro", command=lambda: direciona_cadastro(), image=img_cadastro,
-                         corner_radius=45, width=250, height=60, compound=LEFT, font=FONTE_TITULO)
-btn_cadastro.grid(row=1, column=1, sticky="ew")
+                         corner_radius=45, compound=LEFT, font=FONTE_MENU, fg_color=AZUL_CLARO, hover_color=AZUL_ESCURO)
+btn_cadastro.grid(row=0, column=0, sticky="nsew", padx=(15, 5), pady=(15, 5))
 
 # Botão de Iniciar
 btn_inicia = CTkButton(pagina_inicial, text="Iniciar", command=inicia_app, image=img_iniciar,
-                       corner_radius=45, width=250, height=60, compound=LEFT, font=FONTE_TITULO)
-btn_inicia.grid(row=3, column=1, sticky="ew")
+                       corner_radius=45, compound=LEFT, font=FONTE_MENU, fg_color=AZUL_CLARO, hover_color=AZUL_ESCURO)
+btn_inicia.grid(row=0, column=1, sticky="nsew", padx=(5, 15), pady=(15, 5))
 
 # Botão de Relatório
-btn_relatorio = CTkButton(pagina_inicial, text="Relatório", command=lambda:relatorio(), image=img_relatorio,
-                          corner_radius=45, width=250, height=60, compound=LEFT, font=FONTE_TITULO)
-btn_relatorio.grid(row=5, column=1, sticky="ew")
+btn_relatorio = CTkButton(pagina_inicial, text="Relatório", command=lambda: relatorio(), image=img_relatorio,
+                          corner_radius=45, compound=LEFT, font=FONTE_MENU, fg_color=AZUL_CLARO, hover_color=AZUL_ESCURO)
+btn_relatorio.grid(row=1, column=0, sticky="nsew", padx=(15, 5), pady=(5, 15))
 
 # Botão de Sair
 btn_sair = CTkButton(pagina_inicial, text="Sair", command=sair, image=img_sair,
-                     corner_radius=45, width=250, height=60, compound=LEFT, font=FONTE_TITULO)
-btn_sair.grid(row=7, column=1, sticky="ew")
+                     corner_radius=45, compound=LEFT, font=FONTE_MENU, fg_color=AZUL_CLARO, hover_color=AZUL_ESCURO)
+btn_sair.grid(row=1, column=1, sticky="nsew", padx=(5, 15), pady=(5, 15))
 
 # ================================================== Página de Cadastro ========================================================
 # --------------------------------------------------- Imagens --------------------------------------------------------
@@ -2616,13 +2620,13 @@ def relatorio():
     # ------------------------------------ Botões ---------------------------------
 
     # Botão gerar relatório de aulas
-    botao_aula = CTkButton(janela_relatorio, command=lambda:utils.gera_relatorio_aula(entry_aula.get()), anchor=CENTER, text='Gerar relatório'.upper(),
+    botao_aula = CTkButton(janela_relatorio, command=lambda: utils.gera_relatorio_aula(entry_aula.get()), anchor=CENTER, text='Gerar relatório'.upper(),
                            font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
     botao_aula.grid(row=3, column=1, sticky='ew',
                     padx=(10, 5), pady=(10, 5))
 
     # Botão gerar relatório de alunos
-    botao_aluno = CTkButton(janela_relatorio, command=lambda:utils.gera_relatorio_aluno(entry_aluno.get()), anchor=CENTER, text='Gerar relatório'.upper(),
+    botao_aluno = CTkButton(janela_relatorio, command=lambda: utils.gera_relatorio_aluno(entry_aluno.get()), anchor=CENTER, text='Gerar relatório'.upper(),
                             font=FONTE_BOTAO, fg_color='transparent', border_color=BRANCO, border_width=2, corner_radius=32)
     botao_aluno.grid(row=7, column=1, sticky='ew', padx=(0, 5), pady=(10, 5))
 
