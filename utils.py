@@ -143,7 +143,7 @@ def adiciona_fotos_alunos(aulas_dia, dia):
 def gera_relatorio_aula(nome):
     try:
 
-        nome = nome.lower()
+        nome = nome.lower().strip()
         
         # Inicializar objeto de documento
         document = pdf.Document()
@@ -215,7 +215,7 @@ def gera_relatorio_aula(nome):
 
 def gera_relatorio_aluno(ra):
     try:
-        ra = ra.upper()
+        ra = ra.upper().strip()
 
         # Inicializar objeto de documento
         document = pdf.Document()
