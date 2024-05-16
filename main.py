@@ -326,6 +326,11 @@ img_pesquisa = CTkImage(light_image=Image.open("images/icon_lupa_lightmode.png")
                         dark_image=Image.open("images/icon_lupa_darkmode.png"),
                         size=(25, 25))
 
+# Imagem atualiza pesquisa
+img_atualiza = CTkImage(light_image=Image.open("images/icon_atualiza.png"),
+                      dark_image=Image.open("images/icon_atualiza.png"),
+                      size=(25, 25))
+
 # ---------------------------------------- Frame das Abas --------------------------------------------------------
 
 # Frame das abas (Botões)
@@ -2096,7 +2101,7 @@ def faltas():
         row=1, column=4, sticky='ew', padx=(0, 5), pady=(0, 5))
 
     # Botão mostra tabela de faltas, sem pesquisa
-    botao_procurar_aula = CTkButton(pagina_cadastro, command=lambda: mostra_falta(""), text="CANCELAR\nPROCURA",
+    botao_procurar_aula = CTkButton(pagina_cadastro, command=lambda: mostra_falta(""), image=img_atualiza, text="", #"CANCELAR\nPROCURA",
                                     font=FONTE_BOTAO, fg_color=AZUL_CLARO, hover_color=AZUL_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
     botao_procurar_aula.grid(
         row=1, column=6, sticky='ew', padx=15, pady=(0, 5))
@@ -2265,7 +2270,7 @@ def cameras():
                 botao_undo.grid(row=3, column=5, sticky='ew',
                                 padx=(0, 5), pady=(0, 5))
 
-            botao_salvar = Button(pagina_cadastro, command=atualiza, anchor=CENTER, text="SALVAR\nALTERAÇÕES",
+            botao_salvar = CTkButton(pagina_cadastro, command=atualiza, anchor=CENTER, text="SALVAR\nALTERAÇÕES",
                                   font=FONTE_BOTAO, fg_color=VERDE, hover_color=VERDE_ESCURO, border_color=BRANCO, border_width=2, corner_radius=32)
             botao_salvar.grid(row=3, column=4, sticky='ew',
                               padx=(0, 5), pady=(0, 5))
